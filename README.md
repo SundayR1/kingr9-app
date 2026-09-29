@@ -12,7 +12,7 @@ Run `BUILD.bat`. The single-file build is written to `Release/SingleFile/KingR9T
 
 ## Download
 
-Download the `Portable.rar` asset from the repository's Releases page, extract the full archive, and run `KingR9Tools.exe` from the extracted folder.
+Download the `KingR9.rar` asset from the repository's Releases page, extract the full archive, and run `KingR9Tools.exe` from the extracted folder.
 
 ## Important
 
