@@ -246,7 +246,9 @@
   const statusText = document.getElementById('statusText');
 
   keyInput.addEventListener('input', function () {
-    let v = keyInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16);
+    const raw = keyInput.value.trim();
+    if (/^R9A1-[A-Za-z0-9_-]+$/.test(raw)) { keyInput.value = raw; return; }
+    let v = raw.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 16);
     let out = v.match(/.{1,4}/g);
     keyInput.value = out ? out.join('-') : v;
   });
@@ -296,7 +298,8 @@
 
   btn.addEventListener('click', function () {
     const key = keyInput.value.trim();
-    if (key.length < 19) { KR.toast('กรอก key ให้ครบ 16 ตัว (XXXX-XXXX-XXXX-XXXX)'); return; }
+    const isRecoveryKey = /^R9A1-[A-Za-z0-9_-]+$/.test(key);
+    if (!isRecoveryKey && key.length < 19) { KR.toast('กรอก key ให้ครบ 16 ตัว (XXXX-XXXX-XXXX-XXXX)'); return; }
     btn.classList.add('busy');
     btnText.textContent = 'Checking...';
     bar.style.width = '34%';

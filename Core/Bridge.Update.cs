@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -50,7 +50,7 @@ namespace KingR9Tools.Core
         }
 
         // ---------- AUTO UPDATE (à¸•à¸£à¸§à¸ˆà¹€à¸§à¸­à¸£à¹Œà¸Šà¸±à¸™à¸ˆà¸²à¸ server â†’ à¹‚à¸«à¸¥à¸” â†’ à¸ªà¸¥à¸±à¸šà¹„à¸Ÿà¸¥à¹Œ â†’ à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸­à¸‡) ----------
-        public static string AppVersion = "1.0.1";
+        public static string AppVersion = "1.0.2";
 
         private static bool VersionNewer(string remote, string local)
         {
@@ -228,7 +228,7 @@ namespace KingR9Tools.Core
             sha256 = (sha256 ?? "").Trim();
             notes = (notes ?? "").Trim();
             if (version.Length == 0 || !IsHttpsUrl(url) || !IsSha256(sha256))
-                return J(new { ok = false, msg = "à¸à¸£à¸­à¸ version (à¹€à¸Šà¹ˆà¸™ 1.0.1) à¹à¸¥à¸° URL à¹„à¸Ÿà¸¥à¹Œ exe à¹ƒà¸«à¹‰à¸–à¸¹à¸à¸•à¹‰à¸­à¸‡" });
+                return J(new { ok = false, msg = "à¸à¸£à¸­à¸ version (à¹€à¸Šà¹ˆà¸™ 1.0.2) à¹à¸¥à¸° URL à¹„à¸Ÿà¸¥à¹Œ exe à¹ƒà¸«à¹‰à¸–à¸¹à¸à¸•à¹‰à¸­à¸‡" });
             bool up = HttpPut(FirebaseUrl.TrimEnd('/') + "/appUpdate.json" + AuthQuery(),
                 JsonSerializer.Serialize(new { version, url, sha256 = sha256.ToUpperInvariant(), notes }));
             _log.Ok(up ? "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆà¸­à¸±à¸›à¹€à¸”à¸• v" + version + " à¹à¸¥à¹‰à¸§" : "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆà¸­à¸±à¸›à¹€à¸”à¸•à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§");

@@ -32,6 +32,15 @@ namespace KingR9Tools.Core
             Hello();
             try
             {
+                if (LicenseService.IsAdminRecoveryKey(key?.Trim()))
+                {
+                    _cfg.savedKey = key.Trim();
+                    _cfg.rememberKey = true;
+                    SaveCfg();
+                    _log.Ok("Admin recovery key activated.");
+                    return J(new { ok = true, msg = "Admin recovery key activated", days = 36500 });
+                }
+
                 string norm = LicenseService.Normalize(key);
                 if (string.IsNullOrEmpty(norm) || norm.Length != 19)
                 {

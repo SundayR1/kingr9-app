@@ -72,7 +72,37 @@ namespace KingR9Tools.Core
         // (ถ้าเปลี่ยน CPU หรือลง Windows ใหม่จน HWID เปลี่ยน ให้แก้ค่านี้)
         // (static readonly ห้ามเปลี่ยนเป็น const — เพื่อให้ Obfuscar เข้ารหัสค่าตอน build)
         public static readonly string AdminHwid = "75D6-791C-BE9C-D5BB";
-        public static bool IsAdmin() => Hwid() == AdminHwid;
+        private const string RecoveryPayload = "KingR9Tools.Admin.Recovery.v1";
+        private const string RecoveryPublicKey = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEWsHEbVRtiB6XZz+acficSeN0/k0SqmDqwUeE0XfoUhj8QbXs5dwIQVoOlu4ythZJKynXlm6kLPQD54LESWtkVg==";
+
+        public static bool IsAdminRecoveryKey(string key)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(key) || !key.StartsWith("R9A1-", StringComparison.Ordinal)) return false;
+                string encoded = key.Substring(5).Replace('-', '+').Replace('_', '/');
+                encoded += new string('=', (4 - encoded.Length % 4) % 4);
+                byte[] signature = Convert.FromBase64String(encoded);
+                using var verifier = ECDsa.Create();
+                verifier.ImportSubjectPublicKeyInfo(Convert.FromBase64String(RecoveryPublicKey), out _);
+                return verifier.VerifyData(Encoding.UTF8.GetBytes(RecoveryPayload), signature, HashAlgorithmName.SHA256);
+            }
+            catch { return false; }
+        }
+
+        private static bool HasSavedAdminRecoveryKey()
+        {
+            try
+            {
+                if (!File.Exists(ConfigFile)) return false;
+                using var doc = JsonDocument.Parse(File.ReadAllText(ConfigFile));
+                return doc.RootElement.TryGetProperty("savedKey", out var saved) &&
+                    saved.ValueKind == JsonValueKind.String && IsAdminRecoveryKey(saved.GetString());
+            }
+            catch { return false; }
+        }
+
+        public static bool IsAdmin() => Hwid() == AdminHwid || HasSavedAdminRecoveryKey();
 
         // ---------- STORE ----------
         /// <summary>อ่าน licenses.json โดยไม่ lock — ใช้เฉพาะภายใน lock(IoLock) เท่านั้น</summary>
@@ -132,7 +162,7 @@ namespace KingR9Tools.Core
         public static bool EnsureSeeded()
         {
             if (Load().Count > 0) return false;
-            if (!IsAdmin()) return false;
+            if (!IsAdmin() || HasSavedAdminRecoveryKey()) return false;
             CreateAdminKey(Hwid());
             return true;
         }
@@ -258,7 +288,7 @@ namespace KingR9Tools.Core
         /// <summary>เครื่องแอดมิน: ถ้า key ที่ผูกกับเครื่องยังไม่ได้ขึ้นต้น KINGR9 → เปลี่ยนให้อัตโนมัติ (คืน key ใหม่ / null = ไม่ต้องเปลี่ยน)</summary>
         public static string EnsureAdminKey()
         {
-            if (!IsAdmin()) return null;
+            if (!IsAdmin() || HasSavedAdminRecoveryKey()) return null;
             var mine = Load().FirstOrDefault(x => x.hwid == Hwid());
             if (mine != null && mine.key.StartsWith("KING")) return null;
             return CreateAdminKey(Hwid());
