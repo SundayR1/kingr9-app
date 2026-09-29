@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b1120">
+  <meta name="description" content="ดาวน์โหลด KingR9Tools Portable สำหรับ Windows">
+  <title>KingR9Tools — ดาวน์โหลด</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: #0b1120;
+      color: #f3f6ff;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --muted: #a9b6cd;
+      --line: rgb(169 190 229 / 15%);
+      --blue: #94b8ff;
+      --mint: #76e0c1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 30px 20px 24px;
+      background:
+        radial-gradient(ellipse at 15% 8%, rgb(75 111 198 / 22%), transparent 38rem),
+        radial-gradient(ellipse at 88% 42%, rgb(62 187 158 / 10%), transparent 34rem),
+        #0b1120;
+    }
+    .page { width: min(100%, 1040px); margin: 0 auto; }
+    .topbar { display: flex; align-items: center; gap: 12px; color: #dce6fa; font-weight: 700; }
+    .mark {
+      display: grid; width: 42px; height: 42px; place-items: center;
+      border: 1px solid rgb(148 184 255 / 35%); border-radius: 13px;
+      background: linear-gradient(145deg, rgb(148 184 255 / 23%), rgb(118 224 193 / 12%));
+      color: #c7dcff; font-size: .9rem; letter-spacing: -.05em;
+    }
+    .topbar span { font-size: .98rem; letter-spacing: .02em; }
+    .hero { max-width: 760px; margin: clamp(55px, 10vw, 100px) auto 44px; text-align: center; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px;
+      border: 1px solid rgb(118 224 193 / 22%); border-radius: 999px;
+      background: rgb(118 224 193 / 7%); color: #a5ead7; font-size: .83rem; font-weight: 650;
+    }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 14px rgb(118 224 193 / 70%); }
+    h1 { margin: 20px 0 12px; font-size: clamp(2.6rem, 8vw, 5rem); letter-spacing: -.055em; line-height: 1.04; }
+    .gradient { background: linear-gradient(100deg, #dce8ff 18%, #9dbdff 57%, #8de5cb 100%); background-clip: text; color: transparent; }
+    .lead { max-width: 570px; margin: 0 auto; color: #b6c2d7; font-size: clamp(1rem, 2.5vw, 1.13rem); line-height: 1.8; }
+    .download-card {
+      position: relative; overflow: hidden; width: min(100%, 660px); margin: 0 auto;
+      padding: clamp(25px, 6vw, 42px); border: 1px solid rgb(175 195 233 / 19%); border-radius: 24px;
+      background: linear-gradient(145deg, rgb(29 42 67 / 95%), rgb(19 29 48 / 97%));
+      box-shadow: 0 28px 90px rgb(0 0 0 / 36%), inset 0 1px rgb(255 255 255 / 4%);
+    }
+    .download-card::before { content: ""; position: absolute; top: -135px; right: -70px; width: 280px; height: 220px; border-radius: 50%; background: rgb(118 224 193 / 7%); filter: blur(35px); pointer-events: none; }
+    .card-head { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 22px; }
+    .version { color: #cbd9f1; font-size: .88rem; font-weight: 700; }
+    .portable { color: #9eabc0; font-size: .82rem; }
+    h2 { position: relative; margin: 0 0 9px; font-size: clamp(1.5rem, 5vw, 2rem); letter-spacing: -.025em; }
+    .file-summary { margin: 0 0 26px; color: var(--muted); font-size: .95rem; }
+    .download {
+      position: relative; display: flex; min-height: 58px; align-items: center; justify-content: center; gap: 11px;
+      width: 100%; padding: 12px 20px; border: 0; border-radius: 13px;
+      background: linear-gradient(100deg, #9bbaff, #8ce4c9); color: #0d1925;
+      font-size: 1.02rem; font-weight: 800; text-decoration: none;
+      box-shadow: 0 8px 28px rgb(115 173 238 / 20%); transition: filter .16s ease, transform .16s ease;
+    }
+    .download:hover { transform: translateY(-2px); filter: brightness(1.07); }
+    .download svg { width: 20px; height: 20px; }
+    a:focus-visible, summary:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+    .hint { margin: 13px 0 0; color: #aab7cc; font-size: .82rem; text-align: center; }
+    details { position: relative; margin-top: 22px; border-top: 1px solid var(--line); padding-top: 17px; }
+    summary { width: fit-content; color: #bcd0f3; cursor: pointer; font-size: .9rem; font-weight: 650; }
+    .details-body { display: grid; gap: 13px; margin-top: 17px; }
+    .detail-label { display: block; margin-bottom: 5px; color: #96a7c1; font-size: .78rem; }
+    code { color: #d9e5fa; font-family: "Cascadia Code", Consolas, monospace; font-size: .78rem; line-height: 1.65; overflow-wrap: anywhere; }
+    .details-body a { color: #abc6ff; text-underline-offset: 3px; }
+    .safety-note {
+      width: min(100%, 660px); margin: 20px auto 0; padding: 0 4px;
+      color: #aebbd0; font-size: .83rem; line-height: 1.65; text-align: center;
+    }
+    .safety-note strong { color: #d1dced; }
+    footer { display: flex; justify-content: center; margin-top: 48px; color: #78869d; font-size: .8rem; text-align: center; }
+    @media (max-width: 560px) {
+      body { padding: 20px 15px; }
+      .hero { margin-top: 60px; }
+      .card-head { align-items: flex-start; flex-direction: column; gap: 7px; }
+      .safety-note { text-align: left; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar" aria-label="KingR9Tools">
+      <div class="mark" aria-hidden="true">KR9</div>
+      <span>KingR9Tools</span>
+    </header>
+
+    <section class="hero" aria-labelledby="page-title">
+      <div class="eyebrow"><span class="dot" aria-hidden="true"></span> สำหรับ Windows</div>
+      <h1 id="page-title"><span class="gradient">ดาวน์โหลด</span><br>KingR9Tools</h1>
+      <p class="lead">เครื่องมือปรับแต่ง Windows ในรูปแบบ Portable ดาวน์โหลด แตกไฟล์ แล้วเปิดใช้งานจากโฟลเดอร์ได้เลย</p>
+    </section>
+
+    <section class="download-card" aria-labelledby="download-title">
+      <div class="card-head">
+        <span class="version">เวอร์ชัน 1.0.1</span>
+        <span class="portable">Portable · ไม่ต้องติดตั้ง</span>
+      </div>
+      <h2 id="download-title">พร้อมเริ่มใช้งานหรือยัง?</h2>
+      <p class="file-summary">KingR9.rar <span aria-hidden="true">·</span> 60.6 MB</p>
+      <a class="download" href="https://github.com/SundayR1/kingr9-app/releases/download/v1.0.1/KingR9.rar">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 16v4h14v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        ดาวน์โหลด KingR9.rar
+      </a>
+      <p class="hint">หลังดาวน์โหลด ให้แตกไฟล์ด้วยโปรแกรมจัดการไฟล์ RAR ก่อนเปิด <code>KingR9Tools.exe</code></p>
+
+      <details>
+        <summary>ข้อมูลตรวจสอบไฟล์</summary>
+        <div class="details-body">
+          <div>
+            <span class="detail-label">SHA-256 สำหรับตรวจสอบไฟล์</span>
+            <code>EEC0741048C23042069B38F8DA2A20A7B32173C24D0B4A5D75B9C9701AFC6951</code>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <p class="safety-note"><strong>โปรดทราบ:</strong> บางฟังก์ชันเปลี่ยนการตั้งค่า Windows และต้องตรวจสอบก่อนใช้ หากแอนติไวรัสแจ้งเตือน อย่าปิดการป้องกันเพื่อเปิดไฟล์</p>
+    <footer>ดาวน์โหลด KingR9Tools Portable</footer>
+  </main>
+</body>
+</html>
