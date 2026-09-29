@@ -58,18 +58,6 @@ namespace KingR9Tools.Core
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        public string FreeStandby()
-        {
-            Hello();
-            try
-            {
-                double freed = Memory.PurgeStandby();
-                _log.Ok($"Purge Standby List: à¸„à¸·à¸™ RAM à¸§à¹ˆà¸²à¸‡ {freed:N2} GB");
-                return J(new { ok = true, freed = Math.Round(freed, 2) });
-            }
-            catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
-        }
-
         public string OpenFolder(string which)
         {
             try

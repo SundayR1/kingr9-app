@@ -141,9 +141,7 @@ namespace KingR9Tools.Core
                         return J(new { ok = true, msg = on ? "à¸¥à¹‡à¸­à¸ Turbo Boost (Aggressive)" : "à¸„à¸·à¸™à¸„à¹ˆà¸² Turbo Boost" });
 
                     case "mem_auto":
-                        SetAutoTrim(on);
-                        _log.Ok($"Auto Standby Trim: {(on ? "à¸—à¸¸à¸ 1 à¸Šà¸±à¹ˆà¸§à¹‚à¸¡à¸‡" : "à¸›à¸´à¸”")}");
-                        return J(new { ok = true, msg = on ? "Auto Trim à¹€à¸›à¸´à¸” (à¸—à¸¸à¸ 1 à¸Šà¸¡.)" : "à¸›à¸´à¸” Auto Trim" });
+                        return J(new { ok = false, msg = "Standby memory trimming is no longer available." });
 
                     default:
                         {
@@ -162,28 +160,6 @@ namespace KingR9Tools.Core
                 _log.Err(id + ": " + ex.Message);
                 return J(new { ok = false, msg = ex.Message });
             }
-        }
-
-        private void SetAutoTrim(bool on)
-        {
-            if (!on)
-            {
-                if (_autoTrim != null) { try { _autoTrim.Stop(); _autoTrim.Dispose(); } catch { } _autoTrim = null; }
-                return;
-            }
-            if (_autoTrim != null) return;
-            var t = new System.Timers.Timer(3600000) { AutoReset = true };
-            t.Elapsed += (s, e) =>
-            {
-                try
-                {
-                    double freed = Memory.PurgeStandby();
-                    if (freed > 0.05) _log.Info($"Auto Trim: à¸„à¸·à¸™ RAM {freed:N2} GB");
-                }
-                catch { }
-            };
-            t.Start();
-            _autoTrim = t;
         }
 
         // ---------- MEMORY / CLEANER ----------
@@ -516,7 +492,6 @@ namespace KingR9Tools.Core
                 case "r9_netsh": return "à¸›à¸£à¸±à¸š Netsh (cubic Â· MTU)";
                 case "r9_qos":   return "à¸ªà¸£à¹‰à¸²à¸‡ QoS DSCP 46";
                 case "r9_gta5":  return "à¹€à¸‚à¸µà¸¢à¸™à¹„à¸Ÿà¸¥à¹Œ config à¹€à¸à¸¡ (GTA5/FiveM)";
-                case "mem_auto": return "à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² Auto Trim";
                 case "pw_park":  return "à¸›à¸£à¸±à¸š CPU Core Parking";
                 case "pw_turbo": return "à¸›à¸£à¸±à¸š Turbo Boost";
                 default:         return "à¸à¸³à¸¥à¸±à¸‡à¸›à¸£à¸±à¸š tweak";

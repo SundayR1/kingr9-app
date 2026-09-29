@@ -44,7 +44,6 @@ namespace KingR9Tools.Core
             }
 
             _stats.Start();
-            SetAutoTrim(_cfg.toggles.TryGetValue("mem_auto", out var at) && at);
 
             var lic = LicenseService.RecoverForThisMachine();
             int total = _all.Count(x => x.Recommended);

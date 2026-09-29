@@ -327,7 +327,6 @@
               <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
                 <div class="qa" id="qaOpt" style="margin:0"><b>⚡ Optimize</b><small>ชุดสคริปต์ R9 เต็มรูปแบบ</small></div>
                 <div class="qa" id="qaClean" style="margin:0"><b>🧹 Clean Junk</b><small>ล้างไฟล์ขยะทั้งระบบ</small></div>
-                <div class="qa" id="qaFree" style="margin:0"><b>🧠 Free RAM</b><small>เคลียร์ standby memory</small></div>
                 <div class="qa" id="qaRp" style="margin:0"><b>🛡 Restore Point</b><small>สำรองจุดคืนค่า Windows</small></div>
               </div>
             </div>
@@ -532,12 +531,8 @@
             <div style="font-size:11px;color:var(--txt-3)">อัปเดตเรียลไทม์ทุก 2 วินาที</div>
           </div>
           <div class="glass card">
-            <h2 class="ct">Standby Memory</h2>
-            <p class="desc">Purge Standby List คืน RAM ที่ Windows กันเก็บไว้ แบบเดียวกับ ISLC — แนะนำกดก่อนเปิดเกมทุกครั้ง</p>
-            <div class="btnrow"><button class="apply primary" id="memFree">🧠 Free Standby Memory</button></div>
-            <div class="hr" style="margin:16px 0"></div>
-            <label class="ck"><input type="checkbox" id="memTrim"><i></i>Auto Trim ทุก 1 ชั่วโมง (ทำงานเบื้องหลังอัตโนมัติ)</label>
-            <div class="note">🛈 Auto Trim จะ purge เงียบๆ ทุกชั่วโมง — ถ้าได้ RAM คืนตั้งแต่ 0.05 GB ขึ้นไปจะบันทึกในหน้า Logs</div>
+            <h2 class="ct">Windows Memory Management</h2>
+            <p class="desc">Windows จัดการ Standby Memory ให้อัตโนมัติ แอปจะแสดงการใช้ RAM โดยไม่ล้างหน่วยความจำเบื้องหลัง</p>
           </div>
         </div>
       </section>
@@ -676,7 +671,7 @@
               <div class="ri"><span class="rd"></span><div><b>Dashboard</b><small>ภาพรวมสถานะเครื่อง · สถานะ key · วันหมดอายุ</small></div></div>
               <div class="ri"><span class="rd"></span><div><b>Gaming Hub</b><small>เพิ่ม FPS · โหมดเกม · ปิดบริการที่ไม่จำเป็น · ปรับกราฟิก</small></div></div>
               <div class="ri"><span class="rd"></span><div><b>Network Center</b><small>ลดแล็ก · ปรับ TCP/IP · โหมดเน็ตเกม (R9 Internet)</small></div></div>
-              <div class="ri"><span class="rd"></span><div><b>Memory &amp; RAM</b><small>ล้าง RAM ค้าง · ย่อ standby memory · auto trim</small></div></div>
+              <div class="ri"><span class="rd"></span><div><b>Memory &amp; RAM</b><small>ดูการใช้ RAM แบบเรียลไทม์</small></div></div>
               <div class="ri"><span class="rd"></span><div><b>Hardware Info</b><small>ดูสเปค CPU / GPU / RAM / เมนบอร์ด แบบเรียลไทม์</small></div></div>
               <div class="ri"><span class="rd"></span><div><b>Junk Cleaner</b><small>ลบไฟล์ขยะ · Temp · Cache · ถังขยะ</small></div></div>
               <div class="ri"><span class="rd"></span><div><b>Backup &amp; Restore</b><small>จุดคืนค่าระบบ · กู้ค่า default กลับได้ทุกอย่าง</small></div></div>

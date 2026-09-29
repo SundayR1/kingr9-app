@@ -1,24 +1,28 @@
 @echo off
 chcp 65001 >nul
-title KingR9 Tools - Single-file Build
+title KingR9 Tools - Portable Build
 cd /d "%~dp0"
 
-where dotnet >nul 2>&1
+set "DOTNET=%LOCALAPPDATA%\Programs\dotnet\dotnet.exe"
+if not exist "%DOTNET%" set "DOTNET=dotnet"
+"%DOTNET%" --version >nul 2>&1
 if errorlevel 1 (
   echo [X] ไม่พบ .NET 8 SDK
   echo     ติดตั้งจาก https://dotnet.microsoft.com/download/dotnet/8.0
   exit /b 1
 )
 
-echo Publishing single-file build...
-dotnet publish KingR9Tools.csproj -c Release -r win-x64 --self-contained true ^
-  /p:PublishSingleFile=true ^
-  /p:IncludeNativeLibrariesForSelfExtract=true ^
+echo Publishing portable folder...
+"%DOTNET%" publish KingR9Tools.csproj -c Release -r win-x64 --self-contained true ^
+  /p:PublishSingleFile=false ^
+  /p:IncludeNativeLibrariesForSelfExtract=false ^
   /p:DebugType=None /p:DebugSymbols=false ^
-  -o "%~dp0Release\SingleFile"
+  -o "%~dp0Release\KingR9"
 if errorlevel 1 exit /b 1
 
-del /q "%~dp0Release\SingleFile\*.xml" 2>nul
-echo Build complete: %~dp0Release\SingleFile\KingR9Tools.exe
-echo Send only KingR9Tools.exe. Sign releases with a trusted code-signing certificate before distribution.
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Compress-Archive -Path '%~dp0Release\KingR9\*' -DestinationPath '%~dp0Release\KingR9_Portable.zip' -CompressionLevel Optimal -Force"
+if errorlevel 1 exit /b 1
+
+echo Build complete: %~dp0Release\KingR9
+echo Portable archive: %~dp0Release\KingR9_Portable.zip
 

@@ -440,7 +440,7 @@
       const btn = $('pubGo'); const e = $('pubErr');
       btn.disabled = true; e.style.color = 'var(--red)'; e.textContent = 'กำลังเผยแพร่...';
       try {
-        const r = await KR.rpc('updatePublish', { version: $('pubVer').value.trim(), url: $('pubUrl').value.trim(), notes: $('pubNotes').value.trim() });
+        const r = await KR.rpc('updatePublish', { version: $('pubVer').value.trim(), url: $('pubUrl').value.trim(), sha256: $('pubSha256').value.trim(), notes: $('pubNotes').value.trim() });
         e.style.color = r.ok ? '#3ba55d' : 'var(--red)';
         e.textContent = r.msg || '';
         if (r.ok) KR.toast('เผยแพร่อัปเดตแล้ว ✓');
@@ -534,7 +534,7 @@
     game:   ['Gaming Hub', 'Power plan · FiveM · STR · Services · Graphics'],
     ares:   ['Ares One-Click', 'Ares Store MAX optimizer — ปรับทุกอย่างในคลิกเดียว'],
     net:    ['Network Center', 'Auto adjust · QoS · R9 internet'],
-    mem:    ['Memory & RAM', 'Live usage · standby purge · auto trim'],
+    mem:    ['Memory & RAM', 'Live RAM usage'],
     hw:     ['Hardware Info', 'CPU · GPU · RAM · Motherboard — read live via WMI'],
     clean:  ['Junk Cleaner', 'Temp · Logs · Cache · Recycle Bin'],
     backup: ['Backup & Restore', 'Restore point · defaults rollback · folders'],
@@ -700,9 +700,6 @@
     KR.apply('cleanJunk', null, 'Junk Cleaner')
       .then(function (r) { KR.toast('ล้างได้ ' + (r.total || 0).toFixed(2) + ' GB'); }).catch(function () {});
   });
-  $('qaFree').addEventListener('click', function () {
-    KR.rpc('freeStandby').then(function (r) { KR.toast('คืน RAM ' + (r.freed || 0).toFixed(2) + ' GB'); }).catch(function () {});
-  });
   $('qaRp').addEventListener('click', function () {
     KR.confirm('สร้าง Windows Restore Point ตอนนี้?', { title: 'Create Restore Point', yes: 'สร้างเลย' }).then(function (ok) {
       if (!ok) return;
@@ -712,13 +709,6 @@
   });
 
   /* ---- memory page ---- */
-  $('memFree').addEventListener('click', function () {
-    KR.toast('กำลัง purge standby memory...');
-    KR.rpc('freeStandby').then(function (r) { KR.toast('คืน RAM ' + (r.freed || 0).toFixed(2) + ' GB'); }).catch(function () {});
-  });
-  $('memTrim').addEventListener('change', function () {
-    KR.apply('setTweak', { id: 'mem_auto', on: $('memTrim').checked }, 'Auto Trim').catch(function () {});
-  });
 
   /* ---- junk cleaner page ---- */
   function renderJunk(r) {

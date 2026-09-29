@@ -3,6 +3,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest.xml</ApplicationManifest>
     <AssemblyTitle>KingR9 Tools</AssemblyTitle>
     <Product>KingR9 Tools</Product>
     <Company>KingR9</Company>

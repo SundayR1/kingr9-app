@@ -43,7 +43,6 @@ namespace KingR9Tools.Core
         private readonly Logger _log;
         private readonly List<Tweak> _all;
         private readonly StatsService _stats;
-        private System.Timers.Timer _autoTrim;
         private bool _busy;
 
         // progress à¸‚à¸­à¸‡ Optimize/Restore (JS à¸¡à¸² poll à¸œà¹ˆà¸²à¸™ Progress())
@@ -161,11 +160,11 @@ namespace KingR9Tools.Core
                 int days = dEl.GetInt32();
                 string hwid = j.TryGetProperty("hwid", out var hEl) && hEl.ValueKind == JsonValueKind.String ? hEl.GetString() : "";
                 string created = j.TryGetProperty("created", out var cEl) && cEl.ValueKind == JsonValueKind.String
-                    ? cEl.GetString() : DateTime.Now.ToString("yyyy-MM-dd");
+                    ? cEl.GetString() : LicenseService.TodayUtc();
 
                 if (string.IsNullOrEmpty(hwid))
                 {
-                    created = DateTime.Now.ToString("yyyy-MM-dd");   // à¸­à¸²à¸¢à¸¸à¹€à¸£à¸´à¹ˆà¸¡à¸™à¸±à¸šà¸§à¸±à¸™ Activate à¸‚à¸­à¸‡à¸¥à¸¹à¸à¸„à¹‰à¸²
+                    created = LicenseService.TodayUtc();   // à¸­à¸²à¸¢à¸¸à¹€à¸£à¸´à¹ˆà¸¡à¸™à¸±à¸šà¸§à¸±à¸™ Activate à¸‚à¸­à¸‡à¸¥à¸¹à¸à¸„à¹‰à¸²
                     if (!HttpPatch(ServerKeyUrl(norm), JsonSerializer.Serialize(new { hwid = hw, created, key = norm })))
                         return (false, "à¹€à¸Šà¸·à¹ˆà¸­à¸¡à¸•à¹ˆà¸­ server à¹„à¸¡à¹ˆà¸ªà¸³à¹€à¸£à¹‡à¸ˆ (à¸šà¸±à¸™à¸—à¸¶à¸ HWID)", 0, true);
                     LicenseService.UpsertLocal(norm, created, days);
@@ -173,8 +172,9 @@ namespace KingR9Tools.Core
                 }
                 if (hwid != hw) return (false, "key à¸™à¸µà¹‰à¸–à¸¹à¸à¸œà¸¹à¸à¸à¸±à¸šà¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸­à¸·à¹ˆà¸™à¸­à¸¢à¸¹à¹ˆ", 0, false);
 
-                int left = (int)Math.Floor((DateTime.Parse(created).AddDays(days) - DateTime.Now).TotalDays);
-                if (left < 0) return (false, "key à¸«à¸¡à¸”à¸­à¸²à¸¢à¸¸à¹à¸¥à¹‰à¸§ â€” à¸•à¸´à¸”à¸•à¹ˆà¸­à¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸žà¸·à¹ˆà¸­à¸•à¹ˆà¸­à¸­à¸²à¸¢à¸¸", 0, false);
+                var expiry = new LicenseService.License { created = created, days = days };
+                int left = LicenseService.DaysLeft(expiry);
+                if (LicenseService.IsExpired(expiry)) return (false, "key à¸«à¸¡à¸”à¸­à¸²à¸¢à¸¸à¹à¸¥à¹‰à¸§ â€” à¸•à¸´à¸”à¸•à¹ˆà¸­à¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸žà¸·à¹ˆà¸­à¸•à¹ˆà¸­à¸­à¸²à¸¢à¸¸", 0, false);
                 LicenseService.UpsertLocal(norm, created, days);
                 return (true, "key à¸–à¸¹à¸à¸•à¹‰à¸­à¸‡", left, false);
             }
@@ -211,7 +211,6 @@ namespace KingR9Tools.Core
         /// <summary>เรียกตอนปิดแอป — ล้าง timer และ stats ให้เรียบร้อย</summary>
         public void Cleanup()
         {
-            try { _autoTrim?.Stop(); _autoTrim?.Dispose(); _autoTrim = null; } catch { }
             try { _stats?.Dispose(); } catch { }
         }
 
@@ -309,9 +308,7 @@ namespace KingR9Tools.Core
                 case "enterDashboard": return EnterDashboard();
                 case "dashboardReady": return DashboardInit();
                 case "getJunk":        return Junk();
-                case "cleanJunk":      return Clean();
-                case "freeStandby":    return FreeStandby();
-                case "setTweak":       return Tweak(PS("id"), PB("on"));
+                case "cleanJunk":      return Clean();                case "setTweak":       return Tweak(PS("id"), PB("on"));
                 case "optimize":       return OptimizeStart();
                 case "restoreAll":     return RestoreStart();
                 case "window":         return Window(PS("action"));
@@ -330,7 +327,7 @@ namespace KingR9Tools.Core
                 case "discordTest":    return DiscordTest();
                 case "updateCheck":    return UpdateCheck();
                 case "updateDownload": return UpdateDownload();
-                case "updatePublish":  return UpdatePublish(PS("version"), PS("url"), PS("notes"));
+                case "updatePublish":  return UpdatePublish(PS("version"), PS("url"), PS("sha256"), PS("notes"));
                 case "restartNow":     return RestartNow();
                 case "fivemApply":     return FivemApply(PB("cache"), PB("prio"), PB("cef"), PB("pkg"));
                 case "strApply":       return StrApply(PB("low"));

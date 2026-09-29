@@ -6,6 +6,7 @@ using System.Linq;
 using System.Management;
 using System.Net.Http;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -68,15 +69,22 @@ namespace KingR9Tools.Core
             return false;
         }
 
-        private (string ver, string url, string notes) UpdateManifest()
+        private static bool IsHttpsUrl(string value) =>
+            Uri.TryCreate(value, UriKind.Absolute, out var uri) && uri.Scheme == Uri.UriSchemeHttps &&
+            !string.IsNullOrWhiteSpace(uri.Host) && string.IsNullOrEmpty(uri.UserInfo);
+
+        private static bool IsSha256(string value) => value != null && value.Length == 64 && value.All(Uri.IsHexDigit);
+
+        private (string ver, string url, string notes, string sha256) UpdateManifest()
         {
             string body = HttpGet(FirebaseUrl.TrimEnd('/') + "/appUpdate.json" + AuthQuery());
-            if (string.IsNullOrWhiteSpace(body) || body == "null") return ("", "", "");
+            if (string.IsNullOrWhiteSpace(body) || body == "null") return ("", "", "", "");
             var j = JsonSerializer.Deserialize<JsonElement>(body);
             string ver = j.TryGetProperty("version", out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() ?? "" : "";
             string url = j.TryGetProperty("url", out var u) && u.ValueKind == JsonValueKind.String ? u.GetString() ?? "" : "";
             string notes = j.TryGetProperty("notes", out var n) && n.ValueKind == JsonValueKind.String ? n.GetString() ?? "" : "";
-            return (ver, url, notes);
+            string sha256 = j.TryGetProperty("sha256", out var h) && h.ValueKind == JsonValueKind.String ? h.GetString() ?? "" : "";
+            return (ver, url, notes, sha256);
         }
 
         public string UpdateCheck()
@@ -85,8 +93,8 @@ namespace KingR9Tools.Core
             try
             {
                 if (!ServerReady) return J(new { ok = true, available = false, local = AppVersion });
-                var (ver, url, notes) = UpdateManifest();
-                bool avail = VersionNewer(ver, AppVersion) && url.StartsWith("http", StringComparison.OrdinalIgnoreCase);
+                var (ver, url, notes, sha256) = UpdateManifest();
+                bool avail = VersionNewer(ver, AppVersion) && IsHttpsUrl(url) && IsSha256(sha256);
                 return J(new { ok = true, available = avail, version = ver, notes = notes, url = url, local = AppVersion });
             }
             catch { return J(new { ok = true, available = false, local = AppVersion }); }
@@ -100,8 +108,8 @@ namespace KingR9Tools.Core
             try
             {
                 if (!ServerReady) return J(new { ok = false, msg = "à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¹€à¸Šà¸·à¹ˆà¸­à¸¡ server" });
-                var (ver, url, _) = UpdateManifest();
-                if (!VersionNewer(ver, AppVersion) || !url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                var (ver, url, _, sha256) = UpdateManifest();
+                if (!VersionNewer(ver, AppVersion) || !IsHttpsUrl(url) || !IsSha256(sha256))
                     return J(new { ok = false, msg = "à¸„à¸¸à¸“à¹ƒà¸Šà¹‰à¹€à¸§à¸­à¸£à¹Œà¸Šà¸±à¸™à¸¥à¹ˆà¸²à¸ªà¸¸à¸”à¸­à¸¢à¸¹à¹ˆà¹à¸¥à¹‰à¸§ âœ“" });
 
                 if (!JobBegin("à¸­à¸±à¸›à¹€à¸”à¸•à¹à¸­à¸› â†’ v" + ver))
@@ -121,6 +129,11 @@ namespace KingR9Tools.Core
                     using (var http = new HttpClient { Timeout = TimeSpan.FromMinutes(15) })
                     using (var resp = http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result)
                     {
+                        if (resp.RequestMessage?.RequestUri?.Scheme != Uri.UriSchemeHttps)
+                        {
+                            JobEnd(false, "ลิงก์ดาวน์โหลดเปลี่ยนออกจาก HTTPS");
+                            return J(new { ok = false, msg = "ลิงก์ดาวน์โหลดไม่ปลอดภัย — ต้องใช้ HTTPS ตลอดการดาวน์โหลด" });
+                        }
                         if (!resp.IsSuccessStatusCode)
                         {
                             JobEnd(false, "à¹‚à¸«à¸¥à¸”à¹„à¸Ÿà¸¥à¹Œà¹„à¸¡à¹ˆà¸ªà¸³à¹€à¸£à¹‡à¸ˆ (HTTP " + (int)resp.StatusCode + ")");
@@ -153,10 +166,25 @@ namespace KingR9Tools.Core
                         return J(new { ok = false, msg = "à¹„à¸Ÿà¸¥à¹Œà¸—à¸µà¹ˆà¹‚à¸«à¸¥à¸”à¸¡à¸²à¹„à¸¡à¹ˆà¸ªà¸¡à¸šà¸¹à¸£à¸“à¹Œ â€” à¸¥à¸­à¸‡à¹ƒà¸«à¸¡à¹ˆà¸­à¸µà¸à¸„à¸£à¸±à¹‰à¸‡" });
                     }
                     // อัปเดตแบบ clean (ไม่ trigger AV): rename exe เก่า → move ตัวใหม่เข้าแทน → เปิดตัวใหม่
+                    string actualSha256;
+                    using (var sha = SHA256.Create())
+                    using (var file = File.OpenRead(newPath))
+                        actualSha256 = Convert.ToHexString(sha.ComputeHash(file));
+                    if (!actualSha256.Equals(sha256, StringComparison.OrdinalIgnoreCase))
+                    {
+                        try { File.Delete(newPath); } catch { }
+                        JobEnd(false, "SHA-256 ของไฟล์อัปเดตไม่ตรงกับที่ประกาศไว้");
+                        return J(new { ok = false, msg = "ไฟล์อัปเดตตรวจสอบไม่ผ่าน — ยกเลิกการติดตั้งเพื่อความปลอดภัย" });
+                    }
                     string bakPath = oldPath + ".old";
                     try { if (File.Exists(bakPath)) File.Delete(bakPath); } catch { }
-                    try { File.Move(oldPath, bakPath); } catch { }
-                    File.Move(newPath, oldPath);
+                    File.Move(oldPath, bakPath);
+                    try { File.Move(newPath, oldPath); }
+                    catch
+                    {
+                        if (!File.Exists(oldPath) && File.Exists(bakPath)) File.Move(bakPath, oldPath);
+                        throw;
+                    }
 
                     // เปิดตัวใหม่ พร้อม arg ให้ลบ .old ตอนเปิด
                     var psi = new System.Diagnostics.ProcessStartInfo(oldPath, "--cleanup")
@@ -190,18 +218,19 @@ namespace KingR9Tools.Core
             }
         }
 
-        public string UpdatePublish(string version, string url, string notes)
+        public string UpdatePublish(string version, string url, string sha256, string notes)
         {
             Hello();
             if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
             if (!ServerReady) return J(new { ok = false, msg = "à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server â€” à¸à¸”à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸²à¹ƒà¸™à¸«à¸™à¹‰à¸²à¹€à¸ˆà¸™ key à¸à¹ˆà¸­à¸™" });
             version = (version ?? "").Trim();
             url = (url ?? "").Trim();
+            sha256 = (sha256 ?? "").Trim();
             notes = (notes ?? "").Trim();
-            if (version.Length == 0 || !url.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+            if (version.Length == 0 || !IsHttpsUrl(url) || !IsSha256(sha256))
                 return J(new { ok = false, msg = "à¸à¸£à¸­à¸ version (à¹€à¸Šà¹ˆà¸™ 1.0.1) à¹à¸¥à¸° URL à¹„à¸Ÿà¸¥à¹Œ exe à¹ƒà¸«à¹‰à¸–à¸¹à¸à¸•à¹‰à¸­à¸‡" });
             bool up = HttpPut(FirebaseUrl.TrimEnd('/') + "/appUpdate.json" + AuthQuery(),
-                JsonSerializer.Serialize(new { version, url, notes }));
+                JsonSerializer.Serialize(new { version, url, sha256 = sha256.ToUpperInvariant(), notes }));
             _log.Ok(up ? "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆà¸­à¸±à¸›à¹€à¸”à¸• v" + version + " à¹à¸¥à¹‰à¸§" : "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆà¸­à¸±à¸›à¹€à¸”à¸•à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§");
             return J(new { ok = up, msg = up
                 ? "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆ v" + version + " à¹à¸¥à¹‰à¸§ âœ“ â€” à¸¥à¸¹à¸à¸„à¹‰à¸²à¸ˆà¸°à¹€à¸«à¹‡à¸™ banner à¸­à¸±à¸›à¹€à¸”à¸•à¸•à¸­à¸™à¹€à¸›à¸´à¸”à¹à¸­à¸›"

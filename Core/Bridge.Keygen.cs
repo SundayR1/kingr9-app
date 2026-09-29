@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -87,7 +87,7 @@ namespace KingR9Tools.Core
                             string hwid = e.TryGetProperty("hwid", out var hEl) && hEl.ValueKind == JsonValueKind.String ? hEl.GetString() : "";
                             bool revoked = e.TryGetProperty("revoked", out var rEl) && rEl.ValueKind == JsonValueKind.True;
                             int daysLeft = 0;
-                            try { daysLeft = (int)Math.Floor((DateTime.Parse(created).AddDays(days) - DateTime.Now).TotalDays); } catch { }
+                            try { daysLeft = LicenseService.DaysLeft(new LicenseService.License { created = created, days = days }); } catch { }
                             items.Add(new
                             {
                                 key = e.TryGetProperty("key", out var kEl) && kEl.ValueKind == JsonValueKind.String ? kEl.GetString() : LicenseService.Normalize(kv.Key),
@@ -221,7 +221,7 @@ namespace KingR9Tools.Core
             if (days < 1) return J(new { ok = false, msg = "à¸ˆà¸³à¸™à¸§à¸™à¸§à¸±à¸™à¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡" });
             try
             {
-                string today = DateTime.Now.ToString("yyyy-MM-dd");
+                string today = LicenseService.TodayUtc();
                 bool ok = HttpPatch(ServerKeyUrl(key) + AuthQuery(), JsonSerializer.Serialize(new { days = days, created = today }));
                 if (ok)
                 {

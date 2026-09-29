@@ -8,11 +8,11 @@ A Windows x64 WPF utility for system and network tuning, with a WebView2 interfa
 - .NET 8 SDK
 - Internet access for NuGet restore
 
-Run `BUILD.bat`. The single-file build is written to `Release/SingleFile/KingR9Tools.exe`.
+Run `BUILD.bat`. It creates the portable app folder at `Release/KingR9` and packages it as `Release/KingR9_Portable.zip`.
 
 ## Download
 
-Download the `KingR9.rar` asset from the repository's Releases page, extract the full archive, and run `KingR9Tools.exe` from the extracted folder.
+Download `KingR9_Portable.zip` from the [v1.0.1 release](https://github.com/SundayR1/kingr9-app/releases/tag/v1.0.1). Extract the full archive and run `KingR9Tools.exe` from the extracted folder. Keep the other files alongside it.
 
 ## Important
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -141,8 +142,25 @@ namespace KingR9Tools.Core
                 .Where(char.IsLetterOrDigit).Take(16).Select((c, i) => new { c, i })
                 .GroupBy(x => x.i / 4).Select(g => new string(g.Select(x => x.c).ToArray())));
 
-        public static int DaysLeft(License l) =>
-            (int)Math.Floor((DateTime.Parse(l.created).AddDays(l.days) - DateTime.Now).TotalDays);
+        public static string TodayUtc() => DateTime.UtcNow.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+        public static DateTime ParseCreatedUtc(string value)
+        {
+            var date = DateTime.ParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+            // Older releases could write Buddhist-calendar years on Thai Windows.
+            if (date.Year >= 2400 && date.Year <= 2800) date = date.AddYears(-543);
+            return DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
+        }
+
+        public static bool IsExpired(License l) =>
+            l == null || l.days <= 0 || DateTime.UtcNow >= ParseCreatedUtc(l.created).AddDays(l.days);
+
+        public static int DaysLeft(License l)
+        {
+            if (l == null || l.days <= 0) return 0;
+            var remaining = ParseCreatedUtc(l.created).AddDays(l.days) - DateTime.UtcNow;
+            return remaining <= TimeSpan.Zero ? 0 : (int)Math.Ceiling(remaining.TotalDays);
+        }
 
         /// <summary>ตรวจ key → ถ้าถูกต้องและยังไม่ผูกเครื่อง จะผูกกับ HWID นี้ทันที</summary>
         public static (bool ok, string message, int daysLeft, License lic) Validate(string key)
@@ -161,7 +179,7 @@ namespace KingR9Tools.Core
                     return (false, "ข้อมูล key ในเครื่องไม่ถูกต้อง — เชื่อมต่ออินเทอร์เน็ตเพื่อยืนยันกับ server", 0, null);
                 if (!string.IsNullOrEmpty(l.hwid) && l.hwid != hw)
                     return (false, "key นี้ถูกผูกกับเครื่องอื่นอยู่", 0, null);
-                if (DaysLeft(l) < 0)
+                if (IsExpired(l))
                     return (false, "key หมดอายุแล้ว — ติดต่อแอดมินเพื่อต่ออายุ", 0, null);
 
                 if (string.IsNullOrEmpty(l.hwid))
@@ -177,7 +195,7 @@ namespace KingR9Tools.Core
         public static License RecoverForThisMachine()
         {
             string hw = Hwid();
-            return Load().FirstOrDefault(x => x.hwid == hw && DaysLeft(x) >= 0);
+            return Load().FirstOrDefault(x => x.hwid == hw && !IsExpired(x));
         }
 
         // ---------- KEY GENERATOR ----------
@@ -202,7 +220,7 @@ namespace KingR9Tools.Core
             {
                 key = FormatKey(key),
                 hwid = "",
-                created = DateTime.Now.ToString("yyyy-MM-dd"),
+                created = TodayUtc(),
                 days = days,
                 note = (note ?? "").Trim()
             };
@@ -229,7 +247,7 @@ namespace KingR9Tools.Core
             {
                 key = FormatKey(key),
                 hwid = hw,
-                created = DateTime.Now.ToString("yyyy-MM-dd"),
+                created = TodayUtc(),
                 days = 3650,
                 note = "ADMIN"
             });
@@ -301,7 +319,7 @@ namespace KingR9Tools.Core
                 {
                     key = norm,
                     hwid = "",                                        // ให้ผูกใหม่กับเครื่องนี้ตอน Activate
-                    created = DateTime.Now.ToString("yyyy-MM-dd"),    // อายุเริ่มนับวันนำเข้า
+                    created = TodayUtc(),    // อายุเริ่มนับวันนำเข้า
                     days = l.days > 0 ? l.days : 30,
                     note = l.note ?? ""
                 });
