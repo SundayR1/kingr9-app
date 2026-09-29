@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>KingR9Tools — Key Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0910; --glass:rgba(255,255,255,.035);
+    --stroke:rgba(255,255,255,.08); --stroke-soft:rgba(255,255,255,.05);
+    --txt:#f2f0f7; --txt-2:rgba(242,240,247,.56); --txt-3:rgba(242,240,247,.32);
+    --purple:#b48cff; --purple-bright:#c9a6ff; --pink:#ff9fd1; --green:#7de3b8; --red:#ff6b81; --amber:#ffcf7a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  .topbar,.side,.brand,.hero,.wrap,.ktop{-webkit-app-region:drag}
+  button,input,select,textarea,label,a,.menu,.scroll,.card,.glass,.plist,.pill,.sideout,.back,.mi,.status,.foot{-webkit-app-region:no-drag}
+  .blogo img,.logo img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+  body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:var(--txt);overflow:hidden;-webkit-font-smoothing:antialiased}
+  .backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;background:
+      radial-gradient(120% 120% at 12% 0%, #150f24 0%, transparent 55%),
+      radial-gradient(100% 100% at 100% 100%, #1a0f22 0%, transparent 50%), var(--bg)}
+  .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:float 16s ease-in-out infinite}
+  .orb.a{width:480px;height:480px;background:radial-gradient(circle,#8f5bff,transparent 70%);top:-160px;left:-80px}
+  .orb.b{width:560px;height:560px;background:radial-gradient(circle,#ff6fc0,transparent 70%);bottom:-220px;right:-120px;animation-delay:-6s}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.08)}}
+  .kg{position:relative;z-index:2;display:flex;flex-direction:column;height:100vh}
+  .ktop{display:flex;align-items:center;gap:12px;row-gap:10px;flex-wrap:wrap;padding:16px 150px 16px 24px;border-bottom:1px solid var(--stroke-soft)}
+  .back{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:10px;border:1px solid var(--stroke);background:var(--glass);color:var(--txt-2);font:600 12px 'Inter';cursor:pointer;transition:.2s}
+  .back:hover{color:var(--txt);border-color:rgba(180,140,255,.4)}
+  .back svg{width:14px;height:14px}
+  .blogo{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;flex-shrink:0;
+    background:linear-gradient(140deg,var(--purple),var(--pink));box-shadow:0 8px 22px -6px rgba(180,140,255,.7), inset 0 1px 0 rgba(255,255,255,.4)}
+  .blogo span{font-family:'Space Grotesk';font-weight:700;font-size:13px;color:#150b1e}
+  .kt h1{font-family:'Space Grotesk';font-size:17px;font-weight:700}
+  .kt p{font-size:11px;color:var(--txt-3);margin-top:2px}
+  .kpill{margin-left:auto;display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;border:1px solid var(--stroke);background:var(--glass);font:600 11.5px 'Inter';color:var(--txt-2)}
+  .kpill .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(125,227,184,.9)}
+  .kpill b{color:var(--txt)}
+  .kmain{flex:1;display:grid;grid-template-columns:400px 1fr;grid-template-rows:minmax(0,1fr);gap:16px;padding:18px 24px 22px;min-height:0}
+  @media(max-width:980px){.kmain{grid-template-columns:1fr;overflow-y:auto}}
+  .card{background:var(--glass);border:1px solid var(--stroke-soft);border-radius:20px;backdrop-filter:blur(20px);display:flex;flex-direction:column;min-height:0}
+  .chead{padding:15px 18px;border-bottom:1px solid var(--stroke-soft);display:flex;align-items:center;gap:9px}
+  .chead h2{font-family:'Space Grotesk';font-size:14.5px;font-weight:700}
+  .chead .cnt{margin-left:auto;font:600 10px 'JetBrains Mono';color:var(--txt-3);letter-spacing:1.6px}
+  .lbl{font:700 10px 'Inter';letter-spacing:1.8px;color:var(--txt-3);margin:15px 18px 7px;text-transform:uppercase}
+  .inp{margin:0 18px;padding:11px 13px;border-radius:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);color:var(--txt);font:500 13px 'Inter';outline:none;width:calc(100% - 36px)}
+  .inp:focus{border-color:rgba(180,140,255,.45)}
+  select.inp option{background:#141020}
+  .gen{margin:18px 18px 8px;padding:13px;border-radius:13px;border:none;width:calc(100% - 36px);
+    background:linear-gradient(135deg,var(--purple),var(--pink));color:#16091f;font:800 13.5px 'Space Grotesk';letter-spacing:.4px;cursor:pointer;transition:.2s}
+  .gen:hover{filter:brightness(1.12)}
+  .gen:disabled{opacity:.55;cursor:wait}
+  .hint{margin:8px 18px 16px;font-size:10.8px;color:var(--txt-3);line-height:1.65}
+  .gcard{overflow-y:auto;overflow-x:hidden}
+  .out{margin:4px 18px 0;padding:14px 16px;border-radius:14px;border:1px dashed rgba(180,140,255,.45);background:rgba(180,140,255,.07);display:none}
+  .out.show{display:block}
+  .orow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ok2{font:700 15px 'JetBrains Mono';letter-spacing:1px;color:var(--purple-bright)}
+  .cbtn{margin-left:auto;padding:7px 13px;border-radius:9px;border:1px solid var(--stroke);background:var(--glass);color:var(--txt-2);font:600 11px 'Inter';cursor:pointer;transition:.2s}
+  .cbtn:hover{color:var(--txt);border-color:rgba(180,140,255,.4)}
+  .osub{font-size:10.3px;color:var(--txt-3);margin-top:8px;line-height:1.55}
+  .plist{flex:1;overflow-y:auto;padding:10px 14px 14px;display:flex;flex-direction:column;gap:9px}
+  .empty{padding:34px 10px;text-align:center;color:var(--txt-3);font-size:12px}
+  .krow{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;border:1px solid var(--stroke-soft);background:rgba(255,255,255,.025);flex-wrap:wrap}
+  .kmain2{display:flex;align-items:center;gap:9px;flex-wrap:wrap;flex:1;min-width:240px}
+  .kmain2 b{font:700 13px 'JetBrains Mono';letter-spacing:.8px}
+  .kmain2 small{width:100%;font-size:10.5px;color:var(--txt-3)}
+  .bdg{padding:3px 9px;border-radius:999px;font:600 9.5px 'Inter'}
+  .bdg.free{background:rgba(125,227,184,.13);color:var(--green);border:1px solid rgba(125,227,184,.3)}
+  .bdg.used{background:rgba(180,140,255,.13);color:var(--purple-bright);border:1px solid rgba(180,140,255,.3)}
+  .bdg.exp{background:rgba(255,107,129,.13);color:var(--red);border:1px solid rgba(255,107,129,.3)}
+  .bdg.ban{background:rgba(255,107,129,.13);color:var(--red);border:1px solid rgba(255,107,129,.3)}
+  .kmeta{font-size:10.5px;color:var(--txt-3);font-family:'JetBrains Mono'}
+  .kact{display:flex;gap:7px;margin-left:auto}
+  .kb{padding:7px 13px;border-radius:9px;border:1px solid var(--stroke);background:var(--glass);color:var(--txt-2);font:600 11.5px 'Inter';cursor:pointer;transition:.2s}
+  .kb:hover{color:var(--txt);border-color:rgba(180,140,255,.4)}
+  .kb.danger:hover{color:#ffb3be;border-color:rgba(255,107,129,.45)}
+  .kb.warn:hover{color:#ffd98a;border-color:rgba(255,207,122,.45)}
+  .mdl{position:fixed;inset:0;z-index:900;display:none;place-items:center;background:rgba(5,4,10,.66);backdrop-filter:blur(4px)}
+  .mdl.on{display:grid}
+  .mbox{width:min(380px,88vw);background:#141020;border:1px solid var(--stroke);border-radius:18px;padding:22px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.7)}
+  .mico{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;margin:0 auto 12px;background:rgba(255,207,122,.12);color:var(--amber)}
+  .mico svg{width:22px;height:22px}
+  .mbox b{font:700 15px 'Space Grotesk'}
+  .mbox p{font:400 12.5px 'Inter','Noto Sans Thai';color:var(--txt-2);margin-top:9px;white-space:pre-line;line-height:1.6}
+  .mbtns{display:flex;gap:9px;margin-top:18px}
+  .mbtn{flex:1;padding:10px;border-radius:11px;border:1px solid var(--stroke);background:var(--glass);color:var(--txt-2);font:600 12.5px 'Inter';cursor:pointer;transition:.2s}
+  .mbtn:hover{color:var(--txt)}
+  .mbtn.ok{background:linear-gradient(135deg,var(--purple),var(--pink));border:none;color:#16091f;font-weight:700}
+  .mbtn.ok:hover{filter:brightness(1.1);color:#16091f}
+  .mbtn.dangerok{background:linear-gradient(135deg,#ff6b81,#ff9fd1);border:none;color:#2a0d14;font-weight:700}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);z-index:999;padding:10px 18px;border-radius:999px;
+    background:rgba(20,16,32,.95);border:1px solid var(--stroke);color:var(--txt);font:600 12.5px 'Inter';opacity:0;pointer-events:none;transition:.25s}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  ::-webkit-scrollbar{width:9px}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:99px}
+</style>
+<body>
+<div class="backdrop"><div class="orb a"></div><div class="orb b"></div></div>
+
+<div class="kg">
+  <header class="ktop topbar">
+    <button class="back" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Dashboard</button>
+    <div class="blogo"><img src="logo.png" alt="KingR9"></div>
+    <div class="kt"><h1>Key Generator</h1><p>สร้าง key · ล็อค HWID อัตโนมัติกับเครื่องแรกที่ Activate</p></div>
+    <div class="kpill"><span class="dot"></span>Keys <b id="keyCount">0 keys</b></div>
+  </header>
+
+      <div class="card" id="srvBox" style="display:none;margin:16px 24px 0">
+        <div class="chead" style="margin-bottom:0"><h2>🌐 ตั้งค่า server (ครั้งเดียว)</h2></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;padding:14px 18px 0">
+          <div>
+            <div class="lbl" style="margin:0 0 6px">Web API Key</div>
+            <input class="inp" id="srvKey" style="margin:0;width:100%" placeholder="AIzaSy...">
+          </div>
+          <div>
+            <div class="lbl" style="margin:0 0 6px">อีเมลแอดมิน (Authentication)</div>
+            <input class="inp" id="srvMail" style="margin:0;width:100%" placeholder="admin@kingr9.com">
+          </div>
+          <div>
+            <div class="lbl" style="margin:0 0 6px">รหัสผ่านแอดมิน</div>
+            <input class="inp" id="srvPass" style="margin:0;width:100%" type="password" placeholder="••••••••">
+          </div>
+        </div>
+        <button class="gen" id="srvSave" style="margin:14px 18px 0;width:calc(100% - 36px)">บันทึก &amp; เชื่อมต่อ server</button>
+        <div class="hint" style="margin:8px 18px 14px">ค่าทั้งหมดอยู่ใน Firebase Console ของคุณ · บันทึกลงเครื่องนี้เท่านั้น (config.json) — ไม่ถูกฝังใน exe ที่แจกลูกค้า</div>
+        <div class="err" id="srvErr" style="color:var(--red);font-size:11.5px;margin:0 18px 12px;min-height:14px;text-align:center"></div>
+      </div>
+
+  <div class="card" id="dcBox" style="margin:12px 24px 0;padding:12px 18px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <b style="font-size:13px;white-space:nowrap">🔔 Discord แจ้งเตือน</b>
+      <input class="inp" id="dcUrl" style="margin:0;flex:1;height:32px;font-size:12px;padding:6px 10px" placeholder="https://discord.com/api/webhooks/...">
+      <button class="gen" id="dcSave" style="margin:0;padding:8px 16px;font-size:12.5px;width:auto;flex:none;white-space:nowrap">บันทึก</button>
+      <button class="gen" id="dcTest" style="margin:0;padding:8px 16px;font-size:12.5px;width:auto;flex:none;background:rgba(88,101,242,.28);white-space:nowrap">ทดสอบ</button>
+    </div>
+    <div style="display:flex;justify-content:space-between;gap:16px;margin-top:7px;align-items:baseline">
+      <small style="opacity:.5;font-size:11px">Server Settings → Integrations → Webhooks → Copy URL · แจ้ง: activate · optimize/restore · ares · เจน key · รีเครื่อง · เว้นว่าง+บันทึก = ปิด</small>
+      <small id="dcErr" style="font-size:11.5px;min-height:14px;white-space:nowrap"></small>
+    </div>
+  </div>
+
+  <div class="card" id="pubBox" style="margin:12px 24px 0;padding:12px 18px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <b style="font-size:13px;white-space:nowrap">📦 อัปเดตแอป (เครื่องนี้: <span id="pubLocal">—</span>)</b>
+      <input class="inp" id="pubVer" style="margin:0;width:110px;height:32px;font-size:12px;padding:6px 10px" placeholder="1.0.1">
+      <input class="inp" id="pubUrl" style="margin:0;flex:1;height:32px;font-size:12px;padding:6px 10px" placeholder="URL ไฟล์ KingR9Tools.exe (Netlify/โฮสต์)">
+      <button class="gen" id="pubGo" style="margin:0;padding:8px 16px;font-size:12.5px;width:auto;flex:none;white-space:nowrap">เผยแพร่</button>
+    </div>
+    <div style="display:flex;gap:16px;margin-top:7px;align-items:baseline">
+      <input class="inp" id="pubNotes" style="margin:0;flex:1;height:28px;font-size:11.5px;padding:5px 10px" placeholder="โน้ตสั้น ๆ ที่โชว์ใน banner ลูกค้า (เช่น แก้ค้าง Ares)">
+      <small id="pubErr" style="font-size:11.5px;min-height:14px;white-space:nowrap"></small>
+    </div>
+  </div>
+
+  <div class="kmain">
+    <div class="card gcard">
+      <div class="chead"><h2>เจน key ใหม่</h2></div>
+      <div class="lbl">อายุการใช้งาน</div>
+      <select class="inp" id="daysSel">
+        <option value="7">7 วัน (ทดลอง)</option>
+        <option value="30" selected>30 วัน</option>
+        <option value="90">90 วัน</option>
+        <option value="180">180 วัน</option>
+        <option value="365">365 วัน</option>
+      </select>
+      <div class="lbl">โน้ต (ใครเป็นเจ้าของ / ขายให้ใคร)</div>
+      <input class="inp" id="noteIn" type="text" placeholder="เช่น ลูกค้า A — FB:xxx" maxlength="60">
+      <button class="gen" id="genBtn">Generate Key</button>
+      <div class="out" id="outBox">
+        <div class="orow"><span class="ok2" id="outKey">----</span><button class="cbtn" id="copyNew">คัดลอก</button></div>
+        <div class="osub" id="outSub"></div>
+      </div>
+      <div class="hint" id="hintEl">📍 <b>ส่ง key ให้ลูกค้า:</b> ① กดปุ่ม <b>ไฟล์</b> → เซฟไฟล์ลงเดสก์ท็อป ② ส่ง <b>ไฟล์ + ตัว key</b> ให้ลูกค้าทางแชท ③ ลูกค้าเปิดแอป → กด "มีไฟล์ key?" → เลือกไฟล์ → กด Activate (ล็อค HWID เครื่องลูกค้าทันที)<br>Key ที่เจนใหม่ยังไม่ผูกเครื่อง — ใคร Activate ก่อนได้ = ผูกเครื่องนั้น เครื่องอื่นใช้ key เดิมไม่ได้</div>
+    </div>
+
+    <div class="card">
+      <div class="chead"><h2>รายการ key ทั้งหมด</h2><span class="cnt">LIVE</span></div>
+      <div class="plist" id="keyList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="mdl" id="mdl">
+  <div class="mbox">
+    <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+    <b id="mTitle">ยืนยันการทำรายการ</b>
+    <p id="mMsg"></p>
+    <div class="mbtns">
+      <button class="mbtn" id="mNo">ยกเลิก</button>
+      <button class="mbtn ok" id="mYes">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="bridge.js"></script>
+</body>
+</html>

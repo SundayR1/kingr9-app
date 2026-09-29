@@ -1,0 +1,220 @@
+<Application x:Class="KingR9Tools.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Application.Resources>
+    <!-- ===== PALETTE ===== -->
+    <SolidColorBrush x:Key="Bg"      Color="#0B0F14"/>
+    <SolidColorBrush x:Key="Panel"   Color="#121820"/>
+    <SolidColorBrush x:Key="Card"    Color="#1A222C"/>
+    <SolidColorBrush x:Key="CardHov" Color="#212B37"/>
+    <SolidColorBrush x:Key="Gold"    Color="#F5C542"/>
+    <SolidColorBrush x:Key="GoldDim" Color="#8A6E1F"/>
+    <SolidColorBrush x:Key="Fg"      Color="#E8EEF5"/>
+    <SolidColorBrush x:Key="Sub"     Color="#8B98A8"/>
+    <SolidColorBrush x:Key="Line"    Color="#232C38"/>
+    <SolidColorBrush x:Key="Green"   Color="#4ADE80"/>
+
+    <LinearGradientBrush x:Key="GoldGrad" StartPoint="0,0" EndPoint="1,1">
+      <GradientStop Color="#F7D774" Offset="0"/>
+      <GradientStop Color="#F5C542" Offset="0.5"/>
+      <GradientStop Color="#D9A320" Offset="1"/>
+    </LinearGradientBrush>
+
+    <BooleanToVisibilityConverter x:Key="B2V"/>
+
+    <!-- ===== SCROLLBAR ===== -->
+    <Style TargetType="ScrollBar">
+      <Setter Property="Width" Value="9"/>
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ScrollBar">
+            <Grid Background="Transparent">
+              <Track x:Name="PART_Track" IsDirectionReversed="True">
+                <Track.Thumb>
+                  <Thumb>
+                    <Thumb.Template>
+                      <ControlTemplate TargetType="Thumb">
+                        <Border Background="#2E3A48" CornerRadius="4" Margin="2,0"/>
+                      </ControlTemplate>
+                    </Thumb.Template>
+                  </Thumb>
+                </Track.Thumb>
+                <Track.IncreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False"/>
+                </Track.IncreaseRepeatButton>
+                <Track.DecreaseRepeatButton>
+                  <RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/>
+                </Track.DecreaseRepeatButton>
+              </Track>
+            </Grid>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ===== NAV ITEM ===== -->
+    <Style x:Key="NavItem" TargetType="ListBoxItem">
+      <Setter Property="Foreground" Value="{StaticResource Sub}"/>
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="ListBoxItem">
+            <Border x:Name="b" Background="Transparent" CornerRadius="9" Margin="10,2,10,2" Height="46">
+              <Grid>
+                <Border x:Name="bar" Width="3" HorizontalAlignment="Left" CornerRadius="2"
+                        Background="{StaticResource GoldGrad}" Margin="0,10,0,10" Opacity="0"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+                  <TextBlock Text="{Binding Icon}" FontSize="15" Width="24" VerticalAlignment="Center"/>
+                  <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Name}" FontSize="12.5" FontWeight="SemiBold"
+                               Foreground="{Binding Foreground, RelativeSource={RelativeSource TemplatedParent}}"/>
+                    <TextBlock x:Name="cnt" Text="{Binding Count, StringFormat={}{0} tweaks}"
+                               FontSize="9.5" Foreground="#63707F" Margin="0,1,0,0"/>
+                  </StackPanel>
+                </StackPanel>
+              </Grid>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="b" Property="Background" Value="{StaticResource Card}"/>
+                <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+              </Trigger>
+              <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="b" Property="Background" Value="#1E2836"/>
+                <Setter TargetName="bar" Property="Opacity" Value="1"/>
+                <Setter Property="Foreground" Value="{StaticResource Gold}"/>
+              </Trigger>
+              <DataTrigger Binding="{Binding Count}" Value="0">
+                <Setter TargetName="cnt" Property="Visibility" Value="Collapsed"/>
+              </DataTrigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ===== BUTTONS ===== -->
+    <Style x:Key="BtnBase" TargetType="Button">
+      <Setter Property="Foreground" Value="#0B0F14"/>
+      <Setter Property="Background" Value="{StaticResource GoldGrad}"/>
+      <Setter Property="FontWeight" Value="Bold"/>
+      <Setter Property="FontSize" Value="12.5"/>
+      <Setter Property="Height" Value="38"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="b" Background="{TemplateBinding Background}" CornerRadius="9" Padding="20,0">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="b" Property="Opacity" Value="0.87"/>
+              </Trigger>
+              <Trigger Property="IsPressed" Value="True">
+                <Setter TargetName="b" Property="Opacity" Value="0.65"/>
+              </Trigger>
+              <Trigger Property="IsEnabled" Value="False">
+                <Setter TargetName="b" Property="Opacity" Value="0.35"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <Style x:Key="BtnGhost" TargetType="Button" BasedOn="{StaticResource BtnBase}">
+      <Setter Property="Background" Value="#212B37"/>
+      <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+
+    <Style x:Key="BtnChip" TargetType="Button" BasedOn="{StaticResource BtnGhost}">
+      <Setter Property="Height" Value="30"/>
+      <Setter Property="FontSize" Value="11"/>
+    </Style>
+
+    <Style x:Key="BtnIcon" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{StaticResource Sub}"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Width" Value="46"/>
+      <Setter Property="Height" Value="48"/>
+      <Setter Property="FontSize" Value="14"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="Button">
+            <Border x:Name="b" Background="{TemplateBinding Background}">
+              <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="b" Property="Background" Value="#1E2836"/>
+                <Setter Property="Foreground" Value="{StaticResource Fg}"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ===== TOGGLE SWITCH ===== -->
+    <Style x:Key="Switch" TargetType="CheckBox">
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="CheckBox">
+            <Border x:Name="track" Width="46" Height="25" CornerRadius="13" Background="#2B3644">
+              <Border x:Name="dot" Width="19" Height="19" CornerRadius="10" Background="#78889A"
+                      HorizontalAlignment="Left" Margin="3,0,0,0">
+                <Border.RenderTransform>
+                  <TranslateTransform x:Name="t" X="0"/>
+                </Border.RenderTransform>
+              </Border>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="track" Property="Background" Value="{StaticResource GoldGrad}"/>
+                <Setter TargetName="dot" Property="Background" Value="#0B0F14"/>
+                <Trigger.EnterActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="t" Storyboard.TargetProperty="X"
+                                       To="21" Duration="0:0:0.16">
+                        <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.EnterActions>
+                <Trigger.ExitActions>
+                  <BeginStoryboard>
+                    <Storyboard>
+                      <DoubleAnimation Storyboard.TargetName="t" Storyboard.TargetProperty="X"
+                                       To="0" Duration="0:0:0.16">
+                        <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+                      </DoubleAnimation>
+                    </Storyboard>
+                  </BeginStoryboard>
+                </Trigger.ExitActions>
+              </Trigger>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="track" Property="BorderBrush" Value="{StaticResource Gold}"/>
+                <Setter TargetName="track" Property="BorderThickness" Value="1"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+
+    <!-- ===== PROGRESS ===== -->
+    <Style TargetType="ProgressBar">
+      <Setter Property="Height" Value="3"/>
+      <Setter Property="Background" Value="#1A222C"/>
+      <Setter Property="Foreground" Value="{StaticResource GoldGrad}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+    </Style>
+  </Application.Resources>
+</Application>

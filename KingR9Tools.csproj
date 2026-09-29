@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyTitle>KingR9 Tools</AssemblyTitle>
+    <Product>KingR9 Tools</Product>
+    <Company>KingR9</Company>
+    <Description>Windows Optimization Toolkit for FiveM Gaming</Description>
+    <Copyright>Copyright © KingR9 2024-2026</Copyright>
+    <Version>1.0.1</Version>
+    <FileVersion>1.0.1.0</FileVersion>
+    <ApplicationIcon>KingR9.ico</ApplicationIcon>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="kingr9tools_login.html">
+      <LogicalName>UI.kingr9tools_login.html</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="kingr9tools_dashboard.html">
+      <LogicalName>UI.kingr9tools_dashboard.html</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="kingr9tools_keygen.html">
+      <LogicalName>UI.kingr9tools_keygen.html</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="bridge.js">
+      <LogicalName>UI.bridge.js</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="logo.png">
+      <LogicalName>UI.logo.png</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Scripts\**\*.ps1;Scripts\**\*.bat">
+      <LogicalName>Scripts.%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Scripts\Ares\wallpaper\*.png">
+      <LogicalName>Scripts.Ares.wallpaper.%(Filename)%(Extension)</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Target Name="RemovePublishXmlDocumentation" AfterTargets="Publish">
+    <ItemGroup>
+      <_PublishXmlDocumentation Include="$(PublishDir)**\*.xml" />
+    </ItemGroup>
+    <Delete Files="@(_PublishXmlDocumentation)" />
+  </Target>
+</Project>
+
+

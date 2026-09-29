@@ -1,0 +1,21 @@
+# .NET build artifacts
+bin/
+obj/
+Release/
+.vs/
+*.pdb
+*.user
+*.suo
+
+# Local settings, logs, and backups
+config.json
+licenses.json
+*.log
+build_out*.txt
+build_verify.txt
+Backup/
+
+# Private signing key and downloaded runtime/bootstrapper
+*.pfx
+MicrosoftEdgeWebview2Setup.exe
+Scripts/Ares/vivetool/

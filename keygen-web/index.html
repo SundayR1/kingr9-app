@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KingR9 — Key Generator (Admin)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0910; --glass:rgba(255,255,255,.035);
+    --stroke:rgba(255,255,255,.08); --stroke-soft:rgba(255,255,255,.05);
+    --txt:#f2f0f7; --txt-2:rgba(242,240,247,.56); --txt-3:rgba(242,240,247,.32);
+    --purple:#b48cff; --purple-bright:#c9a6ff; --pink:#ff9fd1; --green:#7de3b8; --red:#ff6b81; --amber:#ffcf7a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{min-height:100%}
+  body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;min-height:100vh}
+  .backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;background:
+      radial-gradient(120% 120% at 12% 0%, #150f24 0%, transparent 55%),
+      radial-gradient(100% 100% at 100% 100%, #1a0f22 0%, transparent 50%), var(--bg)}
+  .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:float 16s ease-in-out infinite}
+  .orb.a{width:480px;height:480px;background:radial-gradient(circle,#8f5bff,transparent 70%);top:-160px;left:-80px}
+  .orb.b{width:560px;height:560px;background:radial-gradient(circle,#ff6fc0,transparent 70%);bottom:-220px;right:-120px;animation-delay:-6s}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.08)}}
+  .kg{position:relative;z-index:2;max-width:1240px;margin:0 auto;padding:26px 22px 60px}
+  .khead{display:flex;align-items:center;gap:12px;row-gap:10px;flex-wrap:wrap;margin-bottom:20px}
+  .blogo{width:46px;height:46px;border-radius:13px;overflow:hidden;flex-shrink:0;
+    background:linear-gradient(140deg,var(--purple),var(--pink));box-shadow:0 8px 22px -6px rgba(180,140,255,.7)}
+  .blogo img{width:100%;height:100%;object-fit:cover;display:block}
+  .kt h1{font-family:'Space Grotesk';font-size:19px;font-weight:700}
+  .kt p{font-size:11.5px;color:var(--txt-3);margin-top:2px}
+  .badge{margin-left:auto;display:flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;border:1px solid var(--stroke);background:var(--glass);font:600 11.5px 'Inter';color:var(--txt-2)}
+  .badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(125,227,184,.9)}
+  .badge b{color:var(--txt)}
+  .card{background:var(--glass);border:1px solid var(--stroke-soft);border-radius:20px;backdrop-filter:blur(20px);padding:18px}
+  .chead{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .chead h2{font-family:'Space Grotesk';font-size:15px;font-weight:700}
+  .lbl{font:700 10px 'Inter';letter-spacing:1.8px;color:var(--txt-3);margin:12px 0 6px;text-transform:uppercase}
+  .inp{width:100%;padding:11px 13px;border-radius:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.04);color:var(--txt);font:500 13px 'Inter';outline:none}
+  .inp:focus{border-color:rgba(180,140,255,.45)}
+  select.inp option{background:#141020}
+  .gen{margin-top:16px;padding:13px;border-radius:13px;border:none;width:100%;
+    background:linear-gradient(135deg,var(--purple),var(--pink));color:#16091f;font:800 13.5px 'Space Grotesk';letter-spacing:.4px;cursor:pointer;transition:.2s}
+  .gen:hover{filter:brightness(1.12)}
+  .gen:disabled{opacity:.55;cursor:wait}
+  .hint{margin-top:12px;font-size:10.8px;color:var(--txt-3);line-height:1.65}
+  .out{margin-top:14px;padding:14px 16px;border-radius:14px;border:1px dashed rgba(180,140,255,.45);background:rgba(180,140,255,.07);display:none}
+  .out.show{display:block}
+  .orow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .ok2{font:700 15px 'JetBrains Mono';letter-spacing:1px;color:var(--purple-bright)}
+  .osub{font-size:10.3px;color:var(--txt-3);margin-top:8px;line-height:1.55}
+  .grid2c{display:grid;grid-template-columns:400px 1fr;gap:16px;align-items:start}
+  @media(max-width:980px){.grid2c{grid-template-columns:1fr}}
+  .plist{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+  .empty{padding:34px 10px;text-align:center;color:var(--txt-3);font-size:12px}
+  .krow{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:14px;border:1px solid var(--stroke-soft);background:rgba(255,255,255,.025);flex-wrap:wrap}
+  .kmain2{display:flex;align-items:center;gap:9px;flex-wrap:wrap;flex:1;min-width:240px}
+  .kmain2 b{font:700 13px 'JetBrains Mono';letter-spacing:.8px}
+  .kmain2 small{width:100%;font-size:10.5px;color:var(--txt-3)}
+  .bdg{padding:3px 9px;border-radius:999px;font:600 9.5px 'Inter'}
+  .bdg.free{background:rgba(125,227,184,.13);color:var(--green);border:1px solid rgba(125,227,184,.3)}
+  .bdg.used{background:rgba(180,140,255,.13);color:var(--purple-bright);border:1px solid rgba(180,140,255,.3)}
+  .bdg.exp{background:rgba(255,107,129,.13);color:var(--red);border:1px solid rgba(255,107,129,.3)}
+  .bdg.ban{background:rgba(255,107,129,.13);color:var(--red);border:1px solid rgba(255,107,129,.3)}
+  .kmeta{font-size:10.5px;color:var(--txt-3);font-family:'JetBrains Mono'}
+  .kact{display:flex;gap:7px;margin-left:auto;flex-wrap:wrap}
+  .kb{padding:7px 13px;border-radius:9px;border:1px solid var(--stroke);background:var(--glass);color:var(--txt-2);font:600 11.5px 'Inter';cursor:pointer;transition:.2s}
+  .kb:hover{color:var(--txt);border-color:rgba(180,140,255,.4)}
+  .kb.warn:hover{color:#ffd98a;border-color:rgba(255,207,122,.45)}
+  .kb.danger:hover{color:#ffb3be;border-color:rgba(255,107,129,.45)}
+  .cbtn{margin-left:auto;padding:7px 13px;border-radius:9px;border:1px solid var(--stroke);background:var(--glass);color:var(--txt-2);font:600 11px 'Inter';cursor:pointer;transition:.2s}
+  .cbtn:hover{color:var(--txt);border-color:rgba(180,140,255,.4)}
+  .mdl{position:fixed;inset:0;z-index:900;display:none;place-items:center;background:rgba(5,4,10,.66);backdrop-filter:blur(4px)}
+  .mdl.on{display:grid}
+  .mbox{width:min(380px,88vw);background:#141020;border:1px solid var(--stroke);border-radius:18px;padding:22px;text-align:center;box-shadow:0 30px 70px -20px rgba(0,0,0,.7)}
+  .mbox b{font:700 15px 'Space Grotesk'}
+  .mbox p{font:400 12.5px 'Inter','Noto Sans Thai';color:var(--txt-2);margin-top:9px;white-space:pre-line;line-height:1.6}
+  .mbtns{display:flex;gap:9px;margin-top:18px}
+  .mbtn{flex:1;padding:10px;border-radius:11px;border:1px solid var(--stroke);background:var(--glass);color:var(--txt-2);font:600 12.5px 'Inter';cursor:pointer;transition:.2s}
+  .mbtn:hover{color:var(--txt)}
+  .mbtn.ok{background:linear-gradient(135deg,var(--purple),var(--pink));border:none;color:#16091f;font-weight:700}
+  .mbtn.ok:hover{filter:brightness(1.1);color:#16091f}
+  .mbtn.dangerok{background:linear-gradient(135deg,#ff6b81,#ff9fd1);border:none;color:#2a0d14;font-weight:700}
+  .toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);z-index:999;padding:10px 18px;border-radius:999px;
+    background:rgba(20,16,32,.95);border:1px solid var(--stroke);color:var(--txt);font:600 12.5px 'Inter';opacity:0;pointer-events:none;transition:.25s}
+  .toast.on{opacity:1;transform:translate(-50%,0)}
+  .screen{display:none}
+  .screen.on{display:block}
+  .center{max-width:460px;margin:8vh auto 0}
+  .err{color:var(--red);font-size:11.5px;margin-top:10px;min-height:14px;text-align:center}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px}
+</style>
+<body>
+<div class="backdrop"><div class="orb a"></div><div class="orb b"></div></div>
+<div class="kg">
+
+  <!-- ===== ตั้งค่า (ครั้งแรก) ===== -->
+  <div class="screen center" id="scrSetup">
+    <div class="khead" style="margin-bottom:14px">
+      <div class="blogo"><img src="logo.png" alt="KingR9" onerror="this.style.display='none'"></div>
+      <div class="kt"><h1>KingR9 — Key Generator</h1><p>ตั้งค่าเชื่อมต่อ Firebase (ทำครั้งเดียว)</p></div>
+    </div>
+    <div class="card">
+      <div class="lbl">Firebase Realtime Database URL</div>
+      <input class="inp" id="cfgDb" placeholder="https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app">
+      <div class="lbl">Web API Key</div>
+      <input class="inp" id="cfgKey" placeholder="Project settings → General → Web API Key">
+      <div class="lbl">อีเมลแอดมิน (สร้างใน Authentication)</div>
+      <input class="inp" id="cfgMail" placeholder="admin@kingr9.com">
+      <div class="lbl">รหัสผ่านแอดมิน</div>
+      <input class="inp" id="cfgPass" type="password" placeholder="••••••••">
+      <button class="gen" id="setupBtn">บันทึก &amp; เข้าสู่ระบบ</button>
+      <div class="hint">วิธีหาค่าทั้ง 4 ช่อง: firebase.google.com → สร้างโปรเจกต์ → Realtime Database (ได้ URL) → Authentication → Sign-in method → เปิด Email/Password แล้วกด Users → Add user (ได้อีเมล/รหัส) → Project settings → General → Web API Key</div>
+      <div class="err" id="stErr"></div>
+    </div>
+  </div>
+
+  <!-- ===== ล็อกอิน ===== -->
+  <div class="screen center" id="scrLogin" style="margin-top:12vh">
+    <div class="khead" style="margin-bottom:14px">
+      <div class="blogo"><img src="logo.png" alt="KingR9" onerror="this.style.display='none'"></div>
+      <div class="kt"><h1>KingR9 — Admin</h1><p>เข้าสู่ระบบจัดการ key</p></div>
+    </div>
+    <div class="card">
+      <div class="lbl">อีเมลแอดมิน</div>
+      <input class="inp" id="lgMail">
+      <div class="lbl">รหัสผ่าน</div>
+      <input class="inp" id="lgPass" type="password">
+      <button class="gen" id="loginBtn">เข้าสู่ระบบ</button>
+      <div class="err" id="lgErr"></div>
+      <div class="hint" style="text-align:center">เปลี่ยนการตั้งค่า Firebase? <a href="#" id="reCfg" style="color:var(--purple-bright)">ตั้งค่าใหม่</a></div>
+    </div>
+  </div>
+
+  <!-- ===== จัดการ key ===== -->
+  <div class="screen" id="scrMain">
+    <div class="khead">
+      <div class="blogo"><img src="logo.png" alt="KingR9" onerror="this.style.display='none'"></div>
+      <div class="kt"><h1>KingR9 — Key Generator</h1><p>เจน key · รี HWID · ระงับ — ทำงานผ่าน server จากที่ไหนก็ได้</p></div>
+      <div class="badge"><span class="dot"></span><span id="whoMail">admin</span>&nbsp;·&nbsp;<a href="#" id="logoutBtn" style="color:#ff8fa0">ออกจากระบบ</a></div>
+    </div>
+    <div class="grid2c">
+      <div class="card">
+        <div class="chead"><h2>เจน key ใหม่</h2></div>
+        <div class="lbl">อายุการใช้งาน</div>
+        <select class="inp" id="daysSel">
+          <option value="7">7 วัน (ทดลอง)</option>
+          <option value="30" selected>30 วัน</option>
+          <option value="90">90 วัน</option>
+          <option value="180">180 วัน</option>
+          <option value="365">365 วัน</option>
+        </select>
+        <div class="lbl">โน้ต (ใครเป็นเจ้าของ)</div>
+        <input class="inp" id="noteIn" placeholder="เช่น ลูกค้า A — FB:xxx" maxlength="60">
+        <button class="gen" id="genBtn">Generate Key</button>
+        <div class="hint">key ขึ้น server ทันที — ส่ง <b>ตัว key</b> ให้ลูกค้าทางแชทได้เลย ลูกค้ากรอกในแอป → ล็อค HWID เครื่องลูกค้าอัตโนมัติ</div>
+        <div class="out" id="outBox">
+          <div class="orow"><span class="ok2" id="outKey">----</span><button class="cbtn" id="copyNew">คัดลอก</button></div>
+          <div class="osub" id="outSub"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="chead"><h2>รายการ key ทั้งหมด</h2><span class="cnt" id="keyCount">0</span></div>
+        <div class="plist" id="keyList"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="mdl" id="mdl">
+  <div class="mbox">
+    <b id="mTitle">ยืนยันการทำรายการ</b>
+    <p id="mMsg"></p>
+    <div class="mbtns">
+      <button class="mbtn" id="mNo">ยกเลิก</button>
+      <button class="mbtn ok" id="mYes">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  let DB = localStorage.getItem('kr_db') || '';
+  let AKEY = localStorage.getItem('kr_api') || '';
+  let MAIL = localStorage.getItem('kr_mail') || '';
+  let PASS = localStorage.getItem('kr_pass') || '';
+  let TOK = sessionStorage.getItem('kr_tok') || '';
+
+  function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._t); t._t=setTimeout(function(){ t.classList.remove('on'); },2600); }
+  function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+  function fall(t){ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); }catch(e){} ta.remove(); }
+  function copyText(t){ if (navigator.clipboard) return navigator.clipboard.writeText(t).catch(function(){ fall(t); }); fall(t); return Promise.resolve(); }
+  function confirmBox(msg,title,yes,danger){
+    return new Promise(function(res){
+      const m=$('mdl'); $('mTitle').textContent=title||'ยืนยัน'; $('mMsg').textContent=msg;
+      const y=$('mYes'); y.textContent=yes||'ยืนยัน'; y.className='mbtn '+(danger?'dangerok':'ok'); m.classList.add('on');
+      function done(v){ m.classList.remove('on'); y.removeEventListener('click',oy); $('mNo').removeEventListener('click',on); m.removeEventListener('click',ob); res(v); }
+      function oy(){ done(true); } function on(){ done(false); } function ob(e){ if (e.target===m) done(false); }
+      y.addEventListener('click',oy); $('mNo').addEventListener('click',on); m.addEventListener('click',ob);
+    });
+  }
+  function show(id){ ['scrSetup','scrLogin','scrMain'].forEach(function(s){ $(s).classList.toggle('on', s===id); }); }
+
+  async function idLogin(email, pass){
+    const r = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+encodeURIComponent(AKEY), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email:email, password:pass, returnSecureToken:true })
+    });
+    const j = await r.json();
+    if (!r.ok){
+      const c=(j.error&&j.error.message)||'';
+      const friendly=['INVALID_LOGIN_CREDENTIALS','EMAIL_NOT_FOUND','INVALID_PASSWORD','INVALID_EMAIL'];
+      throw new Error(friendly.indexOf(c)>=0?'อีเมลหรือรหัสผ่านไม่ถูกต้อง':(c||'เข้าสู่ระบบไม่สำเร็จ'));
+    }
+    TOK = j.idToken; sessionStorage.setItem('kr_tok', TOK);
+  }
+  function base(){ return DB.replace(/\/+$/,''); }
+  async function api(path, opt, retried){
+    if (!TOK && PASS) await idLogin(MAIL, PASS);
+    const sep = path.indexOf('?')>=0 ? '&' : '?';
+    let r;
+    try { r = await fetch(base()+path+sep+'auth='+encodeURIComponent(TOK), opt); }
+    catch(e){ throw new Error('เชื่อมต่อ server ไม่ได้ — ตรวจ URL/อินเทอร์เน็ต'); }
+    if (r.status===401 && !retried && PASS){ await idLogin(MAIL, PASS); return api(path, opt, true); }
+    if (!r.ok) throw new Error('HTTP '+r.status);
+    const t = await r.text();
+    return (t && t!=='null') ? JSON.parse(t) : null;
+  }
+  const KPATH = key => '/keys/' + key.replace(/-/g,'') + '.json';
+  const fmtKey = raw => raw.replace(/(.{4})/g,'$1-').replace(/-$/,'');
+  function genRaw(){ const cs='0123456789ABCDEF'; let s=''; for(let i=0;i<12;i++) s+=cs[Math.floor(Math.random()*16)]; return 'KING'+s; }
+  function enterMain(){ show('scrMain'); $('whoMail').textContent = MAIL; load(); }
+  async function load(){
+    const list = $('keyList');
+    let data;
+    try { data = await api('/keys.json'); }
+    catch(e){ list.innerHTML = '<div class="empty">โหลดไม่สำเร็จ: '+esc(e.message)+'</div>'; return; }
+    if (!data){ $('keyCount').textContent='0'; list.innerHTML='<div class="empty">ยังไม่มี key บน server — เจน key แรกทางซ้ายได้เลย</div>'; return; }
+    const ids = Object.keys(data);
+    $('keyCount').textContent = ids.length + ' keys';
+    list.innerHTML = ids.map(function(id){
+      const k = data[id] || {};
+      const keyStr = k.key || fmtKey(id);
+      let left = 0; try { left = Math.floor((new Date(k.created).getTime() + k.days*864e5 - Date.now())/864e5); } catch(e){}
+      const badge = k.revoked ? '<span class="bdg ban">ระงับการใช้งาน</span>'
+        : (!k.hwid ? '<span class="bdg free">ว่าง · รอผูกเครื่องแรก</span>'
+        : (left<0 ? '<span class="bdg exp">หมดอายุ</span>' : '<span class="bdg used">ผูกแล้ว · HWID '+esc(k.hwid)+'</span>'));
+      return '<div class="krow">'+
+        '<div class="kmain2"><b>'+esc(keyStr)+'</b>'+badge+(k.note?'<small>📝 '+esc(k.note)+'</small>':'')+'</div>'+
+        '<div class="kmeta">'+esc(k.created)+' · '+k.days+' วัน'+(!k.revoked && k.hwid && left>=0 ? ' · เหลือ '+left+' วัน':'')+'</div>'+
+        '<div class="kact">'+
+        '<button class="kb" data-act="copy" data-id="'+id+'" data-k="'+esc(keyStr)+'">คัดลอก</button>'+
+        (!k.revoked ? '<button class="kb" data-act="extend" data-id="'+id+'">ต่ออายุ</button>' : '')+
+        (k.hwid && !k.revoked ? '<button class="kb warn" data-act="reset" data-id="'+id+'" data-k="'+esc(keyStr)+'">รี HWID</button>' : '')+
+        (k.revoked ? '<button class="kb" data-act="unban" data-id="'+id+'">ปลดระงับ</button>' : '<button class="kb danger" data-act="ban" data-id="'+id+'" data-k="'+esc(keyStr)+'">ระงับ</button>')+
+        '<button class="kb danger" data-act="del" data-id="'+id+'" data-k="'+esc(keyStr)+'">ลบ</button>'+
+        '</div></div>';
+    }).join('');
+  }
+
+  $('keyList').addEventListener('click', async function(ev){
+    const b = ev.target.closest('button.kb'); if (!b) return;
+    const id = b.dataset.id, k = b.dataset.k || '', act = b.dataset.act;
+    const J = o => ({ method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(o) });
+    try {
+      if (act==='copy'){ copyText(k).then(function(){ toast('Copied '+k); }); return; }
+      if (act==='reset'){
+        if (!await confirmBox('รี HWID ของ key นี้?\n'+k+'\n\nเครื่องเดิมจะโดนดีดกลับหน้า Activate ครั้งถัดไปที่เปิดแอป แล้วเครื่องใหม่จะผูกแทน','รี HWID','รี HWID',true)) return;
+        await api(KPATH(id), J({hwid:''})); toast('รี HWID แล้ว'); load(); return;
+      }
+      if (act==='ban'){
+        if (!await confirmBox('ระงับ key นี้?\n'+k+'\n\nลูกค้าจะเข้าใช้ไม่ได้ทันทีที่เปิดแอปครั้งถัดไป','ระงับ key','ระงับ',true)) return;
+        await api(KPATH(id), J({revoked:true})); toast('ระงับแล้ว'); load(); return;
+      }
+      if (act==='unban'){ await api(KPATH(id), J({revoked:false})); toast('ปลดระงับแล้ว'); load(); return; }
+      if (act==='extend'){
+        const d = prompt('ต่ออายุเป็นกี่วัน (นับจากวันนี้)?','30'); if (!d) return;
+        const n = parseInt(d,10); if (!n || n<1){ toast('จำนวนวันไม่ถูกต้อง'); return; }
+        await api(KPATH(id), J({days:n, created:new Date().toISOString().slice(0,10)})); toast('ต่ออายุ '+n+' วันแล้ว'); load(); return;
+      }
+      if (act==='del'){
+        if (!await confirmBox('ลบ key นี้ถาวร?\n'+k+'\n\nเครื่องที่ผูกไว้จะโดนดีดครั้งถัดไปที่เปิดแอป','ลบ key','ลบ',true)) return;
+        await api(KPATH(id), {method:'DELETE'}); toast('ลบแล้ว'); load(); return;
+      }
+    } catch(e){ toast('ผิดพลาด: '+e.message); }
+  });
+  $('genBtn').addEventListener('click', async function(){
+    const days = parseInt($('daysSel').value,10)||30, note = $('noteIn').value.trim();
+    const id = genRaw(), keyStr = fmtKey(id);
+    $('genBtn').disabled = true;
+    try {
+      if (await api(KPATH(id))){ toast('key ชนกับของเดิม — ลองอีกครั้ง'); $('genBtn').disabled = false; return; }
+      await api(KPATH(id), { method:'PUT', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ key:keyStr, hwid:'', created:new Date().toISOString().slice(0,10), days:days, note:note, revoked:false }) });
+      $('outBox').classList.add('show'); $('outKey').textContent = keyStr;
+      $('outSub').textContent = 'อายุ '+days+' วัน · ส่งตัว key นี้ให้ลูกค้าได้เลย — เครื่องแรกที่ Activate จะล็อค HWID อัตโนมัติ';
+      toast('สร้าง key สำเร็จ'); load();
+    } catch(e){ toast('ผิดพลาด: '+e.message); }
+    $('genBtn').disabled = false;
+  });
+
+  $('copyNew').addEventListener('click', function(){ copyText($('outKey').textContent).then(function(){ toast('Copied'); }); });
+
+  $('setupBtn').addEventListener('click', async function(){
+    DB = $('cfgDb').value.trim(); AKEY = $('cfgKey').value.trim(); MAIL = $('cfgMail').value.trim(); PASS = $('cfgPass').value;
+    $('stErr').textContent = '';
+    if (!DB.startsWith('http') || !AKEY || !MAIL || !PASS){ $('stErr').textContent = 'กรอกให้ครบทุกช่อง'; return; }
+    $('setupBtn').disabled = true;
+    try {
+      await idLogin(MAIL, PASS);
+      localStorage.setItem('kr_db',DB); localStorage.setItem('kr_api',AKEY); localStorage.setItem('kr_mail',MAIL); localStorage.setItem('kr_pass',PASS);
+      enterMain();
+    } catch(e){ $('stErr').textContent = e.message; }
+    $('setupBtn').disabled = false;
+  });
+
+  $('loginBtn').addEventListener('click', async function(){
+    MAIL = $('lgMail').value.trim(); PASS = $('lgPass').value; $('lgErr').textContent = ''; $('loginBtn').disabled = true;
+    try { await idLogin(MAIL, PASS); localStorage.setItem('kr_mail',MAIL); localStorage.setItem('kr_pass',PASS); enterMain(); }
+    catch(e){ $('lgErr').textContent = e.message; }
+    $('loginBtn').disabled = false;
+  });
+  $('lgPass').addEventListener('keydown', function(e){ if (e.key==='Enter') $('loginBtn').click(); });
+  $('cfgPass').addEventListener('keydown', function(e){ if (e.key==='Enter') $('setupBtn').click(); });
+
+  $('reCfg').addEventListener('click', function(ev){ ev.preventDefault(); show('scrSetup');
+    $('cfgDb').value=DB; $('cfgKey').value=AKEY; $('cfgMail').value=MAIL; });
+  $('logoutBtn').addEventListener('click', function(ev){ ev.preventDefault(); TOK=''; sessionStorage.removeItem('kr_tok'); show('scrLogin'); });
+
+  (function init(){
+    if (!DB || !AKEY){ show('scrSetup'); $('cfgDb').value=DB; $('cfgKey').value=AKEY; $('cfgMail').value=MAIL; return; }
+    if (MAIL && PASS){
+      idLogin(MAIL, PASS).then(function(){ enterMain(); })
+        .catch(function(e){ show('scrLogin'); $('lgMail').value=MAIL; $('lgErr').textContent=e.message; });
+      return;
+    }
+    show('scrLogin');
+  })();
+})();
+</script>
+
+</body>
+</html>

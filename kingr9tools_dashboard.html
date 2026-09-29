@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KingR9Tools — Performance Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0910; --bg-2:#100e1a;
+    --glass:rgba(255,255,255,.035); --glass-strong:rgba(255,255,255,.055);
+    --stroke:rgba(255,255,255,.08); --stroke-soft:rgba(255,255,255,.05);
+    --txt:#f2f0f7; --txt-2:rgba(242,240,247,.56); --txt-3:rgba(242,240,247,.32);
+    --purple:#b48cff; --purple-bright:#c9a6ff; --pink:#ff9fd1; --pink-bright:#ffb8dc;
+    --blue:#9fd0ff; --green:#7de3b8; --amber:#ffcf7a; --red:#ff6b81;
+    --r:22px; --r-sm:14px; --shadow:0 30px 70px -20px rgba(0,0,0,.7);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  .topbar,.side,.brand,.hero,.wrap,.ktop{-webkit-app-region:drag}
+  button,input,select,textarea,label,a,.menu,.scroll,.card,.glass,.plist,.pill,.sideout,.back,.mi,.status,.foot{-webkit-app-region:no-drag}
+  .blogo img,.logo img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);overflow:hidden;-webkit-font-smoothing:antialiased}
+  .backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;background:
+      radial-gradient(120% 120% at 12% 0%, #150f24 0%, transparent 55%),
+      radial-gradient(100% 100% at 100% 100%, #1a0f22 0%, transparent 50%), var(--bg);}
+  .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:float 16s ease-in-out infinite}
+  .orb.a{width:480px;height:480px;background:radial-gradient(circle,#8f5bff,transparent 70%);top:-160px;left:-80px}
+  .orb.b{width:560px;height:560px;background:radial-gradient(circle,#ff6fc0,transparent 70%);bottom:-220px;right:-120px;animation-delay:-6s}
+  .orb.c{width:340px;height:340px;background:radial-gradient(circle,#7cc8ff,transparent 70%);top:40%;left:55%;opacity:.26;animation-delay:-10s}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.08)}}
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");}
+  .app{position:relative;z-index:2;height:100vh;display:grid;grid-template-columns:226px 1fr;
+    grid-template-rows:minmax(0,1fr);overflow:hidden}
+  .side{display:flex;flex-direction:column;padding:20px 14px 16px;border-right:1px solid var(--stroke-soft);
+    background:linear-gradient(180deg,rgba(255,255,255,.025),rgba(255,255,255,.005));backdrop-filter:blur(20px)}
+  .brand{display:flex;align-items:center;gap:12px;padding:4px 6px 16px;border-bottom:1px solid var(--stroke-soft);margin-bottom:12px}
+  .blogo{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex-shrink:0;
+    background:linear-gradient(140deg,var(--purple),var(--pink));box-shadow:0 8px 22px -6px rgba(180,140,255,.7), inset 0 1px 0 rgba(255,255,255,.4)}
+  .blogo span{font-family:'Space Grotesk';font-weight:700;font-size:14px;color:#150b1e}
+  .bmeta h1{font-family:'Space Grotesk';font-size:15.5px;font-weight:700}
+  .bmeta p{font-size:10.5px;color:var(--txt-3);display:flex;align-items:center;gap:5px;margin-top:2px}
+  .bmeta .dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(125,227,184,.9)}
+  .menu{flex:1;display:flex;flex-direction:column;gap:3px;overflow-y:auto;padding-right:2px;scrollbar-width:none}
+  .menu::-webkit-scrollbar{width:0;height:0}
+  .mg{font-size:9.5px;letter-spacing:2.2px;color:var(--txt-3);margin:13px 10px 4px;font-weight:800;font-family:'Space Grotesk'}
+  .mi{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:11px;border:1px solid transparent;background:none;
+    color:var(--txt-2);font:500 13px 'Inter';cursor:pointer;text-align:left;transition:.2s;width:100%}
+  .mi svg{width:17px;height:17px;flex-shrink:0}
+  .mi:hover{background:var(--glass);color:var(--txt)}
+  .mi.act{background:linear-gradient(90deg,rgba(180,140,255,.16),rgba(255,159,209,.07));border-color:rgba(180,140,255,.28);color:var(--txt)}
+  *::-webkit-scrollbar{width:8px;height:8px}
+  *::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:8px}
+  *::-webkit-scrollbar-track{background:transparent}
+  .sideout{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;padding:9px 10px;border-radius:11px;width:100%;
+    border:1px solid rgba(255,107,129,.22);background:rgba(255,107,129,.06);color:#ff8fa0;font:600 12.5px 'Inter';cursor:pointer;transition:.2s}
+  .sideout:hover{background:rgba(255,107,129,.15);color:#ffb3be}
+  .sideout svg{width:15px;height:15px;flex-shrink:0}
+  .main{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:hidden}
+  .topbar{display:flex;align-items:center;gap:10px;row-gap:8px;flex-wrap:wrap;padding:15px 150px 15px 26px;border-bottom:1px solid var(--stroke-soft)}
+  .title-block h1{font-family:'Space Grotesk';font-size:19px;font-weight:700}
+  .title-block p{font-size:11.5px;color:var(--txt-2);margin-top:2px}
+  .spacer{flex:1}
+  .pill{display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:12px;background:var(--glass);
+    border:1px solid var(--stroke-soft);font-size:11px;color:var(--txt-2)}
+  .pill b{font-family:'JetBrains Mono';font-size:11.5px;color:var(--txt)}
+  .pill .pd{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px rgba(125,227,184,.9)}
+  .pill.warn .pd{background:var(--amber);box-shadow:0 0 8px rgba(255,207,122,.9)}
+  .optimize{position:relative;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;border:none;
+    background:linear-gradient(120deg,var(--purple),var(--pink));color:#1b0f26;font-family:'Space Grotesk';font-weight:700;
+    font-size:12.5px;cursor:pointer;box-shadow:0 10px 26px -8px rgba(255,159,209,.55);overflow:hidden}
+  .optimize svg{width:15px;height:15px}
+  .sweep{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%)}
+  .optimize.run .sweep{animation:sweep .9s ease}
+  @keyframes sweep{to{transform:translateX(120%)}}
+  .ghost{padding:10px 16px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--stroke);color:var(--txt);
+    font:600 12.5px 'Space Grotesk';cursor:pointer;display:flex;gap:8px;align-items:center;transition:.2s}
+  .ghost svg{width:14px;height:14px}
+  .ghost:hover{background:rgba(255,255,255,.09)}
+  .scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:22px 26px 32px}
+  .scroll::-webkit-scrollbar{width:8px}
+  .scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:8px}
+  .scroll::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.22)}
+  .scroll::-webkit-scrollbar-track{background:transparent}
+  .page{display:none}.page.act{display:block}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .span2{grid-column:1/-1}
+  .glass{background:var(--glass);border:1px solid var(--stroke-soft);border-radius:var(--r);backdrop-filter:blur(14px);box-shadow:var(--shadow)}
+  .card{padding:20px}
+  .head{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .head h2{font:600 15.5px 'Space Grotesk'}
+  .ct{font:600 15px 'Space Grotesk';margin-bottom:10px}
+  .desc{font-size:12.5px;color:var(--txt-2);line-height:1.6;margin-bottom:6px}
+  .mono{font-family:'JetBrains Mono'}
+  .hero{padding:34px 40px;display:flex;flex-direction:column;align-items:center;text-align:center}
+  .hico{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:rgba(255,255,255,.05);
+    border:1px solid var(--stroke-soft);color:var(--purple-bright);margin-bottom:14px}
+  .hico svg{width:26px;height:26px}
+  .hero h2{font:700 19px 'Space Grotesk'}
+  .hero>p{font-size:12.5px;color:var(--txt-2);margin-top:6px;max-width:520px}
+  .hr{width:100%;height:1px;background:var(--stroke-soft);margin:20px 0 8px}
+  .ck{display:flex;align-items:center;gap:11px;padding:9px 2px;font:500 13px 'Inter';color:var(--txt);cursor:pointer;text-align:left;width:100%}
+  .ck input{display:none}
+  .ck i{width:18px;height:18px;border-radius:6px;border:1.5px solid var(--stroke);background:rgba(255,255,255,.04);flex-shrink:0;position:relative;transition:.2s}
+  .ck input:checked+i{background:linear-gradient(135deg,var(--purple),var(--pink));border-color:transparent;box-shadow:0 0 12px -2px rgba(180,140,255,.7)}
+  .ck input:checked+i::after{content:'';position:absolute;left:5px;top:2px;width:5px;height:9px;border:solid #170d20;border-width:0 2px 2px 0;transform:rotate(42deg)}
+  .ckgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 26px}
+  .apply{margin-top:16px;width:100%;padding:13px;border-radius:12px;border:1px solid var(--stroke);background:rgba(255,255,255,.06);
+    color:var(--txt);font:600 13px 'Space Grotesk';cursor:pointer;transition:.2s}
+  .apply:hover{background:rgba(180,140,255,.16);border-color:rgba(180,140,255,.4)}
+  .apply:disabled{opacity:.5;cursor:wait}
+  .apply.danger:hover{background:rgba(255,107,129,.14);border-color:rgba(255,107,129,.4)}
+  .btnrow{display:flex;gap:12px;margin-top:16px}
+  .btnrow .apply{margin-top:0}
+  .fld-l{font:600 12px 'Inter';color:var(--txt-2);margin:4px 0 8px;text-align:left}
+  .fld{width:100%;padding:11px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--stroke);color:var(--txt);font:500 13px 'Inter';outline:none}
+  .str-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin:2px 0 4px}
+  .str-opt{position:relative;padding:13px 14px;border-radius:12px;background:rgba(255,255,255,.03);
+    border:1px solid var(--stroke);cursor:pointer;text-align:left;transition:.2s;font-family:'Inter'}
+  .str-opt:hover{border-color:rgba(180,140,255,.4);background:rgba(180,140,255,.06)}
+  .str-opt.act{border-color:rgba(180,140,255,.65);background:linear-gradient(135deg,rgba(180,140,255,.16),rgba(255,159,209,.08));
+    box-shadow:0 0 0 1px rgba(180,140,255,.35), 0 8px 22px -10px rgba(180,140,255,.5)}
+  .str-opt .badge{position:absolute;top:10px;right:10px;font:700 9px 'JetBrains Mono';letter-spacing:1.5px;
+    padding:3px 8px;border-radius:999px;border:1px solid rgba(125,227,184,.4);color:var(--green);background:rgba(125,227,184,.08)}
+  .str-opt.act .badge{border-color:rgba(180,140,255,.5);color:var(--purple-bright);background:rgba(180,140,255,.12)}
+  .str-opt b{display:block;font:600 13.5px 'Inter';color:var(--txt)}
+  .str-opt small{display:block;font-size:10.5px;color:var(--txt-3);margin-top:4px;line-height:1.45}
+  .schip{font:700 9px 'JetBrains Mono';letter-spacing:1.5px;padding:3px 9px;border-radius:999px;
+    border:1px solid rgba(180,140,255,.35);color:var(--purple-bright);background:rgba(180,140,255,.1);
+    vertical-align:2px;margin-left:8px;white-space:nowrap}
+  .tset{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .ttile{position:relative;padding:12px 13px;border-radius:12px;border:1px solid var(--stroke);
+    background:rgba(255,255,255,.03);cursor:pointer;text-align:left;transition:.2s;font-family:'Inter'}
+  .ttile:hover{border-color:rgba(180,140,255,.4)}
+  .ttile.on{border-color:rgba(180,140,255,.65);background:linear-gradient(135deg,rgba(180,140,255,.15),rgba(255,159,209,.07));
+    box-shadow:0 0 0 1px rgba(180,140,255,.3)}
+  .ttile .tg{position:absolute;top:10px;right:10px;font:800 8.5px 'JetBrains Mono';letter-spacing:1.2px;
+    padding:3px 7px;border-radius:999px;border:1px solid var(--stroke);color:var(--txt-3)}
+  .ttile.on .tg{border-color:rgba(125,227,184,.45);color:var(--green);background:rgba(125,227,184,.08)}
+  .ttile .ti{font:600 12.5px 'Inter';color:var(--txt);display:flex;align-items:center;gap:7px;margin-bottom:5px}
+  .ttile .ti svg{width:15px;height:15px;color:var(--purple-bright);flex-shrink:0}
+  .ttile small{display:block;font-size:10px;color:var(--txt-3);line-height:1.45}
+  .swrow{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:12px;border:1px solid var(--stroke);
+    background:rgba(255,255,255,.02);margin-bottom:8px;cursor:pointer;transition:.2s}
+  .swrow:hover{border-color:rgba(180,140,255,.35)}
+  .swrow:last-of-type{margin-bottom:0}
+  .swrow .si{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;
+    background:rgba(180,140,255,.1);border:1px solid rgba(180,140,255,.25);color:var(--purple-bright)}
+  .swrow .si svg{width:16px;height:16px}
+  .swrow b{font:600 12.5px 'Inter';display:block;color:var(--txt)}
+  .swrow small{display:block;font-size:10px;color:var(--txt-3);margin-top:2px}
+  .swrow .sw{margin-left:auto;width:40px;height:22px;border-radius:999px;background:rgba(255,255,255,.08);
+    border:1px solid var(--stroke);position:relative;flex-shrink:0;transition:.2s}
+  .swrow .sw::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;
+    background:var(--txt-2);transition:.2s}
+  .swrow.on .sw{background:linear-gradient(120deg,var(--purple),var(--pink));border-color:transparent}
+  .swrow.on .sw::after{left:20px;background:#1b0f26}
+  .fchip{font:600 10px 'JetBrains Mono';padding:4px 9px;border-radius:8px;
+    background:rgba(255,255,255,.04);border:1px solid var(--stroke-soft);color:var(--txt-2)}
+  .mrow{display:flex;align-items:center;gap:10px;width:100%}
+  .mrow>span{font:600 10.5px 'JetBrains Mono';letter-spacing:1px;color:var(--txt-3);width:40px;flex-shrink:0}
+  .mrow .mbar{flex:1;height:8px;border-radius:6px;background:rgba(255,255,255,.06);overflow:hidden}
+  .mrow .mbar i{display:block;height:100%;width:0;border-radius:6px;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .5s ease}
+  .mrow>b{font:600 11px 'JetBrains Mono';color:var(--txt-2);width:56px;text-align:right;flex-shrink:0}
+  .jrow{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid var(--stroke-soft)}
+  .jrow:last-child{border:none}
+  .jrow .jn{width:150px;flex-shrink:0}
+  .jrow .jn b{font:600 12.5px 'Inter';display:block}
+  .jrow .jn small{font-size:10px;color:var(--txt-3)}
+  .jrow .jb{flex:1;height:7px;border-radius:5px;background:rgba(255,255,255,.06);overflow:hidden}
+  .jrow .jb i{display:block;height:100%;background:linear-gradient(90deg,var(--purple),var(--pink));border-radius:5px}
+  .jrow .jv{font:600 11px 'JetBrains Mono';color:var(--txt-2);width:64px;text-align:right;flex-shrink:0}
+  #recentList{max-height:230px;overflow-y:auto;padding-right:4px}
+  #recentList::-webkit-scrollbar{width:6px}
+  #recentList::-webkit-scrollbar-thumb{background:rgba(255,255,255,.12);border-radius:6px}
+  .note{margin-top:12px;padding:11px 13px;border-radius:10px;background:rgba(159,208,255,.07);border:1px solid rgba(159,208,255,.15);
+    color:var(--txt-2);font-size:11.5px;text-align:left;line-height:1.55}
+  .idbox{width:100%;padding:12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--stroke-soft);
+    text-align:center;font-family:'JetBrains Mono';font-size:13.5px;letter-spacing:1px;color:var(--txt);margin-top:6px;word-break:break-word}
+  .tagchip{font:700 10px 'JetBrains Mono';letter-spacing:2px;padding:6px 12px;border-radius:999px;
+    border:1px solid rgba(180,140,255,.35);color:var(--purple-bright);margin:12px 0 4px}
+  .ver{margin-top:16px;font-size:11.5px;color:var(--txt-3)}
+  .ovr{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .oring{display:flex;flex-direction:column;align-items:center;padding:12px 4px;border-radius:14px;background:rgba(255,255,255,.02);border:1px solid var(--stroke-soft)}
+  .oring .rw{position:relative;width:86px;height:86px}
+  .oring svg{transform:rotate(-90deg)}
+  .oring .oc{position:absolute;inset:0;display:grid;place-items:center;font:700 16px 'JetBrains Mono'}
+  .oring .oc-l{font:600 11px 'Inter';color:var(--txt-2);margin-top:7px;letter-spacing:1.2px}
+  .oring .oc-sub{font:500 10.5px 'JetBrains Mono';color:var(--txt-3);margin-top:2px}
+  .qa{display:flex;flex-direction:column;padding:12px 14px;border-radius:12px;border:1px solid var(--stroke-soft);
+    background:rgba(255,255,255,.02);cursor:pointer;transition:.2s;margin-bottom:10px}
+  .qa:last-child{margin-bottom:0}
+  .qa:hover{border-color:rgba(180,140,255,.35);background:rgba(180,140,255,.07)}
+  .qa b{font:600 13px 'Inter'}
+  .qa small{font-size:11px;color:var(--txt-3);margin-top:2px}
+  .ri{display:flex;align-items:center;gap:11px;padding:10px 2px;border-bottom:1px solid var(--stroke-soft)}
+  .ri:last-child{border:none}
+  .rd{width:7px;height:7px;border-radius:50%;background:var(--purple);flex-shrink:0;box-shadow:0 0 8px rgba(180,140,255,.8)}
+  .ri b{font:600 12.5px 'Inter';display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+  .ri small{font-size:10.5px;color:var(--txt-3)}
+  .rt{margin-left:auto;font:500 10.5px 'JetBrains Mono';color:var(--txt-3);flex-shrink:0}
+  .radar{display:flex;justify-content:center;padding:4px 0}
+  .term-h{display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid var(--stroke-soft);border-radius:14px 14px 0 0;background:rgba(255,255,255,.03)}
+  .term-h b{font:700 14px 'Space Grotesk';letter-spacing:1px}
+  .term-h .cnt{font:500 11px 'JetBrains Mono';color:var(--txt-3)}
+  .lf{margin-left:auto;display:flex;gap:6px}
+  .lf button{padding:4px 10px;border-radius:8px;border:1px solid var(--stroke-soft);background:none;color:var(--txt-3);font:600 10px 'JetBrains Mono';cursor:pointer;transition:.2s}
+  .lf button.act{color:var(--txt);border-color:rgba(180,140,255,.45);background:rgba(180,140,255,.12)}
+  .term-b{border:1px solid var(--stroke-soft);border-top:none;border-radius:0 0 14px 14px;background:rgba(0,0,0,.28);
+    padding:12px 16px;min-height:380px;max-height:62vh;overflow-y:auto;font:12px 'JetBrains Mono'}
+  .lr{display:flex;gap:10px;padding:3px 0}
+  .lt{color:var(--txt-3);flex-shrink:0}
+  .lv{flex-shrink:0;width:58px}
+  .lv.OK{color:var(--green)}.lv.WARN{color:var(--amber)}.lv.ERROR{color:var(--red)}.lv.INFO{color:#8ab4ff}
+  .lmsg{color:var(--txt-2);word-break:break-word}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(20,16,30,.92);
+    border:1px solid rgba(180,140,255,.35);color:var(--txt);padding:11px 20px;border-radius:12px;font:500 13px 'Inter';
+    z-index:99;opacity:0;transition:.3s;backdrop-filter:blur(10px)}
+  .toast.on{transform:translateX(-50%);opacity:1}
+  .mdl{position:fixed;inset:0;z-index:1000;display:none;place-items:center;background:rgba(8,6,14,.62);backdrop-filter:blur(6px)}
+  .mdl.on{display:grid}
+  .mbox{width:min(430px,88vw);background:#161022;border:1px solid rgba(180,140,255,.3);border-radius:18px;
+    padding:26px 26px 22px;box-shadow:0 40px 90px -20px rgba(0,0,0,.85);text-align:center;animation:mpop .2s ease}
+  @keyframes mpop{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}
+  .mbox .mico{width:56px;height:56px;margin:0 auto 14px;border-radius:16px;display:grid;place-items:center;
+    background:linear-gradient(140deg,var(--purple),var(--pink));color:#1b0f26;box-shadow:0 14px 30px -10px rgba(255,159,209,.55)}
+  .mbox .mico svg{width:26px;height:26px}
+  .mbox b{font:700 16px 'Space Grotesk';display:block}
+  .mbox p{font:400 12.5px 'Inter';color:var(--txt-2);line-height:1.7;margin-top:9px;white-space:pre-line}
+  .mbtns{display:flex;gap:10px;margin-top:20px}
+  .mbtn{flex:1;padding:11px 0;border-radius:11px;font:700 13px 'Space Grotesk';cursor:pointer;transition:.2s;
+    border:1px solid var(--stroke);background:rgba(255,255,255,.05);color:var(--txt)}
+  .mbtn:hover{background:rgba(255,255,255,.1)}
+  .mbtn.ok{background:linear-gradient(120deg,var(--purple),var(--pink));color:#1b0f26;border:none;
+    box-shadow:0 10px 26px -8px rgba(255,159,209,.5)}
+  .mbtn.ok:hover{filter:brightness(1.08)}
+  .mbtn.dangerok{background:linear-gradient(120deg,#ff6b81,#ff9fd1);color:#260a10;border:none;
+    box-shadow:0 10px 26px -8px rgba(255,107,129,.5)}
+  .mbtn.dangerok:hover{filter:brightness(1.08)}
+  @media(max-width:1100px){.grid2{grid-template-columns:1fr}.ckgrid{grid-template-columns:1fr}.ovr{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="backdrop"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div></div>
+<div class="grain"></div>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <linearGradient id="gr1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#b48cff"/><stop offset="1" stop-color="#ff9fd1"/></linearGradient>
+  <linearGradient id="gr2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7de3b8"/><stop offset="1" stop-color="#9fd0ff"/></linearGradient>
+</defs></svg>
+
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="blogo"><img src="logo.png" alt="KingR9"></div>
+      <div class="bmeta"><h1>KingR9 Tools</h1><p><span id="brandVer">v1.0</span> · <span class="dot"></span> <span id="brandState">Active</span></p></div>
+    </div>
+    <nav class="menu">
+      <div class="mg">MAIN</div>
+      <button class="mi act" data-page="dash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Dashboard</button>
+      <div class="mg">GAME</div>
+      <button class="mi" data-page="game"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="10" rx="5"/><path d="M7 12h4M9 10v4M15.5 11.5h.01M17.5 13.5h.01"/></svg>Gaming Hub</button>
+      <button class="mi" data-page="ares"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>Ares One-Click</button>
+      <div class="mg">NETWORK</div>
+      <button class="mi" data-page="net"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="9" y="3" width="6" height="6" rx="1.5"/><rect x="2.5" y="15" width="6" height="6" rx="1.5"/><rect x="15.5" y="15" width="6" height="6" rx="1.5"/><path d="M12 9v3.5M5.5 15v-2.5h13V15"/></svg>Network Center</button>
+      <div class="mg">SYSTEM</div>
+      <button class="mi" data-page="mem"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="8" rx="2"/><path d="M7 8V5M12 8V5M17 8V5M7 16v3M12 16v3M17 16v3"/></svg>Memory &amp; RAM</button>
+      <button class="mi" data-page="hw"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3"/></svg>Hardware Info</button>
+      <button class="mi" data-page="clean"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/></svg>Junk Cleaner</button>
+      <div class="mg">PROTECT</div>
+      <button class="mi" data-page="backup"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>Backup &amp; Restore</button>
+      <button class="mi" data-page="logs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 17l6-6-6-6M12 19h8"/></svg>Logs</button>
+      <div class="mg">OTHERS</div>
+      <button class="mi" data-page="guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>วิธีใช้</button>
+      <button class="mi" data-page="keygen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.778-7.778zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Key Generator</button>
+      <button class="mi" data-page="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M12 11v5"/></svg>About</button>
+    </nav>
+    <button class="sideout" id="btnLogout"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>Logout</button>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <div class="title-block"><h1 id="pgTitle">Dashboard</h1><p id="pgSub">System overview &amp; quick actions</p></div>
+      <div class="spacer"></div>
+      <div class="pill"><span class="pd"></span><span>CPU</span><b id="cpuTemp">--°C</b></div>
+      <div class="pill warn"><span class="pd"></span><span>GPU</span><b id="gpuTemp">--°C</b></div>
+      <button class="ghost" id="restoreBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Restore</button>
+      <button class="optimize" id="optBtn"><span class="sweep"></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg>
+        Optimize Now</button>
+    </header>
+
+    <div class="scroll">
+      <!-- ============ DASHBOARD ============ -->
+      <section class="page act" id="pg-dash">
+        <div class="glass card" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px">
+          <div class="blogo" style="width:50px;height:50px;border-radius:15px"><img src="logo.png" alt="KingR9"></div>
+          <div style="flex:1;min-width:200px">
+            <div style="font:700 17px 'Space Grotesk'">ยินดีต้อนรับสู่ KingR9 Tools</div>
+            <div style="font-size:12px;color:var(--txt-2);margin-top:3px">เครื่องนี้ถูกเร่งด้วยชุดสคริปต์ R9 — เลือกเมนูซ้ายเพื่อจัดการแต่ละส่วน</div>
+          </div>
+          <div class="pill"><span class="pd"></span>Junk <b id="wJunk">-- GB</b></div>
+          <div class="pill"><span class="pd"></span>Score <b id="wScore">--</b></div>
+        </div>
+        <div class="grid2">
+          <div class="glass card" style="display:flex;flex-direction:column;align-items:center">
+            <div class="head" style="align-self:stretch;width:100%"><h2>System Health</h2><span class="mono" style="margin-left:auto;font-size:10.5px;color:var(--txt-3);letter-spacing:2px">LIVE</span></div>
+            <div style="position:relative;width:172px;height:172px;margin:8px 0 2px">
+              <svg width="172" height="172" viewBox="0 0 172 172"><circle cx="86" cy="86" r="70" stroke="rgba(255,255,255,.07)" stroke-width="11" fill="none"/><circle id="hcArc" cx="86" cy="86" r="70" stroke="url(#gr1)" stroke-width="11" fill="none" stroke-linecap="round" stroke-dasharray="439.8" stroke-dashoffset="439.8" transform="rotate(-90 86 86)"/></svg>
+              <div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center">
+                <div><div style="font:800 36px 'JetBrains Mono'" id="hcScore">--</div><div style="font:600 10px 'Inter';letter-spacing:2.4px;color:var(--txt-3);margin-top:2px">HEALTH SCORE</div></div>
+              </div>
+            </div>
+            <div style="width:100%;margin-top:16px;display:flex;flex-direction:column;gap:10px">
+              <div class="mrow"><span>CPU</span><div class="mbar"><i id="bCpu"></i></div><b id="vbCpu">--</b></div>
+              <div class="mrow"><span>RAM</span><div class="mbar"><i id="bRam"></i></div><b id="vbRam">--</b></div>
+              <div class="mrow"><span>DISK</span><div class="mbar"><i id="bDisk"></i></div><b id="vbDisk">--</b></div>
+              <div class="mrow"><span>PING</span><div class="mbar"><i id="bPing"></i></div><b id="vbPing">--</b></div>
+            </div>
+            <div style="margin-top:12px;font-size:10.5px;color:var(--txt-3);text-align:center">คะแนนรวมจากโหลด CPU · RAM · ดิสก์ · Ping — อัปเดตทุก 2 วินาที</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+            <div class="glass card">
+              <div class="head"><h2>Quick Launch</h2></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+                <div class="qa" id="qaOpt" style="margin:0"><b>⚡ Optimize</b><small>ชุดสคริปต์ R9 เต็มรูปแบบ</small></div>
+                <div class="qa" id="qaClean" style="margin:0"><b>🧹 Clean Junk</b><small>ล้างไฟล์ขยะทั้งระบบ</small></div>
+                <div class="qa" id="qaFree" style="margin:0"><b>🧠 Free RAM</b><small>เคลียร์ standby memory</small></div>
+                <div class="qa" id="qaRp" style="margin:0"><b>🛡 Restore Point</b><small>สำรองจุดคืนค่า Windows</small></div>
+              </div>
+            </div>
+            <div class="glass card" style="flex:1">
+              <div class="head"><h2>Recent Activity</h2></div>
+              <div id="recentList"><div class="ri"><span class="rd"></span><div><b>ยังไม่มีรายการ</b><small>—</small></div></div></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ============ GAMING HUB ============ -->
+      <section class="page" id="pg-game">
+        <div class="grid2">
+          <div class="glass card span2">
+            <h2 class="ct">⚡ R9 Power Plan &amp; CPU Boost<span class="schip">SCRIPT 13</span></h2>
+            <div class="ckgrid">
+              <label class="ck"><input type="checkbox" id="ppPlan" checked><i></i>Import &amp; Activate "R9" Power Plan (Ultimate Performance)</label>
+              <label class="ck"><input type="checkbox" id="ppHib" checked><i></i>Disable Hibernate, Fast Boot &amp; Power Throttling</label>
+              <label class="ck"><input type="checkbox" id="ppBoost" checked><i></i>Maximize CPU Boost Policy (EPP to 0, Aggressive Boost)</label>
+              <label class="ck"><input type="checkbox" id="ppDelay" checked><i></i>Minimize Delay (PCIe Link State, Disks, USB, Graphics)</label>
+            </div>
+            <button class="apply primary" id="ppApply" style="width:100%;margin-top:14px">⚡ Apply Power &amp; Boost</button>
+            <button class="apply" id="ppDedupe" style="width:100%;margin-top:8px">🧹 ตรวจ + ลบ Power Plan ซ้ำ (เหลืออันเดียวต่อชื่อ)</button>
+            <div class="note">⚠️ สร้างแผน <b>R9(FPS+INPUTLAG)</b> — ถ้ามีอยู่แล้วใช้ GUID เดิม · หลัง Apply จะ<b>ตรวจและลบแผนที่ซ้ำกันให้เหลืออันเดียวต่อชื่ออัตโนมัติ</b> · จอ/สลีป = Never · Boost Aggressive · Cooling Active · PCIe ASPM off · USB suspend off · ปุ่ม Restore ด้านบน = powercfg -restoredefaultschemes</div>
+          </div>
+          <div class="glass card">
+            <h2 class="ct">FiveM Optimization<span class="schip">SCRIPT 09</span></h2>
+            <input type="checkbox" id="fmCache" checked hidden>
+            <input type="checkbox" id="fmPrio" checked hidden>
+            <input type="checkbox" id="fmCef" checked hidden>
+            <input type="checkbox" id="fmPkg" hidden>
+            <div class="tset">
+              <div class="ttile on" data-for="fmCache">
+                <span class="tg">ON</span>
+                <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/></svg>Auto-Clear Cache</div>
+                <small>ลบ cache เก่าทุกครั้งที่เปิดเกม — กัน texture พัง/stutter</small>
+              </div>
+              <div class="ttile on" data-for="fmPrio">
+                <span class="tg">ON</span>
+                <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg>High CPU Priority</div>
+                <small>ยกระดับ priority โปรเซสเกมเป็น High</small>
+              </div>
+              <div class="ttile on" data-for="fmCef">
+                <span class="tg">ON</span>
+                <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg>CEF HW Accel OFF</div>
+                <small>ปิด GPU ที่หน้า UI เกม ลดการแย่งการ์ดจอ</small>
+              </div>
+              <div class="ttile" data-for="fmPkg">
+                <span class="tg">OFF</span>
+                <div class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 8l-9-5-9 5v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg>Fast Package Tx</div>
+                <small>MSMQ NoDelay + ปิด Network Throttling</small>
+              </div>
+            </div>
+            <button class="apply primary" id="fmApply" style="width:100%;margin-top:14px">⚡ Apply FiveM Tweaks</button>
+          </div>
+          <div class="glass card">
+            <h2 class="ct">Timer Resolution Service (STR)</h2>
+            <div class="fld-l">Global Timer Resolution Requests</div>
+            <input type="hidden" id="strSel" value="def">
+            <div class="str-grid">
+              <button type="button" class="str-opt act" data-v="def">
+                <span class="badge">SAFE</span>
+                <b>Default</b>
+                <small>ค่าเริ่มต้น Windows · ลบค่า STR ออกจากระบบ (script 12)</small>
+              </button>
+              <button type="button" class="str-opt" data-v="low">
+                <span class="badge">0.5ms</span>
+                <b>Low Latency</b>
+                <small>TimerResolution 5000 + kernel requests ON (script 09)</small>
+              </button>
+            </div>
+            <div class="note">🛈 ต้องใช้สิทธิ์ Administrator · เลือกโหมดแล้วกด Apply — สลับกลับ Default ได้ทุกเมื่อ ไม่ต้องรีสตาร์ทเครื่อง</div>
+            <button class="apply primary" id="strApply" style="margin-top:12px;width:100%">⚡ Apply Timer Service</button>
+          </div>
+          <div class="glass card span2">
+            <h2 class="ct">Windows Services &amp; OS Tweaks<span class="schip">SCRIPT 05 · 06 · 07</span></h2>
+            <input type="checkbox" id="svNet" checked hidden>
+            <input type="checkbox" id="svLat" checked hidden>
+            <input type="checkbox" id="svSvc" checked hidden>
+            <input type="checkbox" id="svBcd" checked hidden>
+            <input type="checkbox" id="svUsb" checked hidden>
+            <div class="swrow on" data-for="svNet">
+              <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.5 3 14 0 18M12 3c-3 3.5-3 14 0 18"/></svg></div>
+              <div style="flex:1;min-width:0"><b>Optimize Network Stack</b><small>autotuning · chimney · netdma · MTU 1492 (script 05)</small></div>
+              <span class="sw"></span>
+            </div>
+            <div class="swrow on" data-for="svLat">
+              <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+              <div style="flex:1;min-width:0"><b>Low Latency Registry Keys</b><small>TcpNoDelay + TcpAckFrequency ทุก adapter</small></div>
+              <span class="sw"></span>
+            </div>
+            <div class="swrow on" data-for="svSvc">
+              <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg></div>
+              <div style="flex:1;min-width:0"><b>Disable Background Services</b><small>SysMain · Telemetry · WSearch และเพื่อนรวม 20 ตัว (script 06)</small></div>
+              <span class="sw"></span>
+            </div>
+            <div class="swrow on" data-for="svBcd">
+              <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3"/></svg></div>
+              <div style="flex:1;min-width:0"><b>BCD Kernel Tweaks</b><small>disabledynamictick · platform tick — ต้องรีสตาร์ทเครื่อง</small></div>
+              <span class="sw"></span>
+            </div>
+            <div class="swrow on" data-for="svUsb">
+              <div class="si"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0V7zM12 16v5"/></svg></div>
+              <div style="flex:1;min-width:0"><b>USB Selective Suspend OFF</b><small>ปิดโหมดประหยัดไฟ USB — กัน input lag เมาส์/คีย์บอร์ด</small></div>
+              <span class="sw"></span>
+            </div>
+            <button class="apply primary" id="svApply" style="width:100%;margin-top:14px">Apply Services &amp; OS Tweaks</button>
+          </div>
+          <div class="glass card">
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
+              <div style="width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;background:rgba(180,140,255,.1);border:1px solid rgba(180,140,255,.25);color:var(--purple-bright)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 12h4m-2-2v4"/><circle cx="16" cy="11" r="1"/><circle cx="18.5" cy="13.5" r="1"/></svg></div>
+              <div style="flex:1;min-width:0">
+                <b style="font:700 13.5px 'Space Grotesk';display:block">GTA5 / FiveM Graphics Preset</b>
+                <div style="font-size:10px;color:var(--txt-3);margin-top:1px">gta5_settings.xml · %APPDATA%\CitizenFX</div>
+              </div>
+              <span class="schip">SCRIPT 10</span>
+            </div>
+            <p class="desc">Auto-detect GPU แล้วเขียนพรีเซ็ต low-latency / high-FPS ให้เกมโดยตรง — ปิดเกมก่อน Apply</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px">
+              <span class="fchip">1080p144</span><span class="fchip">VSync off</span><span class="fchip">AF 16x</span><span class="fchip">Texture ปกติ</span>
+            </div>
+            <button class="apply primary" id="gfxApply" style="width:100%;margin-top:12px">⚡ Write In-Game Settings</button>
+          </div>
+          <div class="glass card">
+            <div style="display:flex;align-items:center;gap:11px;margin-bottom:10px">
+              <div style="width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;background:rgba(180,140,255,.1);border:1px solid rgba(180,140,255,.25);color:var(--purple-bright)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5M9 13l2 2 4-4"/></svg></div>
+              <div style="flex:1;min-width:0">
+                <b style="font:700 13.5px 'Space Grotesk';display:block">CitizenFX.ini</b>
+                <div style="font-size:10px;color:var(--txt-3);margin-top:1px">%APPDATA%\CitizenFX\CitizenFX.ini</div>
+              </div>
+              <span class="schip">SCRIPT 10</span>
+            </div>
+            <p class="desc">ตั้งค่า network / streaming / renderer ของ FiveM โดยตรงผ่านไฟล์ ini</p>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px">
+              <span class="fchip">net_mtu 1472</span><span class="fchip">interp 0</span><span class="fchip">RenderAhead 1</span>
+            </div>
+            <button class="apply" id="cfxApply" style="width:100%;margin-top:12px">📝 Write CitizenFX.ini</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ NETWORK CENTER ============ -->
+      <section class="page" id="pg-ares">
+        <div class="grid2">
+          <div class="glass card span2">
+            <h2 class="ct">⚡ Ares One-Click MAX Optimizer<span class="schip">ARES</span></h2>
+            <div class="note">ปรับทุกอย่างในคลิกเดียวแบบ MAX (รวมจากโปรเจกต์ Ares Store): ปิด telemetry/Copilot/Recall · ลบ bloatware · ปิด services จำนวนมาก · Game/GPU/Input tweaks · Network + QoS DSCP 46 · ลบแผน ARESSTORE เก่า (ไม่สร้าง Power Plan — ใช้แผน R9 จาก Gaming Hub) · ตั้งวอลเปเปอร์ + เปลี่ยนชื่อเครื่องเป็น AresStore · กำหนดงานล้างไฟล์อัตโนมัติรายสัปดาห์</div>
+            <div class="ckgrid">
+              <label class="ck"><input type="checkbox" id="aresUpd"><i></i>อัปเดต Windows เพื่อปลดล็อก Low Latency Profile (KB5094126 — โหลด ~1-2 GB ใช้เวลานานมาก)</label>
+            </div>
+            <button class="apply primary" id="aresRun" style="width:100%;margin-top:14px">⚡ OPTIMIZE NOW — ปรับทุกอย่างแบบ MAX</button>
+            <button class="apply" id="aresRestart" style="width:100%;margin-top:8px">🔄 RESTART WINDOWS (จำเป็นหลัง Optimize)</button>
+            <div class="note">⚠️ มีขั้น [EXTREME]: ปิด Defender real-time · ปิด VBS/HVCI · ปิด Spectre/Meltdown mitigations — เพิ่มความลื่นแต่ลดความปลอดภัย · ใช้เวลา ~3-10 นาที (ไม่ติ๊กอัปเดต) · % จากสคริปต์จริงทีละขั้น · <b>ห้ามปิดแอพกลางทาง</b></div>
+          </div>
+        </div>
+      </section>
+      <section class="page" id="pg-net">
+        <div class="grid2" style="margin-top:40px">
+          <div class="glass card">
+            <h2 class="ct">🌐 Auto Adjust Network<span class="schip">SCRIPT 01 + 05</span></h2>
+            <p class="desc">ปรับ NIC Adapter (EEE off · RSS 4 Queue · RX/TX buffers) + Netsh TCP / MTU 1492 / TcpAckFrequency เป็นค่าแนะนำ แล้ว refresh Group Policy</p>
+            <div class="btnrow">
+              <button class="apply primary" id="netApply">⚡ Auto Adjust Now</button>
+              <button class="apply danger" id="netRestore">↺ Restore</button>
+            </div>
+            <div class="note">Restore = คืนค่าเริ่มต้นทั้งระบบ (netsh int ip reset · winsock · power plan · BCD · ลบ QoS · ถอน STR) — รีสตาร์ทหลังทำ</div>
+          </div>
+          <div class="glass card">
+            <h2 class="ct">📶 QoS Packet Priority<span class="schip">SCRIPT 02</span></h2>
+            <p class="desc">สร้างนโยบาย QoS <b>DSCP 46</b> ให้ FiveM.exe / FiveM_GTAProcess.exe แล้วรัน gpupdate /force ให้มีผลทันที</p>
+            <div class="btnrow"><button class="apply primary" id="qosApply" style="width:100%">⚡ Apply QoS Settings</button></div>
+            <div class="note">🛈 ปิดเกมก่อน Apply · ใช้กับ GTA5 / FiveM เท่านั้น</div>
+          </div>
+          <div class="glass card span2">
+            <h2 class="ct">🌍 R9 internet<span class="schip">ชุดเข้มข้น 6 หมวด</span></h2>
+            <p class="desc">Registry 80 ค่า (TCP/IP · AFD · NetBT · NDIS) · Netsh 18 คำสั่ง (cubic · autotuning restricted · MTU 1492 · Nagle off) · BCD · NIC · ปิด Bindings + DNS Cloudflare 1.1.1.1 — เลือกแบ่งหมวดหรือยิงทั้งชุด</p>
+            <div class="tset">
+              <button class="apply primary" id="r9All">⚡ Apply All ทั้งชุด</button>
+              <button class="apply" id="r9Registry">🗂 Registry — TCP/IP · AFD · NetBT · NDIS</button>
+              <button class="apply" id="r9Netsh">🚀 Netsh — cubic · restricted · MTU</button>
+              <button class="apply" id="r9Bcd">🔩 BCD — dynamic tick (รีสตาร์ท)</button>
+              <button class="apply" id="r9Nic">🔌 NIC — ค่าต่อ adapter</button>
+              <button class="apply" id="r9Bind">🌐 Bindings + DNS 1.1.1.1</button>
+            </div>
+            <button class="apply danger" id="r9Restore" style="width:100%;margin-top:10px">↺ Restore Defaults (เฉพาะชุด R9 internet)</button>
+            <div class="note">ⓘ Apply All ใช้เวลา ~1-3 นาที (มี Reset Adapter ท้ายชุด — เน็ตหลุดแป๊บนึง) · แนะนำกด Create Restore Point (หน้า Backup) ก่อน · Restore คืนเฉพาะค่าของชุดนี้</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ MEMORY & RAM ============ -->
+      <section class="page" id="pg-mem">
+        <div class="grid2" style="max-width:900px;margin:40px auto 0">
+          <div class="glass card" style="display:flex;flex-direction:column;align-items:center">
+            <h2 class="ct">RAM Usage</h2>
+            <div style="position:relative;width:156px;height:156px;margin:10px 0 6px">
+              <svg width="156" height="156" viewBox="0 0 156 156"><circle cx="78" cy="78" r="62" stroke="rgba(255,255,255,.07)" stroke-width="10" fill="none"/><circle id="memArc" cx="78" cy="78" r="62" stroke="url(#gr2)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="389.6" stroke-dashoffset="389.6" transform="rotate(-90 78 78)"/></svg>
+              <div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center">
+                <div><div style="font:800 26px 'JetBrains Mono'" id="memPct">--%</div><div style="font:500 10.5px 'JetBrains Mono';color:var(--txt-3);margin-top:3px" id="memSub">-- / -- GB</div></div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--txt-3)">อัปเดตเรียลไทม์ทุก 2 วินาที</div>
+          </div>
+          <div class="glass card">
+            <h2 class="ct">Standby Memory</h2>
+            <p class="desc">Purge Standby List คืน RAM ที่ Windows กันเก็บไว้ แบบเดียวกับ ISLC — แนะนำกดก่อนเปิดเกมทุกครั้ง</p>
+            <div class="btnrow"><button class="apply primary" id="memFree">🧠 Free Standby Memory</button></div>
+            <div class="hr" style="margin:16px 0"></div>
+            <label class="ck"><input type="checkbox" id="memTrim"><i></i>Auto Trim ทุก 1 ชั่วโมง (ทำงานเบื้องหลังอัตโนมัติ)</label>
+            <div class="note">🛈 Auto Trim จะ purge เงียบๆ ทุกชั่วโมง — ถ้าได้ RAM คืนตั้งแต่ 0.05 GB ขึ้นไปจะบันทึกในหน้า Logs</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ JUNK CLEANER ============ -->
+      <section class="page" id="pg-clean">
+        <div class="glass card" style="max-width:760px;margin:40px auto 0">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <div style="width:44px;height:44px;border-radius:13px;display:grid;place-items:center;flex-shrink:0;background:linear-gradient(140deg,var(--purple),var(--pink));color:#1b0f26"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" style="width:20px;height:20px"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/></svg></div>
+            <div style="flex:1;min-width:200px">
+              <b style="font:700 15px 'Space Grotesk'">Junk Cleaner</b>
+              <div style="font-size:11.5px;color:var(--txt-2);margin-top:2px">สแกนขยะจากโฟลเดอร์จริง 4 หมวด — Temp · Logs · Cache · Recycle Bin · ล้างด้วย script 12</div>
+            </div>
+            <div class="pill"><span class="pd"></span>รวม <b id="clPill">--</b></div>
+          </div>
+          <div class="hr" style="margin:16px 0"></div>
+          <div id="clCats" style="width:100%">
+            <div class="jrow"><div class="jn"><b>ยังไม่ได้สแกน</b><small>กดปุ่มด้านล่าง</small></div><div class="jb"></div><span class="jv">--</span></div>
+          </div>
+          <div class="btnrow" style="margin-top:16px">
+            <button class="apply" id="clScan">🔍 Scan Now</button>
+            <button class="apply primary" id="clClean">🧹 Clean All ด้วย script 12</button>
+          </div>
+          <div class="note" id="clTotal">🛈 สแกนก่อนลบเสมอ — ตัวเลข GB มาจากขนาดไฟล์จริงในดิสก์</div>
+        </div>
+      </section>
+
+      <!-- ============ BACKUP & RESTORE ============ -->
+      <section class="page" id="pg-backup">
+        <div class="glass hero" style="max-width:640px;margin:40px auto 0">
+          <div class="hico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h2>Backup &amp; Restore</h2>
+          <p>สร้าง Windows Restore Point ก่อน tune ทุกครั้ง (แนะนำ) · ทุกครั้งที่กด Optimize ระบบสำรอง Registry ให้อัตโนมัติ · Restore คืนค่า default ทั้งระบบ</p>
+          <div class="hr"></div>
+          <div class="btnrow" style="flex-wrap:wrap">
+            <button class="apply" id="bkPoint">🛡 Create Restore Point</button>
+            <button class="apply danger" id="bkRestore">↺ Restore All Defaults</button>
+          </div>
+          <div class="btnrow">
+            <button class="apply" id="bkFolder">📂 Open Backup Folder</button>
+          </div>
+          <div class="note">🛈 Registry backup เก็บที่ Documents\KingR9Tools\backups · Restore = netsh / powercfg / BCD / QoS / STR กลับค่าเริ่มต้น (script 12) — แนะนำรีสตาร์ทหลัง Restore</div>
+        </div>
+      </section>
+
+      <!-- ============ HARDWARE INFO ============ -->
+      <section class="page" id="pg-hw">
+        <div class="grid2" style="max-width:900px;margin:40px auto 0">
+          <div class="glass card" style="display:flex;gap:13px;align-items:flex-start">
+            <div style="width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;background:rgba(180,140,255,.1);border:1px solid rgba(180,140,255,.25);color:var(--purple-bright)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="fld-l" style="margin:0 0 6px">PROCESSOR</div><b style="font:600 13px 'Inter';line-height:1.55;word-break:break-word;display:block" id="hwCpu">กำลังอ่านค่า...</b><div style="font-size:10px;color:var(--txt-3);margin-top:4px">Win32_Processor</div></div>
+          </div>
+          <div class="glass card" style="display:flex;gap:13px;align-items:flex-start">
+            <div style="width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;background:rgba(180,140,255,.1);border:1px solid rgba(180,140,255,.25);color:var(--purple-bright)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><rect x="2" y="6" width="20" height="12" rx="3"/><path d="M6 12h4m-2-2v4"/><circle cx="16" cy="11" r="1"/><circle cx="18.5" cy="13.5" r="1"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="fld-l" style="margin:0 0 6px">GRAPHICS CARD</div><b style="font:600 13px 'Inter';line-height:1.55;word-break:break-word;display:block" id="hwGpu">กำลังอ่านค่า...</b><div style="font-size:10px;color:var(--txt-3);margin-top:4px">Win32_VideoController</div></div>
+          </div>
+          <div class="glass card" style="display:flex;gap:13px;align-items:flex-start">
+            <div style="width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;background:rgba(180,140,255,.1);border:1px solid rgba(180,140,255,.25);color:var(--purple-bright)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><rect x="3" y="8" width="18" height="8" rx="2"/><path d="M7 8V5M12 8V5M17 8V5M7 16v3M12 16v3M17 16v3"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="fld-l" style="margin:0 0 6px">MEMORY</div><b style="font:600 13px 'Inter';line-height:1.55;word-break:break-word;display:block" id="hwRam">กำลังอ่านค่า...</b><div style="font-size:10px;color:var(--txt-3);margin-top:4px">Win32_ComputerSystem</div></div>
+          </div>
+          <div class="glass card" style="display:flex;gap:13px;align-items:flex-start">
+            <div style="width:38px;height:38px;border-radius:11px;display:grid;place-items:center;flex-shrink:0;background:rgba(180,140,255,.1);border:1px solid rgba(180,140,255,.25);color:var(--purple-bright)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 2v3m6-3v3M9 19v3m6-3v3M2 9h3m-3 6h3m14-6h3m-3 6h3"/></svg></div>
+            <div style="flex:1;min-width:0"><div class="fld-l" style="margin:0 0 6px">MOTHERBOARD</div><b style="font:600 13px 'Inter';line-height:1.55;word-break:break-word;display:block" id="mbProd">กำลังอ่านค่า...</b><div style="font-size:10px;color:var(--txt-3);margin-top:4px" id="mbManu">&nbsp;</div></div>
+          </div>
+          <div class="glass card span2" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+            <div style="flex:1;min-width:220px">
+              <b style="font:600 13px 'Inter'">อ่านค่าสดจาก WMI ของเครื่องนี้</b>
+              <div style="font-size:11px;color:var(--txt-3);margin-top:3px">ค้นหาสเปก mainboard ต่อได้จาก Google — ใช้ product signature จริงจาก Win32_BaseBoard</div>
+            </div>
+            <button class="apply" id="mbSearch">🔍 Search Motherboard in Google</button>
+          </div>
+        </div>
+      </section>
+      <!-- ============ LOGS ============ -->
+      <section class="page" id="pg-logs">
+        <div class="term">
+          <div class="term-h">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17l6-6-6-6M12 19h8"/></svg>
+            <b>LOG</b><span class="cnt" id="logCount">0 entries</span>
+            <div class="lf">
+              <button class="act" data-lf="ALL">ALL</button>
+              <button data-lf="OK">OK</button>
+              <button data-lf="WARN">WARN</button>
+              <button data-lf="ERROR">ERROR</button>
+              <button data-lf="INFO">INFO</button>
+            </div>
+          </div>
+          <div class="term-b" id="logList"></div>
+        </div>
+      </section>
+
+      <!-- ============ ABOUT ============ -->
+      <section class="page" id="pg-about">
+        <div class="grid2">
+          <div class="glass hero" style="justify-content:center;min-height:430px">
+            <div class="hico" style="width:74px;height:74px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="width:34px;height:34px"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10z"/></svg></div>
+            <h2 style="font-size:24px">KingR9 Tools</h2>
+            <div class="tagchip">ADVANCED TOOLBOX</div>
+            <p style="margin-top:10px">Ultimate system parameters tuning, TCP/IP latency optimizer, and NDIS driver performance editor — ขับเคลื่อนด้วยชุดสคริปต์ R9 Settings ทั้ง 10 ไฟล์</p>
+            <p class="ver mono" id="abVer">Version 1.0.1 · Active License</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="glass card">
+              <h2 class="ct">🔑 License</h2>
+              <div class="ri"><span class="rd" style="background:var(--green);box-shadow:0 0 8px rgba(125,227,184,.8)"></span><div><b class="mono" id="abKey">—</b><small id="abDays">—</small></div></div>
+            </div>
+            <div class="glass card">
+              <h2 class="ct">💬 Discord Community</h2>
+              <p class="desc">Join our guild to download plugins, request configuration profiles, and communicate with developers.</p>
+              <button class="apply" id="abDiscord">➜ JOIN DISCORD</button>
+            </div>
+            <div class="glass card" style="flex:1">
+              <h2 class="ct">📁 Data &amp; Backup Folders</h2>
+              <p class="desc">เปิดโฟลเดอร์ข้อมูลของแอป — licenses · config · log · registry backups · สคริปต์ R9 ทั้งหมด</p>
+              <div class="btnrow">
+                <button class="apply" id="abData">📂 Open Data Folder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ GUIDE (วิธีใช้) ============ -->
+      <section class="page" id="pg-guide">
+        <div class="grid2">
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="glass card">
+              <h2 class="ct">🚀 เริ่มต้นใช้งานใน 4 ขั้นตอน</h2>
+              <div class="ri"><span style="flex:none;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font:800 12px 'JetBrains Mono';background:linear-gradient(140deg,var(--purple),var(--pink));color:#fff">1</span><div><b>รับ key จากแอดมิน</b><small>รูปแบบ KING-XXXX-XXXX-XXXX — ส่งกันทางแชท</small></div></div>
+              <div class="ri"><span style="flex:none;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font:800 12px 'JetBrains Mono';background:linear-gradient(140deg,var(--purple),var(--pink));color:#fff">2</span><div><b>เปิดโปรแกรม ใส่ key หน้า Activate</b><small>พิมพ์ key ให้ถูกต้อง แล้วกดปุ่ม Activate</small></div></div>
+              <div class="ri"><span style="flex:none;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font:800 12px 'JetBrains Mono';background:linear-gradient(140deg,var(--purple),var(--pink));color:#fff">3</span><div><b>ระบบล็อค key กับเครื่องนี้ให้อัตโนมัติ</b><small>key หนึ่งตัวใช้ได้เครื่องเดียว (ผูกกับ HWID ของเครื่องแรกที่ Activate)</small></div></div>
+              <div class="ri"><span style="flex:none;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font:800 12px 'JetBrains Mono';background:linear-gradient(140deg,var(--purple),var(--pink));color:#fff">4</span><div><b>ใช้งานได้ทุกเมนูจนกว่า key จะหมดอายุ</b><small>ครั้งถัดไปเปิดโปรแกรมจะเข้าให้อัตโนมัติ ไม่ต้องกรอก key ซ้ำ</small></div></div>
+            </div>
+            <div class="glass card">
+              <h2 class="ct">📖 แต่ละเมนูทำอะไร</h2>
+              <div class="ri"><span class="rd"></span><div><b>Dashboard</b><small>ภาพรวมสถานะเครื่อง · สถานะ key · วันหมดอายุ</small></div></div>
+              <div class="ri"><span class="rd"></span><div><b>Gaming Hub</b><small>เพิ่ม FPS · โหมดเกม · ปิดบริการที่ไม่จำเป็น · ปรับกราฟิก</small></div></div>
+              <div class="ri"><span class="rd"></span><div><b>Network Center</b><small>ลดแล็ก · ปรับ TCP/IP · โหมดเน็ตเกม (R9 Internet)</small></div></div>
+              <div class="ri"><span class="rd"></span><div><b>Memory &amp; RAM</b><small>ล้าง RAM ค้าง · ย่อ standby memory · auto trim</small></div></div>
+              <div class="ri"><span class="rd"></span><div><b>Hardware Info</b><small>ดูสเปค CPU / GPU / RAM / เมนบอร์ด แบบเรียลไทม์</small></div></div>
+              <div class="ri"><span class="rd"></span><div><b>Junk Cleaner</b><small>ลบไฟล์ขยะ · Temp · Cache · ถังขยะ</small></div></div>
+              <div class="ri"><span class="rd"></span><div><b>Backup &amp; Restore</b><small>จุดคืนค่าระบบ · กู้ค่า default กลับได้ทุกอย่าง</small></div></div>
+              <div class="ri"><span class="rd"></span><div><b>Logs</b><small>ดูประวัติการทำงานของโปรแกรมทั้งหมด</small></div></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <div class="glass card">
+              <h2 class="ct">🛠 แก้ปัญหาที่เจอบ่อย</h2>
+              <div class="ri"><span class="rd" style="background:var(--pink);box-shadow:0 0 8px rgba(255,159,209,.8)"></span><div><b>"key นี้ถูกผูกกับเครื่องอื่นอยู่"</b><small>key ถูก Activate ที่เครื่องอื่นแล้ว → แจ้งแอดมินขอรี HWID แล้ว Activate ใหม่</small></div></div>
+              <div class="ri"><span class="rd" style="background:var(--pink);box-shadow:0 0 8px rgba(255,159,209,.8)"></span><div><b>"key ถูกระงับการใช้งาน"</b><small>โดนระงับจากฝั่งแอดมิน → ติดต่อแอดมินเพื่อตรวจสอบ/ปลดระงับ</small></div></div>
+              <div class="ri"><span class="rd" style="background:var(--pink);box-shadow:0 0 8px rgba(255,159,209,.8)"></span><div><b>"key หมดอายุการใช้งาน"</b><small>ครบกำหนดแพ็กเกจ → ต่ออายุกับแอดมิน (ใช้ key เดิมได้ทันที ไม่ต้องขอใหม่)</small></div></div>
+              <div class="ri"><span class="rd" style="background:var(--purple)"></span><div><b>เปลี่ยนเครื่อง / ลง Windows ใหม่</b><small>HWID จะเปลี่ยน → แจ้งแอดมินรี HWID แล้ว Activate ใหม่ได้ปกติ</small></div></div>
+              <div class="ri"><span class="rd" style="background:var(--green);box-shadow:0 0 8px rgba(125,227,184,.8)"></span><div><b>เน็ตหลุดชั่วคราว</b><small>ใช้งานต่อได้ตามปกติ — ระบบจะตรวจกับ server ใหม่เองเมื่อเน็ตกลับมา</small></div></div>
+            </div>
+            <div class="glass card" style="flex:1">
+              <h2 class="ct">⚠️ ข้อควรรู้</h2>
+              <p class="desc">🔑 <b>1 key = 1 เครื่อง</b> — ล็อคกับเครื่องแรกที่ Activate อัตโนมัติ เครื่องอื่นเอาไปใช้ไม่ได้</p>
+              <p class="desc">🚫 <b>ห้ามแชร์ / ขายต่อ key</b> — ทุกการเข้าใช้งานถูกบันทึกประวัติฝั่งแอดมิน ถ้าโดนระงับ key จะเข้าไม่ได้ทุกเครื่อง</p>
+              <p class="desc">🚪 <b>ปุ่ม Logout</b> = ออกจากบัญชี — เปิดโปรแกรมครั้งถัดไปต้องใส่ key ใหม่อีกครั้ง</p>
+              <p class="desc">📅 <b>เช็ควันหมดอายุ</b> ได้ที่เมนู About (แสดง key + วันที่เหลือ)</p>
+              <p class="desc" style="margin-top:12px">💬 ติดต่อแอดมิน: ทาง <b>Discord</b> (ปุ่มในหน้า About) — แจ้งปัญหาพร้อมชื่อ key ของคุณจะช่วยให้แก้ไขเร็วขึ้น</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+
+
+
+    </div>
+  </div>
+</div>
+
+<div class="mdl" id="mdl">
+  <div class="mbox">
+    <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+    <b id="mTitle">ยืนยันการทำรายการ</b>
+    <p id="mMsg"></p>
+    <div class="mbtns">
+      <button class="mbtn" id="mNo">ยกเลิก</button>
+      <button class="mbtn ok" id="mYes">ยืนยัน</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="bridge.js"></script>
+</body>
+</html>

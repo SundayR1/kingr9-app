@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>KingR9Tools — Activate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0910; --stroke:rgba(255,255,255,.08); --stroke-soft:rgba(255,255,255,.05);
+    --txt:#f2f0f7; --txt-2:rgba(242,240,247,.56); --txt-3:rgba(242,240,247,.32);
+    --purple:#b48cff; --purple-bright:#c9a6ff; --pink:#ff9fd1; --green:#7de3b8; --red:#ff6b81;
+    --shadow:0 30px 70px -20px rgba(0,0,0,.7);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  .topbar,.side,.brand,.hero,.wrap,.ktop{-webkit-app-region:drag}
+  button,input,select,textarea,label,a,.menu,.scroll,.card,.glass,.plist,.pill,.sideout,.back,.mi,.status,.foot{-webkit-app-region:no-drag}
+  .blogo img,.logo img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+  body{font-family:'Inter','Noto Sans Thai',sans-serif;background:var(--bg);color:var(--txt);
+    height:100vh;display:flex;align-items:stretch;justify-content:stretch;overflow:hidden;
+    -webkit-font-smoothing:antialiased;position:relative}
+  .backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;background:
+      radial-gradient(120% 120% at 12% 0%, #150f24 0%, transparent 55%),
+      radial-gradient(100% 100% at 100% 100%, #1a0f22 0%, transparent 50%), var(--bg)}
+  .orb{position:absolute;border-radius:50%;filter:blur(90px);opacity:.5;animation:float 16s ease-in-out infinite}
+  .orb.a{width:480px;height:480px;background:radial-gradient(circle,#8f5bff,transparent 70%);top:-160px;left:-80px}
+  .orb.b{width:560px;height:560px;background:radial-gradient(circle,#ff6fc0,transparent 70%);bottom:-220px;right:-120px;animation-delay:-6s}
+  .orb.c{width:340px;height:340px;background:radial-gradient(circle,#7cc8ff,transparent 70%);top:40%;left:55%;opacity:.26;animation-delay:-10s}
+  @keyframes float{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(40px,-30px) scale(1.08)}}
+  .grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+  .wrap{position:relative;z-index:2;display:grid;grid-template-columns:1.02fr 1fr;
+    width:100vw;height:100vh;overflow:hidden;
+    background:rgba(255,255,255,.03);backdrop-filter:blur(24px)}
+  .hero{padding:46px 42px;display:flex;flex-direction:column;position:relative;
+    background:linear-gradient(160deg,rgba(180,140,255,.16),rgba(255,159,209,.06) 55%,transparent);border-right:1px solid var(--stroke-soft)}
+  .hero::after{content:"";position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent)}
+  .panel{padding:46px 42px 30px;display:flex;flex-direction:column;justify-content:center}
+  @media(max-width:880px){.wrap{grid-template-columns:1fr}.hero{display:none}.panel{padding:38px 32px 26px}}
+  .logo{width:52px;height:52px;border-radius:15px;display:grid;place-items:center;
+    background:linear-gradient(140deg,var(--purple),var(--pink));
+    box-shadow:0 10px 26px -6px rgba(180,140,255,.7), inset 0 1px 0 rgba(255,255,255,.4)}
+  .logo span{font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#150b1e}
+  .hero h1{font-family:'Space Grotesk';font-size:26px;font-weight:700;margin-top:20px}
+  .hero .tag{font-size:12.5px;color:var(--txt-2);line-height:1.7;margin-top:8px}
+  .feat{display:flex;flex-direction:column;gap:14px;margin-top:32px;list-style:none}
+  .feat li{display:flex;gap:12px;align-items:flex-start}
+  .feat .fi{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;flex-shrink:0;
+    background:rgba(180,140,255,.1);border:1px solid rgba(180,140,255,.25);color:var(--purple-bright)}
+  .feat .fi svg{width:16px;height:16px}
+  .feat b{font:600 13px 'Inter';display:block}
+  .feat small{font-size:11px;color:var(--txt-3);display:block;margin-top:1px}
+  .hfoot{margin-top:auto;padding-top:30px;font-size:10.5px;color:var(--txt-3)}
+  .card h2{font:700 21px 'Space Grotesk'}
+  .sub{font-size:12px;color:var(--txt-2);margin-top:5px}
+  .fld-l{font:600 11px 'Inter';letter-spacing:.3px;color:var(--txt-2);margin:20px 0 7px;text-align:left}
+  .hwid{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;
+    background:rgba(255,255,255,.04);border:1px solid var(--stroke-soft);margin-top:20px}
+  .hwid .val{flex:1;font-family:'JetBrains Mono';font-size:13px;letter-spacing:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .copy-btn{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:9px;flex-shrink:0;
+    border:1px solid rgba(180,140,255,.35);background:rgba(180,140,255,.1);color:var(--purple-bright);
+    font:600 11px 'Inter';cursor:pointer;transition:.2s}
+  .copy-btn svg{width:13px;height:13px}
+  .copy-btn:hover{background:rgba(180,140,255,.22)}
+  .key-input{display:flex;align-items:center;gap:9px;padding:13px 14px;border-radius:12px;
+    background:rgba(255,255,255,.04);border:1px solid var(--stroke);transition:.2s}
+  .key-input:focus-within{border-color:rgba(180,140,255,.55);box-shadow:0 0 0 3px rgba(180,140,255,.12)}
+  .key-input svg{color:var(--txt-3);flex-shrink:0}
+  .key-input input{flex:1;background:none;border:none;outline:none;color:var(--txt);
+    font:600 15px 'JetBrains Mono';letter-spacing:2px;min-width:0}
+  .key-input input::placeholder{color:var(--txt-3);font-weight:400;letter-spacing:1px}
+  .row-between{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+  .chk{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--txt-2);user-select:none}
+  .chk input{display:none}
+  .chk .sw{width:36px;height:20px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--stroke);position:relative;transition:.2s}
+  .chk .sw::after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--txt-2);transition:.2s}
+  .chk input:checked + .sw{background:linear-gradient(120deg,var(--purple),var(--pink));border-color:transparent}
+  .chk input:checked + .sw::after{left:18px;background:#1b0f26}
+  .row-between a{font-size:12px;color:var(--purple-bright);text-decoration:none}
+  .row-between a:hover{text-decoration:underline}
+  .submit{position:relative;width:100%;margin-top:20px;padding:14px 0;border:none;border-radius:13px;cursor:pointer;overflow:hidden;
+    background:linear-gradient(120deg,var(--purple),var(--pink));color:#1b0f26;font:700 14px 'Space Grotesk';letter-spacing:.5px;
+    box-shadow:0 14px 34px -10px rgba(255,159,209,.55);transition:.2s}
+  .submit:hover{filter:brightness(1.07)}
+  .submit .bar{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(27,15,38,.22);transition:width .4s ease}
+  .submit .label{position:relative;display:flex;align-items:center;justify-content:center;gap:9px}
+  .submit .spinner{width:14px;height:14px;border:2px solid rgba(27,15,38,.3);border-top-color:#1b0f26;border-radius:50%;display:none;animation:spin .7s linear infinite}
+  .submit.busy .spinner{display:block}
+  .submit.busy{pointer-events:none;filter:saturate(.85)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .sweep{position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.4) 50%,transparent 70%);transform:translateX(-120%)}
+  .submit.run .sweep{animation:sweep 1s ease}
+  @keyframes sweep{to{transform:translateX(120%)}}
+  .status{display:none;margin-top:14px;font-size:12px;color:var(--txt-2);text-align:center}
+  .status.show{display:block}
+  .status .dot{color:var(--purple)}
+  .foot{margin-top:20px;font-size:10.5px;color:var(--txt-3);text-align:center}
+  .success{position:fixed;inset:0;z-index:50;display:none;place-items:center;background:rgba(10,9,16,.82);backdrop-filter:blur(10px)}
+  .success.show{display:grid}
+  .success .in{text-align:center}
+  .success h2{font:700 22px 'Space Grotesk';margin-top:16px}
+  .success p{font-size:12.5px;color:var(--txt-2);margin-top:6px}
+  .check-circle{fill:none;stroke:var(--green);stroke-width:3;stroke-dasharray:170;stroke-dashoffset:170;animation:dash .7s ease forwards}
+  .check-mark{fill:none;stroke:var(--green);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:60;stroke-dashoffset:60;animation:dash .5s .5s ease forwards}
+  @keyframes dash{to{stroke-dashoffset:0}}
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(70px);background:rgba(20,16,30,.92);
+    border:1px solid rgba(180,140,255,.35);color:var(--txt);padding:10px 18px;border-radius:11px;font:500 12.5px 'Inter';
+    z-index:99;opacity:0;transition:.3s}
+  .toast.show,.toast.on{transform:translateX(-50%);opacity:1}
+</style>
+</head>
+<body>
+<div class="backdrop"><div class="orb a"></div><div class="orb b"></div><div class="orb c"></div></div>
+<div class="grain"></div>
+
+<div class="wrap">
+  <aside class="hero brand">
+    <div class="logo"><img src="logo.png" alt="KingR9"></div>
+    <h1>KingR9 Tools</h1>
+    <p class="tag">Performance Suite สำหรับ FiveM &amp; GTA5 — เร่งเครื่องด้วยชุดสคริปต์ R9 ครบชุด ปลอดภัย ผูกกับเครื่องคุณเท่านั้น</p>
+    <ul class="feat">
+      <li>
+        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z"/></svg></div>
+        <div><b>12 Optimization Scripts</b><small>Power Plan · Network · FiveM · Services — รันจริงทั้งชุด</small></div>
+      </li>
+      <li>
+        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div><b>HWID Lock</b><small>License ผูกกับฮาร์ดแวร์ของเครื่องนี้เท่านั้น</small></div>
+      </li>
+      <li>
+        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="18" height="8" rx="2"/><path d="M7 8V5M12 8V5M17 8V5M7 16v3M12 16v3M17 16v3"/></svg></div>
+        <div><b>Memory &amp; Junk Cleaner</b><small>Purge standby RAM · ล้างไฟล์ขยะวัดเป็น GB จริง</small></div>
+      </li>
+      <li>
+        <div class="fi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></div>
+        <div><b>Live Monitor</b><small>CPU · GPU · RAM · Ping อัปเดตเรียลไทม์ทุก 2 วิ</small></div>
+      </li>
+    </ul>
+    <div class="hfoot"><span class="lver">v1.0.1</span> · © KingR9 — All rights reserved</div>
+  </aside>
+
+  <main class="panel">
+    <div class="card">
+      <h2>Activate</h2>
+      <p class="sub">กรอก License Key เพื่อปลดล็อกการใช้งาน</p>
+
+      <div class="hwid">
+        <div style="flex:1;min-width:0">
+          <div class="fld-l" style="margin:0 0 4px">HARDWARE ID</div>
+          <div class="val" id="hwidVal">กำลังอ่านค่า...</div>
+        </div>
+        <button type="button" class="copy-btn" id="copyBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          Copy
+        </button>
+      </div>
+
+      <form id="loginForm" onsubmit="return false;">
+        <div class="fld-l">LICENSE KEY</div>
+        <div class="key-input">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.778-7.778zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          <input id="pass" type="text" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" maxlength="19">
+        </div>
+
+        <div class="row-between">
+          <label class="chk"><input type="checkbox" id="remember" checked><span class="sw"></span>Remember this key</label>
+          <span style="display:flex;gap:12px;align-items:center">
+            <a href="#" id="importLink" style="color:var(--purple-bright)">มีไฟล์ key?</a>
+            <a href="#" id="lostLink">Lost key?</a>
+          </span>
+        </div>
+        <input type="file" id="keyFile" accept=".json,application/json" style="display:none">
+
+        <button class="submit" id="btn" type="submit">
+          <span class="bar" id="bar"></span>
+          <span class="label"><span class="spinner"></span><span id="btnText">Activate</span></span>
+          <span class="sweep"></span>
+        </button>
+
+        <div class="status" id="status"><span class="dot">●</span> <span id="statusText"></span></div>
+      </form>
+    </div>
+    <div class="foot"><span class="lver">v1.0.1</span> · Protected by HWID Lock · KingR9</div>
+  </main>
+</div>
+
+<div class="success" id="success">
+  <div class="in">
+    <svg width="60" height="60" viewBox="0 0 60 60">
+      <circle class="check-circle" cx="30" cy="30" r="26"/>
+      <path class="check-mark" d="M18 31 L26 39 L42 21"/>
+    </svg>
+    <h2>Activated</h2>
+    <p>Launching KingR9Tools…</p>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+  if (!window.KR_HOSTED) {
+  const btn=document.getElementById('btn'),bar=document.getElementById('bar'),btnText=document.getElementById('btnText');
+  const status=document.getElementById('status'),statusText=document.getElementById('statusText');
+  const success=document.getElementById('success'),form=document.getElementById('loginForm');
+  const keyInput=document.getElementById('pass'),copyBtn=document.getElementById('copyBtn');
+  const hwidVal=document.getElementById('hwidVal'),toast=document.getElementById('toast');
+
+  keyInput.addEventListener('input',()=>{
+    let v=keyInput.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,16);
+    let out=v.match(/.{1,4}/g);
+    keyInput.value=out?out.join('-'):v;
+  });
+
+  copyBtn.addEventListener('click',()=>{
+    navigator.clipboard?.writeText(hwidVal.textContent).catch(()=>{});
+    toast.classList.add('show');
+    setTimeout(()=>toast.classList.remove('show'),1400);
+  });
+
+  const steps=[
+    {pct:30,text:'Verifying key…'},
+    {pct:65,text:'Confirming HWID with server…'},
+    {pct:100,text:'Unlocked successfully'}
+  ];
+
+  form.addEventListener('submit',()=>{
+    if(btn.classList.contains('busy'))return;
+    btn.classList.add('busy','run');
+    btnText.textContent='Checking…';
+    status.classList.add('show');
+    let i=0;
+    const tick=()=>{
+      const s=steps[i];bar.style.width=s.pct+'%';statusText.textContent=s.text;i++;
+      if(i<steps.length){setTimeout(tick,550);}
+      else{setTimeout(()=>{success.classList.add('show');},450);}
+    };
+    setTimeout(tick,200);
+  });
+  }
+</script>
+<script src="bridge.js"></script>
+</body>
+</html>

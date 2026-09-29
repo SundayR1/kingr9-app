@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- KingR9 Tools — ตั้งค่า obfuscation (ตั้งใจให้ปลอดภัยกับ WPF/WebView2/JSON/COM):
+     - HideStrings = เข้ารหัส string ทุกตัวใน exe (Firebase URL · รหัส admin · ข้อความ) — decompiler จะเห็นแค่ blob
+     - ไม่เปลี่ยนชื่อ type/method/property เพราะแอปนี้ใช้ XAML(BAML) + System.Text.Json(อ่านชื่อ property)
+       + WebView2 host object (JS เรียกเมธอดด้วยชื่อ) — เปลี่ยนชื่อแล้วแอปจะพัง -->
+<Obfuscator>
+  <Var name="InPath" value="bin\Release\net8.0-windows\win-x64" />
+  <Var name="OutPath" value="obj\obfuscated" />
+  <Var name="HideStrings" value="false" />
+  <Var name="RenameProperties" value="false" />
+  <Var name="RenameFields" value="false" />
+  <Var name="RenameEvents" value="false" />
+  <Var name="RenameMethods" value="false" />
+  <Var name="RenameTypes" value="false" />
+  <Module file="$(InPath)\KingR9Tools.dll" />
+</Obfuscator>
