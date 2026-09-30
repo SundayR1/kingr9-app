@@ -604,7 +604,8 @@
       put('vbRam', ram + '%');
       put('memPct', ram + '%');
       arc('memArc', MC, ram);
-      if (d.ramUsed) put('memSub', d.ramUsed + ' / ' + d.ramTotal + ' GB');
+      if (d.ramUsed != null) put('memSub', d.ramUsed + ' / ' + d.ramTotal + ' GB');
+      if (d.ramFree != null) put('memAvailable', 'RAM ว่าง ' + d.ramFree + ' GB');
     }
     if (disk !== null) { bar('bDisk', disk); put('vbDisk', disk + '%'); }
     if (ping !== null) { bar('bPing', Math.max(0, 100 - ping * 2)); put('vbPing', ping + 'ms'); }
@@ -712,7 +713,73 @@
   });
 
   /* ---- memory page ---- */
+  const memClear = $('memClear');
+  const memAutoToggle = $('memAutoToggle');
+  const memAutoMinutes = $('memAutoMinutes');
+  const memAutoStatus = $('memAutoStatus');
+  const MEM_AUTO_KEY = 'kingr9tools.ramAuto';
+  const MEM_MINUTES_KEY = 'kingr9tools.ramAutoMinutes';
+  let memAutoEnabled = false, memAutoTimer = 0, memAutoNext = 0, memBusy = false;
 
+  try {
+    const savedMinutes = localStorage.getItem(MEM_MINUTES_KEY);
+    if (memAutoMinutes && ['5','10','15','30','60'].includes(savedMinutes)) memAutoMinutes.value = savedMinutes;
+    memAutoEnabled = localStorage.getItem(MEM_AUTO_KEY) === '1';
+  } catch (e) {}
+
+  function memIntervalMs() { return (parseInt(memAutoMinutes && memAutoMinutes.value, 10) || 10) * 60000; }
+  function updateMemAutoStatus() {
+    if (!memAutoStatus) return;
+    if (!memAutoEnabled) { memAutoStatus.textContent = 'ปิดอยู่'; return; }
+    const left = Math.max(0, memAutoNext - Date.now());
+    const minutes = Math.floor(left / 60000), seconds = Math.floor((left % 60000) / 1000);
+    memAutoStatus.textContent = 'เปิดอยู่ · ครั้งถัดไปใน ' + minutes + ':' + String(seconds).padStart(2, '0') + ' นาที';
+  }
+  function scheduleMemAuto() {
+    if (memAutoTimer) clearTimeout(memAutoTimer);
+    if (!memAutoEnabled) { memAutoNext = 0; updateMemAutoStatus(); return; }
+    memAutoNext = Date.now() + memIntervalMs();
+    updateMemAutoStatus();
+    memAutoTimer = setTimeout(async function () {
+      await clearRam(true);
+      if (memAutoEnabled) scheduleMemAuto();
+    }, memIntervalMs());
+  }
+  async function clearRam(automatic) {
+    if (memBusy) return;
+    memBusy = true;
+    if (memClear) { memClear.disabled = true; memClear.textContent = 'กำลังคืน RAM...'; }
+    if (memAutoToggle) memAutoToggle.disabled = true;
+    try {
+      const r = await KR.rpc('clearRam');
+      if (!r || !r.ok) { KR.toast((r && r.msg) || 'คืน RAM ไม่สำเร็จ'); return; }
+      const delta = r.availableAfterGb - r.availableBeforeGb;
+      const change = (delta >= 0 ? '+' : '') + delta.toFixed(2);
+      const message = 'คืน working set แล้ว ' + r.processesTrimmed + ' แอป · RAM ว่างเปลี่ยน ' + change + ' GB';
+      KR.toast(automatic ? 'ล้าง RAM อัตโนมัติแล้ว · ' + message : message);
+    } catch (e) {
+      KR.toast('คืน RAM ไม่สำเร็จ');
+    } finally {
+      memBusy = false;
+      if (memClear) { memClear.disabled = false; memClear.textContent = 'ล้าง RAM ตอนนี้'; }
+      if (memAutoToggle) memAutoToggle.disabled = false;
+      updateMemAutoStatus();
+    }
+  }
+  if (memClear) memClear.addEventListener('click', function () { clearRam(false); });
+  if (memAutoToggle) memAutoToggle.addEventListener('click', function () {
+    memAutoEnabled = !memAutoEnabled;
+    try { localStorage.setItem(MEM_AUTO_KEY, memAutoEnabled ? '1' : '0'); } catch (e) {}
+    memAutoToggle.textContent = memAutoEnabled ? 'หยุดล้างอัตโนมัติ' : 'เริ่มล้างอัตโนมัติ';
+    scheduleMemAuto();
+  });
+  if (memAutoMinutes) memAutoMinutes.addEventListener('change', function () {
+    try { localStorage.setItem(MEM_MINUTES_KEY, memAutoMinutes.value); } catch (e) {}
+    if (memAutoEnabled) scheduleMemAuto();
+  });
+  if (memAutoToggle) memAutoToggle.textContent = memAutoEnabled ? 'หยุดล้างอัตโนมัติ' : 'เริ่มล้างอัตโนมัติ';
+  if (memAutoEnabled) scheduleMemAuto();
+  setInterval(updateMemAutoStatus, 1000);
   /* ---- junk cleaner page ---- */
   function renderJunk(r) {
     const box = $('clCats');

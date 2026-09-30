@@ -20,21 +20,21 @@ namespace KingR9Tools.Core
         {
             Hello();
 
-            // à¹‚à¸«à¸¡à¸”à¸­à¸­à¸™à¹„à¸¥à¸™à¹Œ: à¸–à¸²à¸¡ server à¸—à¸¸à¸à¸„à¸£à¸±à¹‰à¸‡à¸—à¸µà¹ˆà¹€à¸‚à¹‰à¸² Dashboard â€” à¸–à¸¹à¸à¸›à¸à¸´à¹€à¸ªà¸˜ (à¸£à¸µ/à¸£à¸°à¸‡à¸±à¸š/à¸œà¸¹à¸à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸­à¸·à¹ˆà¸™) = à¸”à¸µà¸”à¸à¸¥à¸±à¸šà¸«à¸™à¹‰à¸² Activate
-            // à¸ªà¹ˆà¸§à¸™ "à¹€à¸Šà¸·à¹ˆà¸­à¸¡à¸•à¹ˆà¸­ server à¹„à¸¡à¹ˆà¹„à¸”à¹‰" (à¸­à¸­à¸Ÿà¹„à¸¥à¸™à¹Œ) = à¸›à¸¥à¹ˆà¸­à¸¢à¸œà¹ˆà¸²à¸™ à¹ƒà¸Šà¹‰à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¹ƒà¸™à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸•à¹ˆà¸­
+            // โหมดออนไลน์: ถาม server ทุกครั้งที่เข้า Dashboard — ถูกปฏิเสธ (รี/ระงับ/ผูกเครื่องอื่น) = ดีดกลับหน้า Activate
+            // ส่วน "เชื่อมต่อ server ไม่ได้" (ออฟไลน์) = ปล่อยผ่าน ใช้ข้อมูลในเครื่องต่อ
             if (ServerOn && !LicenseService.IsAdmin() && _cfg.rememberKey && !string.IsNullOrWhiteSpace(_cfg.savedKey))
             {
                 var (sok, smsg, _, soff) = ServerActivate(_cfg.savedKey, LicenseService.Hwid());
                 if (!sok && !soff)
                 {
-                    _log.Warn("server à¸›à¸à¸´à¹€à¸ªà¸˜ key à¸—à¸µà¹ˆà¸ˆà¸³à¹„à¸§à¹‰: " + smsg + " â†’ à¸à¸¥à¸±à¸šà¸«à¸™à¹‰à¸² Activate");
+                    _log.Warn("server ปฏิเสธ key ที่จำไว้: " + smsg + " → กลับหน้า Activate");
                     _cfg.rememberKey = false;
                     _cfg.savedKey = "";
                     SaveCfg();
                     _win.Dispatcher.BeginInvoke(new Action(_win.NavigateLogin));
                     return J(new { ok = false, kick = true, msg = smsg });
                 }
-                if (!sok && soff) _log.Warn("server à¹€à¸‚à¹‰à¸²à¹„à¸¡à¹ˆà¸–à¸¶à¸‡ â€” à¹ƒà¸Šà¹‰à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¹ƒà¸™à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸•à¹ˆà¸­à¸Šà¸±à¹ˆà¸§à¸„à¸£à¸²à¸§");
+                if (!sok && soff) _log.Warn("server เข้าไม่ถึง — ใช้ข้อมูลในเครื่องต่อชั่วคราว");
             }
 
             foreach (var kv in _cfg.toggles)
@@ -49,7 +49,7 @@ namespace KingR9Tools.Core
             int total = _all.Count(x => x.Recommended);
             if (_cfg.lastTotal <= 0) { _cfg.lastTotal = total; SaveCfg(); }
 
-            _log.Head("Dashboard à¸žà¸£à¹‰à¸­à¸¡à¹ƒà¸Šà¹‰à¸‡à¸²à¸™ â€” real-time monitor à¹€à¸£à¸´à¹ˆà¸¡à¸—à¸³à¸‡à¸²à¸™");
+            _log.Head("Dashboard พร้อมใช้งาน — real-time monitor เริ่มทำงาน");
 
             return J(new
             {
@@ -61,7 +61,7 @@ namespace KingR9Tools.Core
                 applied = _cfg.lastApplied,
                 total,
                 license = lic == null
-                    ? (object)new { key = "â€”", hwid = LicenseService.Hwid(), days = 0, status = "Inactive" }
+                    ? (object)new { key = "—", hwid = LicenseService.Hwid(), days = 0, status = "Inactive" }
                     : new { key = lic.key, hwid = lic.hwid, days = LicenseService.DaysLeft(lic), status = "Active" }
             });
         }

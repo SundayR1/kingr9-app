@@ -117,6 +117,10 @@
   .btnrow .apply{margin-top:0}
   .fld-l{font:600 12px 'Inter';color:var(--txt-2);margin:4px 0 8px;text-align:left}
   .fld{width:100%;padding:11px 12px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--stroke);color:var(--txt);font:500 13px 'Inter';outline:none}
+  select.fld{appearance:none;color-scheme:dark;cursor:pointer;padding-right:36px;background-color:rgba(255,255,255,.04);background-image:linear-gradient(45deg,transparent 50%,#cbb8ea 50%),linear-gradient(135deg,#cbb8ea 50%,transparent 50%);background-position:calc(100% - 17px) 50%,calc(100% - 12px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+  select.fld:focus{border-color:rgba(190,145,255,.7);box-shadow:0 0 0 3px rgba(180,140,255,.12)}
+  select.fld option{background:#211b2c;color:#f4efff;padding:10px}
+  select.fld option:checked{background:#64448a;color:#fff}
   .str-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin:2px 0 4px}
   .str-opt{position:relative;padding:13px 14px;border-radius:12px;background:rgba(255,255,255,.03);
     border:1px solid var(--stroke);cursor:pointer;text-align:left;transition:.2s;font-family:'Inter'}
@@ -528,11 +532,28 @@
                 <div><div style="font:800 26px 'JetBrains Mono'" id="memPct">--%</div><div style="font:500 10.5px 'JetBrains Mono';color:var(--txt-3);margin-top:3px" id="memSub">-- / -- GB</div></div>
               </div>
             </div>
-            <div style="font-size:11px;color:var(--txt-3)">อัปเดตเรียลไทม์ทุก 2 วินาที</div>
+            <div style="font-size:11px;color:var(--txt-3)" id="memAvailable">RAM ว่าง -- GB</div>
+            <div class="note" style="max-width:440px">พยายามคืนหน่วยความจำที่แอปอื่นพักไว้ โดยไม่ปิดแอปหรือแตะโปรเซสสำคัญ Windows อาจนำ RAM กลับมาใช้เมื่อจำเป็น และผลที่เห็นขึ้นกับโปรแกรมที่กำลังเปิด</div>
+            <div style="font-size:11px;color:var(--txt-3);margin-top:10px">อัปเดตเรียลไทม์ทุก 2 วินาที</div>
           </div>
-          <div class="glass card">
-            <h2 class="ct">Windows Memory Management</h2>
-            <p class="desc">Windows จัดการ Standby Memory ให้อัตโนมัติ แอปจะแสดงการใช้ RAM โดยไม่ล้างหน่วยความจำเบื้องหลัง</p>
+          <div class="glass card" style="display:flex;flex-direction:column;align-items:stretch">
+            <h2 class="ct">RAM Cleaner</h2>
+            <p class="desc">ล้าง RAM ด้วยตนเอง หรือเปิดให้ล้างซ้ำตามช่วงเวลาที่เลือก</p>
+            <button class="apply" id="memClear" style="width:100%;margin-top:8px">ล้าง RAM ตอนนี้</button>
+            <div style="height:1px;background:var(--stroke);margin:18px 0"></div>
+            <label class="fld-l" for="memAutoMinutes">ล้างอัตโนมัติทุก</label>
+            <div style="display:flex;align-items:center;gap:10px">
+              <select class="fld" id="memAutoMinutes" style="flex:1">
+                <option value="5">5 นาที</option>
+                <option value="10" selected>10 นาที</option>
+                <option value="15">15 นาที</option>
+                <option value="30">30 นาที</option>
+                <option value="60">60 นาที</option>
+              </select>
+              <button class="apply" id="memAutoToggle" style="width:auto;min-width:150px;margin:0">เริ่มล้างอัตโนมัติ</button>
+            </div>
+            <div class="note" id="memAutoStatus" style="margin-top:12px">ปิดอยู่</div>
+            <p class="desc" style="margin-top:12px">ทำงานขณะเปิดแอปเท่านั้น การล้างคืนเฉพาะหน่วยความจำที่โปรแกรมปล่อยได้ ไม่ปิดแอปหรือแตะโปรเซสสำคัญ และ RAM อาจถูก Windows นำกลับไปใช้ตามปกติ</p>
           </div>
         </div>
       </section>

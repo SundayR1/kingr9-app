@@ -32,8 +32,8 @@ namespace KingR9Tools.Core
     }
 
     /// <summary>
-    /// à¸•à¸±à¸§à¹€à¸Šà¸·à¹ˆà¸­à¸¡ HTML UI â†” C# à¹à¸šà¸š host object â€” JS à¹€à¸£à¸µà¸¢à¸à¹€à¸¡à¸˜à¸­à¸”à¸•à¸£à¸‡à¹†
-    /// à¸œà¹ˆà¸²à¸™ window.chrome.webview.hostObjects.sync.kr.*  à¹à¸¥à¸°à¹„à¸”à¹‰à¸œà¸¥à¸¥à¸±à¸žà¸˜à¹Œà¸à¸¥à¸±à¸šà¹ƒà¸™ call à¹€à¸”à¸µà¸¢à¸§
+    /// ตัวเชื่อม HTML UI ↔ C# แบบ host object — JS เรียกเมธอดตรงๆ
+    /// ผ่าน window.chrome.webview.hostObjects.sync.kr.*  และได้ผลลัพธ์กลับใน call เดียว
     /// </summary>
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
@@ -45,30 +45,30 @@ namespace KingR9Tools.Core
         private readonly StatsService _stats;
         private bool _busy;
 
-        // progress à¸‚à¸­à¸‡ Optimize/Restore (JS à¸¡à¸² poll à¸œà¹ˆà¸²à¸™ Progress())
+        // progress ของ Optimize/Restore (JS มา poll ผ่าน Progress())
         private readonly object _runLock = new object();
         private bool _running, _done, _restart;
         private int _pct, _ok, _fail, _applied, _total, _score;
 
-        // progress à¸‚à¸­à¸‡à¸›à¸¸à¹ˆà¸¡ Apply à¸—à¸±à¹ˆà¸§à¹„à¸› (r9net / power / fivem / svc / clean à¸¯à¸¥à¸¯) â€” JS à¹‚à¸Šà¸§à¹Œà¸«à¸™à¹‰à¸²à¹‚à¸«à¸¥à¸” + %
+        // progress ของปุ่ม Apply ทั่วไป (r9net / power / fivem / svc / clean ฯลฯ) — JS โชว์หน้าโหลด + %
         private readonly object _jobLock = new object();
         private bool _jobRunning, _jobDone, _jobOk;
         private int _jobPct;
-        private double _jobBase, _jobSpan = 100;      // à¸Šà¹ˆà¸§à¸‡ % à¸‚à¸­à¸‡à¸‚à¸±à¹‰à¸™à¸›à¸±à¸ˆà¸ˆà¸¸à¸šà¸±à¸™ (à¹à¸–à¸šà¹„à¸«à¸¥à¸ à¸²à¸¢à¹ƒà¸™à¸Šà¹ˆà¸§à¸‡à¸™à¸µà¹‰ à¹„à¸¡à¹ˆà¸—à¸±à¸šà¸‚à¸±à¹‰à¸™à¸­à¸·à¹ˆà¸™)
+        private double _jobBase, _jobSpan = 100;      // ช่วง % ของขั้นปัจจุบัน (แถบไหลภายในช่วงนี้ ไม่ทับขั้นอื่น)
         private DateTime _jobStepStart = DateTime.UtcNow;
         private string _jobLabel = "", _jobDoneMsg = "";
 
         private AppConfig _cfg;
         private readonly object _cfgLock = new object();
 
-        // à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸­à¸”à¸¡à¸´à¸™ (à¸”à¸¹à¸£à¸²à¸¢à¸¥à¸°à¹€à¸­à¸µà¸¢à¸”à¹ƒà¸™ LicenseService.AdminHwid)
+        // เครื่องแอดมิน (ดูรายละเอียดใน LicenseService.AdminHwid)
         private bool IsAdmin() => LicenseService.IsAdmin();
 
-        // ================= SERVER (Firebase Realtime Database â€” à¸Ÿà¸£à¸µ) =================
-        // à¸§à¸´à¸˜à¸µà¹€à¸›à¸´à¸”à¹ƒà¸Šà¹‰: à¸ªà¸¡à¸±à¸„à¸£ firebase.google.com â†’ à¸ªà¸£à¹‰à¸²à¸‡à¹‚à¸›à¸£à¹€à¸ˆà¸à¸•à¹Œ â†’ à¹€à¸›à¸´à¸” Realtime Database
-        // â†’ à¸„à¸±à¸”à¸¥à¸­à¸ URL à¸¡à¸²à¸§à¸²à¸‡à¹à¸—à¸™à¸„à¹ˆà¸²à¸§à¹ˆà¸²à¸‡à¸”à¹‰à¸²à¸™à¸¥à¹ˆà¸²à¸‡ (à¹€à¸Šà¹ˆà¸™ "https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app")
-        // à¸›à¸¥à¹ˆà¸­à¸¢à¸§à¹ˆà¸²à¸‡ = à¹ƒà¸Šà¹‰à¹‚à¸«à¸¡à¸”à¹„à¸Ÿà¸¥à¹Œ licenses.json à¹€à¸«à¸¡à¸·à¸­à¸™à¹€à¸”à¸´à¸¡
-        // static readonly (à¸«à¹‰à¸²à¸¡ const) â€” à¹€à¸žà¸·à¹ˆà¸­à¹ƒà¸«à¹‰ Obfuscar à¹€à¸‚à¹‰à¸²à¸£à¸«à¸±à¸ªà¸„à¹ˆà¸²à¹„à¸”à¹‰à¸•à¸­à¸™ build (const à¸ˆà¸°à¸«à¸¥à¸¸à¸”à¹€à¸›à¹‡à¸™ plain text)
+        // ================= SERVER (Firebase Realtime Database — ฟรี) =================
+        // วิธีเปิดใช้: สมัคร firebase.google.com → สร้างโปรเจกต์ → เปิด Realtime Database
+        // → คัดลอก URL มาวางแทนค่าว่างด้านล่าง (เช่น "https://xxx-default-rtdb.asia-southeast1.firebasedatabase.app")
+        // ปล่อยว่าง = ใช้โหมดไฟล์ licenses.json เหมือนเดิม
+        // static readonly (ห้าม const) — เพื่อให้ Obfuscar เข้ารหัสค่าได้ตอน build (const จะหลุดเป็น plain text)
         private static readonly string FirebaseUrl = "https://kingr9-f3e43-default-rtdb.asia-southeast1.firebasedatabase.app";
         private static bool ServerOn =>
             !string.IsNullOrWhiteSpace(FirebaseUrl) && FirebaseUrl.StartsWith("http", StringComparison.OrdinalIgnoreCase);
@@ -77,12 +77,12 @@ namespace KingR9Tools.Core
         private static string ServerKeyUrl(string key) =>
             FirebaseUrl.TrimEnd('/') + "/keys/" + LicenseService.Normalize(key).Replace("-", "") + ".json";
 
-        /// <summary>à¸žà¸£à¹‰à¸­à¸¡à¹ƒà¸Šà¹‰à¹‚à¸«à¸¡à¸”à¸­à¸­à¸™à¹„à¸¥à¸™à¹Œ (à¸¡à¸µ URL + à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸²à¸šà¸±à¸à¸Šà¸µà¹à¸­à¸”à¸¡à¸´à¸™à¹à¸¥à¹‰à¸§)</summary>
+        /// <summary>พร้อมใช้โหมดออนไลน์ (มี URL + ตั้งค่าบัญชีแอดมินแล้ว)</summary>
         private bool ServerReady =>
             ServerOn && !string.IsNullOrWhiteSpace(_cfg.srvApiKey) &&
             !string.IsNullOrWhiteSpace(_cfg.srvEmail) && !string.IsNullOrWhiteSpace(_cfg.srvPass);
 
-        /// <summary>à¸¥à¹‡à¸à¸­à¸´à¸™à¸”à¹‰à¸§à¸¢à¸šà¸±à¸à¸Šà¸µà¹à¸­à¸”à¸¡à¸´à¸™ â†’ à¹„à¸”à¹‰ token (à¸­à¸²à¸¢à¸¸ ~1 à¸Šà¸¡. à¹€à¸à¹‡à¸š cache à¹ƒà¸™ config)</summary>
+        /// <summary>ล็กอินด้วยบัญชีแอดมิน → ได้ token (อายุ ~1 ชม. เก็บ cache ใน config)</summary>
         private void EnsureToken()
         {
             if (!string.IsNullOrWhiteSpace(_cfg.srvToken) && DateTime.Now < _cfg.srvTokenExp.AddMinutes(-5)) return;
@@ -92,14 +92,14 @@ namespace KingR9Tools.Core
                 JsonSerializer.Serialize(new { email = _cfg.srvEmail, password = _cfg.srvPass, returnSecureToken = true }),
                 Encoding.UTF8, "application/json")).Result;
             if (!resp.IsSuccessStatusCode)
-                throw new Exception("à¹€à¸‚à¹‰à¸²à¸ªà¸¹à¹ˆà¸£à¸°à¸šà¸š server à¹„à¸¡à¹ˆà¸ªà¸³à¹€à¸£à¹‡à¸ˆ â€” à¸•à¸£à¸§à¸ˆ Web API Key / à¸­à¸µà¹€à¸¡à¸¥ / à¸£à¸«à¸±à¸ªà¸œà¹ˆà¸²à¸™à¹à¸­à¸”à¸¡à¸´à¸™");
+                throw new Exception("เข้าสู่ระบบ server ไม่สำเร็จ — ตรวจ Web API Key / อีเมล / รหัสผ่านแอดมิน");
             var j = JsonSerializer.Deserialize<JsonElement>(resp.Content.ReadAsStringAsync().Result);
             _cfg.srvToken = j.GetProperty("idToken").GetString() ?? "";
             _cfg.srvTokenExp = DateTime.Now.AddSeconds(3600);
             SaveCfg();
         }
 
-        /// <summary>query auth à¸ªà¸³à¸«à¸£à¸±à¸š REST (à¸–à¹‰à¸²à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² à¸„à¸·à¸™à¸„à¹ˆà¸²à¸§à¹ˆà¸²à¸‡ = à¹€à¸£à¸µà¸¢à¸à¹à¸šà¸šà¹„à¸¡à¹ˆà¸¡à¸µ token)</summary>
+        /// <summary>query auth สำหรับ REST (ถ้ายังไม่ตั้งค่า คืนค่าว่าง = เรียกแบบไม่มี token)</summary>
         private string AuthQuery()
         {
             if (!ServerReady) return "";
@@ -112,10 +112,10 @@ namespace KingR9Tools.Core
             try
             {
                 using var resp = Http.GetAsync(url).Result;
-                if (resp.StatusCode == System.Net.HttpStatusCode.NotFound) return "null";   // key à¹„à¸¡à¹ˆà¸¡à¸µà¸šà¸™ server
+                if (resp.StatusCode == System.Net.HttpStatusCode.NotFound) return "null";   // key ไม่มีบน server
                 return resp.Content.ReadAsStringAsync().Result;
             }
-            catch { return null; }   // à¹€à¸™à¹‡à¸•/à¹€à¸‹à¸´à¸£à¹Œà¸Ÿà¹€à¸§à¸­à¸£à¹Œà¹€à¸‚à¹‰à¸²à¹„à¸¡à¹ˆà¸–à¸¶à¸‡
+            catch { return null; }   // เน็ต/เซิร์ฟเวอร์เข้าไม่ถึง
         }
 
         private static bool HttpPut(string url, string json)
@@ -140,23 +140,23 @@ namespace KingR9Tools.Core
             catch { return false; }
         }
 
-        /// <summary>Activate à¸œà¹ˆà¸²à¸™ server â€” à¸œà¸¹à¸ HWID à¸—à¸µà¹ˆà¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸£à¸à¸—à¸±à¸™à¸—à¸µ + à¸•à¸£à¸§à¸ˆà¸­à¸²à¸¢à¸¸/à¸à¸²à¸£à¸£à¸°à¸‡à¸±à¸šà¸—à¸¸à¸à¸„à¸£à¸±à¹‰à¸‡
-        /// offline=true = à¸•à¸´à¸”à¸•à¹ˆà¸­ server à¹„à¸¡à¹ˆà¸–à¸¶à¸‡ (à¹„à¸¡à¹ˆà¹ƒà¸Šà¹ˆà¸à¸²à¸£à¸–à¸¹à¸à¸›à¸à¸´à¹€à¸ªà¸˜ â€” à¹ƒà¸«à¹‰à¹ƒà¸Šà¹‰à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¹ƒà¸™à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸—à¸™à¹„à¸”à¹‰)</summary>
+        /// <summary>Activate ผ่าน server — ผูก HWID ที่เครื่องแรกทันที + ตรวจอายุ/การระงับทุกครั้ง
+        /// offline=true = ติดต่อ server ไม่ถึง (ไม่ใช่การถูกปฏิเสธ — ให้ใช้ข้อมูลในเครื่องแทนได้)</summary>
         private (bool ok, string msg, int days, bool offline) ServerActivate(string norm, string hw)
         {
             try
             {
                 string body = HttpGet(ServerKeyUrl(norm));
                 if (body == null)
-                    return (false, "à¹€à¸Šà¸·à¹ˆà¸­à¸¡à¸•à¹ˆà¸­ server à¹„à¸¡à¹ˆà¹„à¸”à¹‰ â€” à¸•à¸£à¸§à¸ˆà¸­à¸´à¸™à¹€à¸—à¸­à¸£à¹Œà¹€à¸™à¹‡à¸•", 0, true);
+                    return (false, "เชื่อมต่อ server ไม่ได้ — ตรวจอินเทอร์เน็ต", 0, true);
                 if (string.IsNullOrWhiteSpace(body) || body == "null")
-                    return (false, "à¹„à¸¡à¹ˆà¸žà¸š key à¸™à¸µà¹‰à¹ƒà¸™à¸£à¸°à¸šà¸š", 0, false);
+                    return (false, "ไม่พบ key นี้ในระบบ", 0, false);
 
                 var j = JsonSerializer.Deserialize<JsonElement>(body);
                 if (j.TryGetProperty("revoked", out var rv) && rv.ValueKind == JsonValueKind.True)
-                    return (false, "key à¸™à¸µà¹‰à¸–à¸¹à¸à¸£à¸°à¸‡à¸±à¸šà¸à¸²à¸£à¹ƒà¸Šà¹‰à¸‡à¸²à¸™", 0, false);
+                    return (false, "key นี้ถูกระงับการใช้งาน", 0, false);
                 if (!j.TryGetProperty("days", out var dEl) || dEl.ValueKind != JsonValueKind.Number)
-                    return (false, "à¸‚à¹‰à¸­à¸¡à¸¹à¸¥ key à¸šà¸™ server à¹„à¸¡à¹ˆà¸ªà¸¡à¸šà¸¹à¸£à¸“à¹Œ", 0, false);
+                    return (false, "ข้อมูล key บน server ไม่สมบูรณ์", 0, false);
                 int days = dEl.GetInt32();
                 string hwid = j.TryGetProperty("hwid", out var hEl) && hEl.ValueKind == JsonValueKind.String ? hEl.GetString() : "";
                 string created = j.TryGetProperty("created", out var cEl) && cEl.ValueKind == JsonValueKind.String
@@ -164,23 +164,23 @@ namespace KingR9Tools.Core
 
                 if (string.IsNullOrEmpty(hwid))
                 {
-                    created = LicenseService.TodayUtc();   // à¸­à¸²à¸¢à¸¸à¹€à¸£à¸´à¹ˆà¸¡à¸™à¸±à¸šà¸§à¸±à¸™ Activate à¸‚à¸­à¸‡à¸¥à¸¹à¸à¸„à¹‰à¸²
+                    created = LicenseService.TodayUtc();   // อายุเริ่มนับวัน Activate ของลูกค้า
                     if (!HttpPatch(ServerKeyUrl(norm), JsonSerializer.Serialize(new { hwid = hw, created, key = norm })))
-                        return (false, "à¹€à¸Šà¸·à¹ˆà¸­à¸¡à¸•à¹ˆà¸­ server à¹„à¸¡à¹ˆà¸ªà¸³à¹€à¸£à¹‡à¸ˆ (à¸šà¸±à¸™à¸—à¸¶à¸ HWID)", 0, true);
+                        return (false, "เชื่อมต่อ server ไม่สำเร็จ (บันทึก HWID)", 0, true);
                     LicenseService.UpsertLocal(norm, created, days);
-                    return (true, "à¸¥à¹‡à¸­à¸„ HWID à¸ªà¸³à¹€à¸£à¹‡à¸ˆ", days, false);
+                    return (true, "ล็อค HWID สำเร็จ", days, false);
                 }
-                if (hwid != hw) return (false, "key à¸™à¸µà¹‰à¸–à¸¹à¸à¸œà¸¹à¸à¸à¸±à¸šà¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸­à¸·à¹ˆà¸™à¸­à¸¢à¸¹à¹ˆ", 0, false);
+                if (hwid != hw) return (false, "key นี้ถูกผูกกับเครื่องอื่นอยู่", 0, false);
 
                 var expiry = new LicenseService.License { created = created, days = days };
                 int left = LicenseService.DaysLeft(expiry);
-                if (LicenseService.IsExpired(expiry)) return (false, "key à¸«à¸¡à¸”à¸­à¸²à¸¢à¸¸à¹à¸¥à¹‰à¸§ â€” à¸•à¸´à¸”à¸•à¹ˆà¸­à¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸žà¸·à¹ˆà¸­à¸•à¹ˆà¸­à¸­à¸²à¸¢à¸¸", 0, false);
+                if (LicenseService.IsExpired(expiry)) return (false, "key หมดอายุแล้ว — ติดต่อแอดมินเพื่อต่ออายุ", 0, false);
                 LicenseService.UpsertLocal(norm, created, days);
-                return (true, "key à¸–à¸¹à¸à¸•à¹‰à¸­à¸‡", left, false);
+                return (true, "key ถูกต้อง", left, false);
             }
             catch
             {
-                return (false, "à¹€à¸Šà¸·à¹ˆà¸­à¸¡à¸•à¹ˆà¸­ server à¹„à¸¡à¹ˆà¹„à¸”à¹‰ â€” à¸•à¸£à¸§à¸ˆà¸­à¸´à¸™à¹€à¸—à¸­à¸£à¹Œà¹€à¸™à¹‡à¸•", 0, true);
+                return (false, "เชื่อมต่อ server ไม่ได้ — ตรวจอินเทอร์เน็ต", 0, true);
             }
         }
 
@@ -191,7 +191,7 @@ namespace KingR9Tools.Core
             _all = all;
             _cfg = LoadCfg();
 
-            // à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸­à¸”à¸¡à¸´à¸™: à¸¢à¸à¸£à¸°à¸”à¸±à¸š key à¸‚à¸­à¸‡à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸™à¸µà¹‰à¹€à¸›à¹‡à¸™à¸£à¸¹à¸›à¹à¸šà¸š KINGR9 à¸­à¸±à¸•à¹‚à¸™à¸¡à¸±à¸•à¸´ (à¸—à¸³à¸„à¸£à¸±à¹‰à¸‡à¹€à¸”à¸µà¸¢à¸§)
+            // เครื่องแอดมิน: ยกระดับ key ของเครื่องนี้เป็นรูปแบบ KINGR9 อัตโนมัติ (ทำครั้งเดียว)
             try
             {
                 string nk = LicenseService.EnsureAdminKey();
@@ -200,7 +200,7 @@ namespace KingR9Tools.Core
                     _cfg.savedKey = nk;
                     _cfg.rememberKey = true;
                     SaveCfg();
-                    _log.Ok($"à¹€à¸›à¸¥à¸µà¹ˆà¸¢à¸™ key à¸‚à¸­à¸‡à¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸›à¹‡à¸™à¸£à¸¹à¸›à¹à¸šà¸š KINGR9: {nk}");
+                    _log.Ok($"เปลี่ยน key ของแอดมินเป็นรูปแบบ KINGR9: {nk}");
                 }
             }
             catch { }
@@ -240,24 +240,24 @@ namespace KingR9Tools.Core
 
         private static string J(object o) => JsonSerializer.Serialize(o);
 
-        // à¸‡à¸²à¸™à¹„à¸«à¸™à¸™à¸²à¸™ (netsh/bcdedit/à¸§à¸±à¸”à¸‚à¸¢à¸°/à¸•à¸£à¸§à¸ˆ server) à¸«à¸™à¹‰à¸²à¸•à¹ˆà¸²à¸‡à¸ˆà¸°à¸‚à¸¶à¹‰à¸™ "Not Responding"
-        // à¹ƒà¸«à¸¡à¹ˆ: bridge.js à¸ªà¹ˆà¸‡ { __kr, type, payload } à¸¡à¸²à¸—à¸²à¸‡ postMessage â†’ à¸‡à¸²à¸™à¸«à¸™à¸±à¸à¸—à¸±à¹‰à¸‡à¸«à¸¡à¸”
-        // à¸¥à¸‡ background thread à¹à¸¥à¹‰à¸§à¸ªà¹ˆà¸‡à¸œà¸¥à¸à¸¥à¸±à¸šà¹€à¸›à¹‡à¸™ { __krRes, res } à¹ƒà¸«à¹‰ JS resolve à¸•à¸²à¸¡ id
+        // งานไหนนาน (netsh/bcdedit/วัดขยะ/ตรวจ server) หน้าต่างจะขึ้น "Not Responding"
+        // ใหม่: bridge.js ส่ง { __kr, type, payload } มาทาง postMessage → งานหนักทั้งหมด
+        // ลง background thread แล้วส่งผลกลับเป็น { __krRes, res } ให้ JS resolve ตาม id
 
-        /// <summary>à¸£à¸±à¸š rpc à¸ˆà¸²à¸à¸«à¸™à¹‰à¸²à¹€à¸§à¹‡à¸š (à¹€à¸£à¸µà¸¢à¸à¸ˆà¸²à¸ MainWindow.WebMessageReceived â€” UI thread à¸•à¹‰à¸­à¸‡à¸à¸¥à¸±à¸šà¸—à¸±à¸™à¸—à¸µ)</summary>
+        /// <summary>รับ rpc จากหน้าเว็บ (เรียกจาก MainWindow.WebMessageReceived — UI thread ต้องกลับทันที)</summary>
         public void OnWebMessage(string json)
         {
             JsonElement msg;
             try { msg = JsonSerializer.Deserialize<JsonElement>(json ?? ""); } catch { return; }
-            if (msg.ValueKind != JsonValueKind.Object || !msg.TryGetProperty("__kr", out var idEl)) return;  // à¹„à¸¡à¹ˆà¹ƒà¸Šà¹ˆ rpc
+            if (msg.ValueKind != JsonValueKind.Object || !msg.TryGetProperty("__kr", out var idEl)) return;  // ไม่ใช่ rpc
             long id = idEl.ValueKind == JsonValueKind.Number ? idEl.GetInt64() : 0;
             string type = msg.TryGetProperty("type", out var tEl) && tEl.ValueKind == JsonValueKind.String ? tEl.GetString() : "";
             JsonElement payload = msg.TryGetProperty("payload", out var pEl) && pEl.ValueKind == JsonValueKind.Object ? pEl : default;
 
             string PS(string n) => payload.ValueKind == JsonValueKind.Object && payload.TryGetProperty(n, out var x) && x.ValueKind == JsonValueKind.String ? (x.GetString() ?? "") : "";
 
-            // à¸¥à¸²à¸/à¸¢à¹ˆà¸­/à¸‚à¸¢à¸²à¸¢/à¸›à¸´à¸”à¸«à¸™à¹‰à¸²à¸•à¹ˆà¸²à¸‡ â€” à¸—à¸³à¸šà¸™ UI thread à¸—à¸±à¸™à¸—à¸µ (WebMessageReceived à¸­à¸¢à¸¹à¹ˆà¸šà¸™ UI thread à¸­à¸¢à¸¹à¹ˆà¹à¸¥à¹‰à¸§)
-            // à¸¢à¸´à¹ˆà¸‡à¹€à¸£à¹‡à¸§ DragMove à¸¢à¸´à¹ˆà¸‡à¸•à¸²à¸¡à¹€à¸¡à¸²à¸ªà¹Œà¸—à¸±à¸™ â€” à¸–à¹‰à¸²à¸£à¸­ Task.Run à¹€à¸¡à¸²à¸ªà¹Œà¸ˆà¸°à¸›à¸¥à¹ˆà¸­à¸¢à¸à¹ˆà¸­à¸™à¹à¸¥à¹‰à¸§à¸¥à¸²à¸à¹„à¸¡à¹ˆà¸•à¸´à¸”
+            // ลาก/ย่อ/ขยาย/ปิดหน้าต่าง — ทำบน UI thread ทันที (WebMessageReceived อยู่บน UI thread อยู่แล้ว)
+            // ยิ่งเร็ว DragMove ยิ่งตามเมาส์ทัน — ถ้ารอ Task.Run เมาส์จะปล่อยก่อนแล้วลากไม่ติด
             if (type == "window")
             {
                 try
@@ -280,18 +280,18 @@ namespace KingR9Tools.Core
                 string result;
                 try
                 {
-                    // à¸‡à¸²à¸™à¸¥à¸¹à¸à¹‚à¸‹à¹ˆà¸«à¸¥à¸²à¸¢à¸‚à¸±à¹‰à¸™ â†’ job à¹€à¸”à¸µà¸¢à¸§ à¹à¸–à¸š % à¹„à¸«à¸¥à¸•à¹ˆà¸­à¹€à¸™à¸·à¹ˆà¸­à¸‡à¸•à¸¥à¸­à¸”à¸—à¸±à¹‰à¸‡à¸Šà¸¸à¸”
+                    // งานลูกโซ่หลายขั้น → job เดียว แถบ % ไหลต่อเนื่องตลอดทั้งชุด
                     if (type == "applyChain") result = RunChainJob(payload);
-                    // à¸‡à¸²à¸™ apply à¸›à¸à¸•à¸´ â†’ à¸«à¹ˆà¸­ job (à¸à¸±à¸™à¸à¸”à¸‹à¹‰à¸­à¸™ + à¸£à¸²à¸¢à¸‡à¸²à¸™ %)
+                    // งาน apply ปกติ → ห่อ job (กันกดซ้อน + รายงาน %)
                     else if (IsApplyType(type)) result = RunApplyJob(ApplyLabel(type, payload), () => RunRpc(type, payload));
                     else result = RunRpc(type, payload);
                 }
-                catch (Exception ex) { result = J(new { ok = false, msg = "à¸œà¸´à¸”à¸žà¸¥à¸²à¸”: " + ex.Message }); }
+                catch (Exception ex) { result = J(new { ok = false, msg = "ผิดพลาด: " + ex.Message }); }
                 PostRpc(id, result);
             });
         }
 
-        /// <summary>à¹€à¸ªà¹‰à¸™à¸—à¸²à¸‡ rpc (à¸•à¸±à¸§à¸ˆà¸£à¸´à¸‡ à¹„à¸¡à¹ˆà¸«à¹ˆà¸­ job) â†’ à¹€à¸¡à¸˜à¸­à¸”à¹€à¸”à¸´à¸¡à¸—à¸¸à¸à¸•à¸±à¸§ (à¸£à¸±à¸™à¸šà¸™ background thread â€” à¹€à¸¡à¸˜à¸­à¸”à¸—à¸µà¹ˆà¹à¸•à¸° UI à¹ƒà¸Šà¹‰ Dispatcher à¸ à¸²à¸¢à¹ƒà¸™à¸­à¸¢à¸¹à¹ˆà¹à¸¥à¹‰à¸§)</summary>
+        /// <summary>เส้นทาง rpc (ตัวจริง ไม่ห่อ job) → เมธอดเดิมทุกตัว (รันบน background thread — เมธอดที่แตะ UI ใช้ Dispatcher ภายในอยู่แล้ว)</summary>
         private string RunRpc(string type, JsonElement payload)
         {
             string PS(string n) => payload.ValueKind == JsonValueKind.Object && payload.TryGetProperty(n, out var x) && x.ValueKind == JsonValueKind.String ? (x.GetString() ?? "") : "";
@@ -308,7 +308,9 @@ namespace KingR9Tools.Core
                 case "enterDashboard": return EnterDashboard();
                 case "dashboardReady": return DashboardInit();
                 case "getJunk":        return Junk();
-                case "cleanJunk":      return Clean();                case "setTweak":       return Tweak(PS("id"), PB("on"));
+                case "cleanJunk":      return Clean();
+                case "clearRam":       return ClearRam();
+                case "setTweak":       return Tweak(PS("id"), PB("on"));
                 case "optimize":       return OptimizeStart();
                 case "restoreAll":     return RestoreStart();
                 case "window":         return Window(PS("action"));
@@ -352,7 +354,19 @@ namespace KingR9Tools.Core
             }
         }
 
-        /// <summary>à¸ªà¹ˆà¸‡à¸œà¸¥à¸¥à¸±à¸žà¸˜à¹Œà¸à¸¥à¸±à¸šà¸«à¸™à¹‰à¸²à¹€à¸§à¹‡à¸š (PostWebMessageAsJson à¸•à¹‰à¸­à¸‡à¹€à¸£à¸µà¸¢à¸à¸šà¸™ UI thread)</summary>
+        private string ClearRam()
+        {
+            var result = Memory.ClearAppWorkingSets();
+            _log.Ok($"คืน working set ของ {result.ProcessesTrimmed} แอป; RAM ว่าง {result.AvailableBeforeGb:F2} → {result.AvailableAfterGb:F2} GB");
+            return J(new
+            {
+                ok = true,
+                processesTrimmed = result.ProcessesTrimmed,
+                availableBeforeGb = result.AvailableBeforeGb,
+                availableAfterGb = result.AvailableAfterGb
+            });
+        }
+        /// <summary>ส่งผลลัพธ์กลับหน้าเว็บ (PostWebMessageAsJson ต้องเรียกบน UI thread)</summary>
         private void PostRpc(long id, string resultJson)
         {
             JsonElement res;

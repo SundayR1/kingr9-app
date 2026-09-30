@@ -1,4 +1,6 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace KingR9Tools.Core
@@ -32,6 +34,9 @@ namespace KingR9Tools.Core
         [DllImport("psapi.dll", SetLastError = true)]
         private static extern bool GetPerformanceInfo(ref PERFORMANCE_INFORMATION p, uint cb);
 
+        [DllImport("psapi.dll", SetLastError = true)]
+        private static extern bool EmptyWorkingSet(IntPtr hProcess);
+
         public sealed class RamInfo { public double TotalGb, UsedGb, FreeGb, CachedGb; public int Pct; }
 
         public static RamInfo GetRam()
@@ -56,6 +61,53 @@ namespace KingR9Tools.Core
                 FreeGb = free,
                 CachedGb = cached,
                 Pct = tot > 0 ? (int)Math.Round(used / tot * 100.0) : 0
+            };
+        }
+
+        public sealed class RamClearResult
+        {
+            public int ProcessesTrimmed { get; set; }
+            public double AvailableBeforeGb { get; set; }
+            public double AvailableAfterGb { get; set; }
+        }
+
+        // Trims reclaimable working-set pages from ordinary processes in this user session.
+        // It never terminates processes and deliberately skips this app and Windows-critical processes.
+        public static RamClearResult ClearAppWorkingSets()
+        {
+            var before = GetRam();
+            int currentSession = Process.GetCurrentProcess().SessionId;
+            int currentPid = Process.GetCurrentProcess().Id;
+            var protectedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "csrss", "wininit", "winlogon", "services", "lsass", "smss", "svchost",
+                "explorer", "dwm", "fontdrvhost", "sihost", "audiodg"
+            };
+            int trimmed = 0;
+
+            foreach (var process in Process.GetProcesses())
+            {
+                using (process)
+                {
+                    try
+                    {
+                        if (process.Id == currentPid || process.SessionId != currentSession ||
+                            protectedNames.Contains(process.ProcessName) || process.WorkingSet64 < 8L * 1024 * 1024)
+                            continue;
+                        if (EmptyWorkingSet(process.Handle)) trimmed++;
+                    }
+                    catch (System.ComponentModel.Win32Exception) { }
+                    catch (InvalidOperationException) { }
+                    catch (NotSupportedException) { }
+                }
+            }
+
+            var after = GetRam();
+            return new RamClearResult
+            {
+                ProcessesTrimmed = trimmed,
+                AvailableBeforeGb = Math.Round(before.FreeGb, 2),
+                AvailableAfterGb = Math.Round(after.FreeGb, 2)
             };
         }
 

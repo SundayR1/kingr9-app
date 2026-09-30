@@ -8,7 +8,7 @@ A Windows x64 WPF utility for system and network tuning, with a WebView2 interfa
 - .NET 8 SDK
 - Internet access for NuGet restore
 
-Run `BUILD.bat`. It creates the portable app folder at `Release/KingR9` and packages it as `Release/KingR9_v1.0.2.zip`.
+Run `BUILD.bat`. It creates the self-contained multi-file app folder at `Release/KingR9_v1.0.2` and packages it as `Release/KingR9_v1.0.2.zip`.
 
 ## Download
 

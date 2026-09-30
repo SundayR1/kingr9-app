@@ -36,10 +36,10 @@ namespace KingR9Tools.Core
             Hello();
             try
             {
-                // à¸§à¸±à¸”à¸‚à¸™à¸²à¸”à¸à¹ˆà¸­à¸™ â†’ à¸¥à¹‰à¸²à¸‡à¸”à¹‰à¸§à¸¢à¸ªà¸„à¸£à¸´à¸›à¸•à¹Œà¸‚à¸­à¸‡à¹€à¸£à¸² (12_System_Tools -Action junk) â†’ à¸§à¸±à¸”à¸«à¸¥à¸±à¸‡
+                // วัดขนาดก่อน → ล้างด้วยสคริปต์ของเรา (12_System_Tools -Action junk) → วัดหลัง
                 var before = CleanerService.Measure(null);
                 double beforeTotal = CleanerService.Total(before);
-                _log.Info($"à¸¥à¹‰à¸²à¸‡à¸‚à¸¢à¸°à¸”à¹‰à¸§à¸¢ 12_System_Tools.ps1 -Action junk (à¸à¹ˆà¸­à¸™ {beforeTotal:N2} GB)...");
+                _log.Info($"ล้างขยะด้วย 12_System_Tools.ps1 -Action junk (ก่อน {beforeTotal:N2} GB)...");
                 TweakRegistry.SystemTool(_log, "junk");
 
                 var after = CleanerService.Measure(null);
@@ -52,7 +52,7 @@ namespace KingR9Tools.Core
                     gb = Math.Max(0, Math.Round(b.Gb - a.Gb, 2))
                 }).ToList();
 
-                _log.Ok($"Junk Cleaner à¸„à¸·à¸™à¸žà¸·à¹‰à¸™à¸—à¸µà¹ˆ {total:N2} GB");
+                _log.Ok($"Junk Cleaner คืนพื้นที่ {total:N2} GB");
                 return J(new { ok = true, cats, total });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
@@ -71,6 +71,6 @@ namespace KingR9Tools.Core
         }
 
         // ---------- OPTIMIZE / RESTORE ----------
-        // ---------- POWER PLAN DEDUPE (à¸•à¸£à¸§à¸ˆ + à¸¥à¸šà¹à¸œà¸™à¹„à¸Ÿà¸‹à¹‰à¸³ à¹€à¸«à¸¥à¸·à¸­à¸­à¸±à¸™à¹€à¸”à¸µà¸¢à¸§à¸•à¹ˆà¸­à¸Šà¸·à¹ˆà¸­) ----------
+        // ---------- POWER PLAN DEDUPE (ตรวจ + ลบแผนไฟซ้ำ เหลืออันเดียวต่อชื่อ) ----------
     }
 }

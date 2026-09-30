@@ -44,11 +44,11 @@ namespace KingR9Tools.Core
                 string norm = LicenseService.Normalize(key);
                 if (string.IsNullOrEmpty(norm) || norm.Length != 19)
                 {
-                    _log.Warn("Activate à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§: à¸£à¸¹à¸›à¹à¸šà¸š key à¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡");
-                    return J(new { ok = false, msg = "à¸£à¸¹à¸›à¹à¸šà¸š key à¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡ (XXXX-XXXX-XXXX-XXXX)" });
+                    _log.Warn("Activate ล้มเหลว: รูปแบบ key ไม่ถูกต้อง");
+                    return J(new { ok = false, msg = "รูปแบบ key ไม่ถูกต้อง (XXXX-XXXX-XXXX-XXXX)" });
                 }
 
-                // à¹‚à¸«à¸¡à¸”à¸­à¸­à¸™à¹„à¸¥à¸™à¹Œ â€” à¸•à¸£à¸§à¸ˆà¸à¸±à¸š server (à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸­à¸”à¸¡à¸´à¸™à¹ƒà¸Šà¹‰ local à¸•à¸²à¸¡à¸›à¸à¸•à¸´)
+                // โหมดออนไลน์ — ตรวจกับ server (เครื่องแอดมินใช้ local ตามปกติ)
                 if (ServerOn && !LicenseService.IsAdmin())
                 {
                     var (sok, smsg, sdays, soff) = ServerActivate(norm, LicenseService.Hwid());
@@ -57,27 +57,27 @@ namespace KingR9Tools.Core
                         _cfg.rememberKey = remember;
                         _cfg.savedKey = LicenseService.Normalize(norm);
                         SaveCfg();
-                        _log.Ok($"Activate à¸ªà¸³à¹€à¸£à¹‡à¸ˆ (server): {norm} (à¹€à¸«à¸¥à¸·à¸­ {sdays} à¸§à¸±à¸™)");
-                        Notify("green", "ðŸ”‘ Key Activate", "**" + norm + "** â€” à¸œà¸¹à¸à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸¥à¹‰à¸§\nà¹€à¸«à¸¥à¸·à¸­à¸­à¸²à¸¢à¸¸ **" + sdays + " à¸§à¸±à¸™**");
-                        return J(new { ok = true, msg = "key à¸–à¸¹à¸à¸•à¹‰à¸­à¸‡", days = sdays });
+                        _log.Ok($"Activate สำเร็จ (server): {norm} (เหลือ {sdays} วัน)");
+                        Notify("green", "🔑 Key Activate", "**" + norm + "** — ผูกเครื่องแล้ว\nเหลืออายุ **" + sdays + " วัน**");
+                        return J(new { ok = true, msg = "key ถูกต้อง", days = sdays });
                     }
                     if (!soff)
                     {
-                        _log.Warn("Activate à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§: " + smsg);
+                        _log.Warn("Activate ล้มเหลว: " + smsg);
                         return J(new { ok = false, msg = smsg });
                     }
-                    // server à¹€à¸‚à¹‰à¸²à¹„à¸¡à¹ˆà¸–à¸¶à¸‡ â†’ à¹ƒà¸Šà¹‰à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸—à¸µà¹ˆà¹€à¸„à¸¢à¸šà¸±à¸™à¸—à¸¶à¸à¹ƒà¸™à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸—à¸™ (à¸¢à¸±à¸‡à¸¥à¹‡à¸­à¸„ HWID à¸­à¸¢à¸¹à¹ˆ)
+                    // server เข้าไม่ถึง → ใช้ข้อมูลที่เคยบันทึกในเครื่องแทน (ยังล็อค HWID อยู่)
                     var (lok, lmsg, ldays, llic) = LicenseService.Validate(key);
                     if (lok)
                     {
                         _cfg.rememberKey = remember;
                         _cfg.savedKey = LicenseService.Normalize(key);
                         SaveCfg();
-                        _log.Warn("server à¹€à¸‚à¹‰à¸²à¹„à¸¡à¹ˆà¸–à¸¶à¸‡ â€” Activate à¸”à¹‰à¸§à¸¢à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¹ƒà¸™à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸—à¸™ (à¹€à¸«à¸¥à¸·à¸­ " + ldays + " à¸§à¸±à¸™)");
-                        Notify("yellow", "ðŸ”‘ Key Activate (offline)", "**" + norm + "** â€” server à¹€à¸‚à¹‰à¸²à¹„à¸¡à¹ˆà¸–à¸¶à¸‡ à¹ƒà¸Šà¹‰à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¹ƒà¸™à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸—à¸™\nà¹€à¸«à¸¥à¸·à¸­à¸­à¸²à¸¢à¸¸ **" + ldays + " à¸§à¸±à¸™**");
-                        return J(new { ok = true, msg = "key à¸–à¸¹à¸à¸•à¹‰à¸­à¸‡", days = ldays });
+                        _log.Warn("server เข้าไม่ถึง — Activate ด้วยข้อมูลในเครื่องแทน (เหลือ " + ldays + " วัน)");
+                        Notify("yellow", "🔑 Key Activate (offline)", "**" + norm + "** — server เข้าไม่ถึง ใช้ข้อมูลในเครื่องแทน\nเหลืออายุ **" + ldays + " วัน**");
+                        return J(new { ok = true, msg = "key ถูกต้อง", days = ldays });
                     }
-                    _log.Warn("Activate à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§ (à¸­à¸­à¸Ÿà¹„à¸¥à¸™à¹Œ): " + smsg);
+                    _log.Warn("Activate ล้มเหลว (ออฟไลน์): " + smsg);
                     return J(new { ok = false, msg = smsg });
                 }
 
@@ -87,16 +87,16 @@ namespace KingR9Tools.Core
                     _cfg.rememberKey = remember;
                     _cfg.savedKey = remember ? LicenseService.Normalize(key) : "";
                     SaveCfg();
-                    _log.Ok($"Activate à¸ªà¸³à¹€à¸£à¹‡à¸ˆ: {lic.key} (à¹€à¸«à¸¥à¸·à¸­ {days} à¸§à¸±à¸™)");
-                    Notify("green", "ðŸ”‘ Key Activate", "**" + lic.key + "** â€” à¸œà¸¹à¸à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸¥à¹‰à¸§\nà¹€à¸«à¸¥à¸·à¸­à¸­à¸²à¸¢à¸¸ **" + days + " à¸§à¸±à¸™**");
+                    _log.Ok($"Activate สำเร็จ: {lic.key} (เหลือ {days} วัน)");
+                    Notify("green", "🔑 Key Activate", "**" + lic.key + "** — ผูกเครื่องแล้ว\nเหลืออายุ **" + days + " วัน**");
                 }
-                else _log.Warn("Activate à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§: " + msg);
+                else _log.Warn("Activate ล้มเหลว: " + msg);
                 return J(new { ok, msg, days });
             }
             catch (Exception ex)
             {
                 _log.Err("activate: " + ex.Message);
-                return J(new { ok = false, msg = "à¸œà¸´à¸”à¸žà¸¥à¸²à¸”: " + ex.Message });
+                return J(new { ok = false, msg = "ผิดพลาด: " + ex.Message });
             }
         }
 

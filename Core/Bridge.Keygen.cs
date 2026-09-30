@@ -24,7 +24,7 @@ namespace KingR9Tools.Core
                 _cfg.rememberKey = false;
                 _cfg.savedKey = "";
                 SaveCfg();
-                _log.Ok("Logout â€” à¸¥à¹‰à¸²à¸‡à¸à¸²à¸£à¸ˆà¸³ key à¹à¸¥à¹‰à¸§ à¸à¸¥à¸±à¸šà¸«à¸™à¹‰à¸² Activate");
+                _log.Ok("Logout — ล้างการจำ key แล้ว กลับหน้า Activate");
             }
             catch { }
             _win.Dispatcher.BeginInvoke(new Action(_win.NavigateLogin));
@@ -34,16 +34,16 @@ namespace KingR9Tools.Core
         public string OpenKeygen()
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
             _win.Dispatcher.BeginInvoke(new Action(_win.NavigateKeygen));
             return J(new { ok = true });
         }
 
-        /// <summary>à¹€à¸ˆà¸™ key à¹ƒà¸«à¸¡à¹ˆ â€” à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¸œà¸¹à¸à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡ à¹ƒà¸„à¸£à¹€à¸­à¸²à¹„à¸› Activate à¸„à¸™à¹à¸£à¸à¸ˆà¸°à¹‚à¸”à¸™à¸¥à¹‡à¸­à¸„ HWID à¸—à¸±à¸™à¸—à¸µ</summary>
+        /// <summary>เจน key ใหม่ — ยังไม่ผูกเครื่อง ใครเอาไป Activate คนแรกจะโดนล็อค HWID ทันที</summary>
         public string GenerateKey(int days, string note)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
             try
             {
                 var lic = LicenseService.CreateKey(days, note, "KING");
@@ -51,10 +51,10 @@ namespace KingR9Tools.Core
                 {
                     bool up = HttpPut(ServerKeyUrl(lic.key) + AuthQuery(), JsonSerializer.Serialize(new
                     { key = lic.key, hwid = "", created = lic.created, days = lic.days, note = lic.note, revoked = false }));
-                    _log.Ok("à¸­à¸±à¸›à¹‚à¸«à¸¥à¸” key à¸‚à¸¶à¹‰à¸™ server: " + (up ? "à¸ªà¸³à¹€à¸£à¹‡à¸ˆ â€” à¸ªà¹ˆà¸‡à¹„à¸”à¹‰à¹à¸„à¹ˆà¸•à¸±à¸§ key" : "à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§ (à¸•à¸£à¸§à¸ˆà¹€à¸™à¹‡à¸•/à¸à¸²à¸£à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server)"));
+                    _log.Ok("อัปโหลด key ขึ้น server: " + (up ? "สำเร็จ — ส่งได้แค่ตัว key" : "ล้มเหลว (ตรวจเน็ต/การตั้งค่า server)"));
                 }
-                _log.Ok($"à¹€à¸ˆà¸™ key à¹ƒà¸«à¸¡à¹ˆ: {lic.key} ({lic.days} à¸§à¸±à¸™) â€” à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¸œà¸¹à¸à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡");
-                Notify("blue", "ðŸ— à¹€à¸ˆà¸™ key à¹ƒà¸«à¸¡à¹ˆ", "**" + lic.key + "**\nà¸­à¸²à¸¢à¸¸ " + lic.days + " à¸§à¸±à¸™" + (string.IsNullOrWhiteSpace(lic.note) ? "" : " Â· à¹‚à¸™à¹‰à¸•: " + lic.note));
+                _log.Ok($"เจน key ใหม่: {lic.key} ({lic.days} วัน) — ยังไม่ผูกเครื่อง");
+                Notify("blue", "🗝 เจน key ใหม่", "**" + lic.key + "**\nอายุ " + lic.days + " วัน" + (string.IsNullOrWhiteSpace(lic.note) ? "" : " · โน้ต: " + lic.note));
                 return J(new { ok = true, key = lic.key, days = lic.days, created = lic.created });
             }
             catch (Exception ex)
@@ -67,9 +67,9 @@ namespace KingR9Tools.Core
         public string ListKeys()
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
 
-            // à¹‚à¸«à¸¡à¸”à¸­à¸­à¸™à¹„à¸¥à¸™à¹Œ â€” à¸”à¸¶à¸‡à¸£à¸²à¸¢à¸à¸²à¸£à¸ˆà¸²à¸ server (à¸ªà¸–à¸²à¸™à¸° HWID à¹à¸¡à¹ˆà¸™à¸¢à¸³à¸ˆà¸²à¸à¸—à¸¸à¸à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸¥à¸¹à¸à¸„à¹‰à¸²)
+            // โหมดออนไลน์ — ดึงรายการจาก server (สถานะ HWID แม่นยำจากทุกเครื่องลูกค้า)
             if (ServerReady)
             {
                 try
@@ -105,7 +105,7 @@ namespace KingR9Tools.Core
                 }
                 catch (Exception ex)
                 {
-                    _log.Err("listkeys(server): " + ex.Message + " â†’ à¹ƒà¸Šà¹‰à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¹ƒà¸™à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸—à¸™");
+                    _log.Err("listkeys(server): " + ex.Message + " → ใช้ข้อมูลในเครื่องแทน");
                 }
             }
 
@@ -126,8 +126,8 @@ namespace KingR9Tools.Core
         public string RemoveKey(string key)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
-            if (ServerOn && !ServerReady) return J(new { ok = false, msg = "à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server â€” à¸à¸”à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸²à¹ƒà¸™à¸«à¸™à¹‰à¸²à¹€à¸ˆà¸™ key à¸à¹ˆà¸­à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
+            if (ServerOn && !ServerReady) return J(new { ok = false, msg = "ยังไม่ได้ตั้งค่า server — กดตั้งค่าในหน้าเจน key ก่อน" });
             bool ok = LicenseService.RemoveKey(key);
             if (ServerOn)
             {
@@ -135,20 +135,20 @@ namespace KingR9Tools.Core
                 {
                     bool up = HttpPatch(ServerKeyUrl(key) + AuthQuery(), JsonSerializer.Serialize(new { revoked = true }));
                     ok = up;
-                    _log.Warn("à¸£à¸°à¸‡à¸±à¸š key à¸šà¸™ server à¹à¸¥à¹‰à¸§: " + key + " â€” à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸¥à¸¹à¸à¸„à¹‰à¸²à¸ˆà¸°à¹€à¸‚à¹‰à¸²à¹ƒà¸Šà¹‰à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¸—à¸±à¸™à¸—à¸µà¸—à¸µà¹ˆà¹€à¸›à¸´à¸”à¹à¸­à¸›à¸„à¸£à¸±à¹‰à¸‡à¸–à¸±à¸”à¹„à¸›");
+                    _log.Warn("ระงับ key บน server แล้ว: " + key + " — เครื่องลูกค้าจะเข้าใช้ไม่ได้ทันทีที่เปิดแอปครั้งถัดไป");
                 }
                 catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
             }
-            else if (ok) _log.Warn($"à¸¥à¸š key à¸­à¸­à¸à¸ˆà¸²à¸à¸£à¸°à¸šà¸š: {key}");
+            else if (ok) _log.Warn($"ลบ key ออกจากระบบ: {key}");
             return J(new { ok });
         }
 
-        /// <summary>à¸£à¸µ HWID â€” à¸›à¸¥à¸”à¸à¸²à¸£à¸œà¸¹à¸à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹€à¸”à¸´à¸¡ à¹ƒà¸«à¹‰ key à¸à¸¥à¸±à¸šà¹„à¸›à¸£à¸­à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹ƒà¸«à¸¡à¹ˆ (à¹€à¸‰à¸žà¸²à¸°à¹à¸­à¸”à¸¡à¸´à¸™)</summary>
+        /// <summary>รี HWID — ปลดการผูกเครื่องเดิม ให้ key กลับไปรอเครื่องใหม่ (เฉพาะแอดมิน)</summary>
         public string ResetHwid(string key)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
-            if (ServerOn && !ServerReady) return J(new { ok = false, msg = "à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server â€” à¸à¸”à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸²à¹ƒà¸™à¸«à¸™à¹‰à¸²à¹€à¸ˆà¸™ key à¸à¹ˆà¸­à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
+            if (ServerOn && !ServerReady) return J(new { ok = false, msg = "ยังไม่ได้ตั้งค่า server — กดตั้งค่าในหน้าเจน key ก่อน" });
             bool ok = LicenseService.ResetHwid(key);
             if (ServerOn)
             {
@@ -156,37 +156,37 @@ namespace KingR9Tools.Core
                 {
                     bool up = HttpPatch(ServerKeyUrl(key) + AuthQuery(), JsonSerializer.Serialize(new { hwid = "" }));
                     ok = up;
-                    _log.Ok("à¸£à¸µ HWID à¸šà¸™ server à¹à¸¥à¹‰à¸§: " + key + " â€” à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹€à¸”à¸´à¸¡à¸ˆà¸°à¹‚à¸”à¸™à¸”à¸µà¸”à¸à¸¥à¸±à¸šà¸«à¸™à¹‰à¸² Activate à¸„à¸£à¸±à¹‰à¸‡à¸–à¸±à¸”à¹„à¸›à¸—à¸µà¹ˆà¹€à¸›à¸´à¸”à¹à¸­à¸›");
+                    _log.Ok("รี HWID บน server แล้ว: " + key + " — เครื่องเดิมจะโดนดีดกลับหน้า Activate ครั้งถัดไปที่เปิดแอป");
                 }
                 catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
             }
-            else if (ok) _log.Ok($"à¸£à¸µ HWID à¹à¸¥à¹‰à¸§: {key} â€” key à¸à¸¥à¸±à¸šà¹€à¸›à¹‡à¸™ 'à¸§à¹ˆà¸²à¸‡' à¸£à¸­à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹ƒà¸«à¸¡à¹ˆ Activate");
+            else if (ok) _log.Ok($"รี HWID แล้ว: {key} — key กลับเป็น 'ว่าง' รอเครื่องใหม่ Activate");
             return J(new { ok });
         }
 
-        /// <summary>à¸šà¸­à¸à¸«à¸™à¹‰à¸²à¹€à¸§à¹‡à¸šà¸§à¹ˆà¸²à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸™à¸µà¹‰à¹ƒà¸Šà¹ˆà¹à¸­à¸”à¸¡à¸´à¸™à¹„à¸«à¸¡ (à¹„à¸§à¹‰à¸‹à¹ˆà¸­à¸™/à¹‚à¸Šà¸§à¹Œà¹€à¸¡à¸™à¸¹ Key Generator)</summary>
+        /// <summary>บอกหน้าเว็บว่าเครื่องนี้ใช่แอดมินไหม (ไว้ซ่อน/โชว์เมนู Key Generator)</summary>
         public string AdminCheck()
         {
             Hello();
             return J(new { ok = true, admin = IsAdmin(), server = ServerOn, ready = ServerReady });
         }
 
-        /// <summary>à¸šà¸±à¸™à¸—à¸¶à¸à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¹€à¸Šà¸·à¹ˆà¸­à¸¡à¸•à¹ˆà¸­ server (API Key + à¸šà¸±à¸à¸Šà¸µà¹à¸­à¸”à¸¡à¸´à¸™) à¸ˆà¸²à¸à¸«à¸™à¹‰à¸²à¹€à¸ˆà¸™ key à¹ƒà¸™à¹à¸­à¸›</summary>
+        /// <summary>บันทึกข้อมูลเชื่อมต่อ server (API Key + บัญชีแอดมิน) จากหน้าเจน key ในแอป</summary>
         public string ServerSave(string apiKey, string email, string pass)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
             if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(pass))
-                return J(new { ok = false, msg = "à¸à¸£à¸­à¸à¹ƒà¸«à¹‰à¸„à¸£à¸šà¸—à¸¸à¸à¸Šà¹ˆà¸­à¸‡" });
+                return J(new { ok = false, msg = "กรอกให้ครบทุกช่อง" });
             try
             {
                 _cfg.srvApiKey = apiKey.Trim();
                 _cfg.srvEmail = email.Trim();
                 _cfg.srvPass = pass;
                 _cfg.srvToken = "";
-                EnsureToken();   // à¸—à¸”à¸ªà¸­à¸šà¸¥à¹‡à¸à¸­à¸´à¸™à¸—à¸±à¸™à¸—à¸µ â€” à¸œà¸´à¸”à¸žà¸¥à¸²à¸”à¸ˆà¸° throw
+                EnsureToken();   // ทดสอบล็กอินทันที — ผิดพลาดจะ throw
                 SaveCfg();
-                _log.Ok("à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server à¸ªà¸³à¹€à¸£à¹‡à¸ˆ â€” à¹‚à¸«à¸¡à¸”à¸­à¸­à¸™à¹„à¸¥à¸™à¹Œà¸žà¸£à¹‰à¸­à¸¡à¹ƒà¸Šà¹‰");
+                _log.Ok("ตั้งค่า server สำเร็จ — โหมดออนไลน์พร้อมใช้");
                 return J(new { ok = true });
             }
             catch (Exception ex)
@@ -197,28 +197,28 @@ namespace KingR9Tools.Core
             }
         }
 
-        /// <summary>à¸›à¸¥à¸”à¸£à¸°à¸‡à¸±à¸š key à¸—à¸µà¹ˆà¸–à¸¹à¸à¸£à¸°à¸‡à¸±à¸šà¹„à¸§à¹‰ (server)</summary>
+        /// <summary>ปลดระงับ key ที่ถูกระงับไว้ (server)</summary>
         public string UnbanKey(string key)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
-            if (!ServerReady) return J(new { ok = false, msg = "à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
+            if (!ServerReady) return J(new { ok = false, msg = "ยังไม่ได้ตั้งค่า server" });
             try
             {
                 bool ok = HttpPatch(ServerKeyUrl(key) + AuthQuery(), JsonSerializer.Serialize(new { revoked = false }));
-                if (ok) _log.Ok("à¸›à¸¥à¸”à¸£à¸°à¸‡à¸±à¸š key: " + key);
+                if (ok) _log.Ok("ปลดระงับ key: " + key);
                 return J(new { ok });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸•à¹ˆà¸­à¸­à¸²à¸¢à¸¸ key â€” à¸™à¸±à¸šà¹ƒà¸«à¸¡à¹ˆà¸ˆà¸²à¸à¸§à¸±à¸™à¸™à¸µà¹‰ (server)</summary>
+        /// <summary>ต่ออายุ key — นับใหม่จากวันนี้ (server)</summary>
         public string ExtendKey(string key, int days)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
-            if (!ServerReady) return J(new { ok = false, msg = "à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server" });
-            if (days < 1) return J(new { ok = false, msg = "à¸ˆà¸³à¸™à¸§à¸™à¸§à¸±à¸™à¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
+            if (!ServerReady) return J(new { ok = false, msg = "ยังไม่ได้ตั้งค่า server" });
+            if (days < 1) return J(new { ok = false, msg = "จำนวนวันไม่ถูกต้อง" });
             try
             {
                 string today = LicenseService.TodayUtc();
@@ -226,23 +226,23 @@ namespace KingR9Tools.Core
                 if (ok)
                 {
                     LicenseService.UpsertLocal(key, today, days);
-                    _log.Ok($"à¸•à¹ˆà¸­à¸­à¸²à¸¢à¸¸ key: {key} â†’ {days} à¸§à¸±à¸™ (à¸™à¸±à¸šà¸ˆà¸²à¸à¸§à¸±à¸™à¸™à¸µà¹‰)");
+                    _log.Ok($"ต่ออายุ key: {key} → {days} วัน (นับจากวันนี้)");
                 }
                 return J(new { ok });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸ªà¹ˆà¸‡à¸­à¸­à¸ key à¹€à¸›à¹‡à¸™à¹„à¸Ÿà¸¥à¹Œ licenses.json (à¹„à¸Ÿà¸¥à¹Œà¹€à¸”à¸µà¸¢à¸§) à¸¥à¸‡ Desktop â€” à¹„à¸Ÿà¸¥à¹Œà¸™à¸µà¹‰à¸„à¸·à¸­ "à¹ƒà¸š license" à¸—à¸µà¹ˆà¸ªà¹ˆà¸‡à¹ƒà¸«à¹‰à¸¥à¸¹à¸à¸„à¹‰à¸²</summary>
+        /// <summary>ส่งออก key เป็นไฟล์ licenses.json (ไฟล์เดียว) ลง Desktop — ไฟล์นี้คือ "ใบ license" ที่ส่งให้ลูกค้า</summary>
         public string ExportKeyFile(string key)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
             try
             {
                 string norm = LicenseService.Normalize(key);
                 var lic = LicenseService.AllKeys().FirstOrDefault(x => LicenseService.Normalize(x.key) == norm);
-                if (lic == null) return J(new { ok = false, msg = "à¹„à¸¡à¹ˆà¸žà¸š key à¸™à¸µà¹‰à¹ƒà¸™à¸£à¸°à¸šà¸š" });
+                if (lic == null) return J(new { ok = false, msg = "ไม่พบ key นี้ในระบบ" });
 
                 string desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
                 string file = Path.Combine(desktop, "KingR9-key-" + norm + ".json");
@@ -251,29 +251,29 @@ namespace KingR9Tools.Core
                     new LicenseService.License { key = lic.key, hwid = "", created = lic.created, days = lic.days, note = lic.note }
                 };
                 File.WriteAllText(file, JsonSerializer.Serialize(one, new JsonSerializerOptions { WriteIndented = true }));
-                _log.Ok($"à¸ªà¹ˆà¸‡à¸­à¸­à¸ key à¹€à¸›à¹‡à¸™à¹„à¸Ÿà¸¥à¹Œ: {file}");
+                _log.Ok($"ส่งออก key เป็นไฟล์: {file}");
                 return J(new { ok = true, file = Path.GetFileName(file) });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸™à¸³à¹€à¸‚à¹‰à¸²à¹„à¸Ÿà¸¥à¹Œ key à¸—à¸µà¹ˆà¹à¸­à¸”à¸¡à¸´à¸™à¸ªà¹ˆà¸‡à¸¡à¸² (à¸¥à¸¹à¸à¸„à¹‰à¸²à¹ƒà¸Šà¹‰ â€” à¹„à¸¡à¹ˆà¸•à¹‰à¸­à¸‡à¹€à¸›à¹‡à¸™à¹à¸­à¸”à¸¡à¸´à¸™)</summary>
+        /// <summary>นำเข้าไฟล์ key ที่แอดมินส่งมา (ลูกค้าใช้ — ไม่ต้องเป็นแอดมิน)</summary>
         public string ImportKeyLicenses(string json)
         {
             Hello();
             try
             {
                 var incoming = JsonSerializer.Deserialize<List<LicenseService.License>>(json ?? "[]");
-                if (incoming == null || incoming.Count == 0) return J(new { ok = false, msg = "à¹„à¸Ÿà¸¥à¹Œà¸™à¸µà¹‰à¹„à¸¡à¹ˆà¸¡à¸µ key" });
+                if (incoming == null || incoming.Count == 0) return J(new { ok = false, msg = "ไฟล์นี้ไม่มี key" });
                 int n = LicenseService.MergeLicenses(incoming);
-                if (n == 0) return J(new { ok = false, msg = "key à¹ƒà¸™à¹„à¸Ÿà¸¥à¹Œà¸™à¸µà¹‰à¸¡à¸µà¸­à¸¢à¸¹à¹ˆà¹ƒà¸™à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹à¸¥à¹‰à¸§" });
-                _log.Ok($"à¸™à¸³à¹€à¸‚à¹‰à¸² key à¸ˆà¸²à¸à¹„à¸Ÿà¸¥à¹Œ: {n} à¸£à¸²à¸¢à¸à¸²à¸£");
+                if (n == 0) return J(new { ok = false, msg = "key ในไฟล์นี้มีอยู่ในเครื่องแล้ว" });
+                _log.Ok($"นำเข้า key จากไฟล์: {n} รายการ");
                 return J(new { ok = true, count = n, key = LicenseService.Normalize(incoming[0].key) });
             }
-            catch (Exception ex) { return J(new { ok = false, msg = "à¹„à¸Ÿà¸¥à¹Œà¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡: " + ex.Message }); }
+            catch (Exception ex) { return J(new { ok = false, msg = "ไฟล์ไม่ถูกต้อง: " + ex.Message }); }
         }
 
-        /// <summary>(debug) à¸§à¸±à¸” viewport/scroll à¸ˆà¸£à¸´à¸‡à¸‚à¸­à¸‡à¸«à¸™à¹‰à¸²à¹€à¸§à¹‡à¸š â†’ à¹€à¸‚à¸µà¸¢à¸™à¸¥à¸‡ log à¹„à¸Ÿà¸¥à¹Œ</summary>
+        /// <summary>(debug) วัด viewport/scroll จริงของหน้าเว็บ → เขียนลง log ไฟล์</summary>
         public string DbgScroll()
         {
             Hello();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,9 +20,9 @@ namespace KingR9Tools.Core
             Hello();
             string script = Path.Combine(WebAssets.Root, "Scripts", "Ares", "optimizer.ps1");
             if (!File.Exists(script))
-                return J(new { ok = false, msg = "à¹„à¸¡à¹ˆà¸žà¸š Ares optimizer.ps1 â€” à¸¥à¸­à¸‡à¸›à¸´à¸”à¹à¸¥à¹‰à¸§à¹€à¸›à¸´à¸”à¹‚à¸›à¸£à¹à¸à¸£à¸¡à¹ƒà¸«à¸¡à¹ˆ" });
+                return J(new { ok = false, msg = "ไม่พบ Ares optimizer.ps1 — ลองปิดแล้วเปิดโปรแกรมใหม่" });
             if (!JobBegin("Ares One-Click Optimizer"))
-                return J(new { ok = false, msg = "à¸¡à¸µà¸‡à¸²à¸™à¸à¸³à¸¥à¸±à¸‡à¸—à¸³à¸‡à¸²à¸™à¸­à¸¢à¸¹à¹ˆ â€” à¸£à¸­à¸ˆà¸šà¸à¹ˆà¸­à¸™à¹à¸¥à¹‰à¸§à¸à¸”à¹ƒà¸«à¸¡à¹ˆ" });
+                return J(new { ok = false, msg = "มีงานกำลังทำงานอยู่ — รอจบก่อนแล้วกดใหม่" });
             var creep = Task.Run(CreepLoop);
             try
             {
@@ -64,26 +64,26 @@ namespace KingR9Tools.Core
                             int idx = ev.TryGetProperty("idx", out var ie) && ie.ValueKind == JsonValueKind.Number ? ie.GetInt32() : 0;
                             int tot = ev.TryGetProperty("total", out var te) && te.ValueKind == JsonValueKind.Number ? te.GetInt32() : 0;
                             bool skip = ev.TryGetProperty("skip", out var se) && se.ValueKind == JsonValueKind.True;
-                            string lbl = (tot > 0 ? "à¸‚à¸±à¹‰à¸™à¸—à¸µà¹ˆ " + idx + "/" + tot + " Â· " : "") + m + (skip ? " â€” à¸‚à¹‰à¸²à¸¡ (à¸•à¸±à¹‰à¸‡à¹„à¸§à¹‰à¹à¸¥à¹‰à¸§)" : "");
+                            string lbl = (tot > 0 ? "ขั้นที่ " + idx + "/" + tot + " · " : "") + m + (skip ? " — ข้าม (ตั้งไว้แล้ว)" : "");
                             JobStep(pct, lbl);
-                            _log.Info("Ares: " + m + (skip ? " (à¸‚à¹‰à¸²à¸¡)" : ""));
+                            _log.Info("Ares: " + m + (skip ? " (ข้าม)" : ""));
                         }
                         else if (t == "dl")
                         {
-                            // pct à¸‚à¸­à¸‡à¸”à¸²à¸§à¸™à¹Œà¹‚à¸«à¸¥à¸”à¹€à¸›à¹‡à¸™ % à¸‚à¸­à¸‡à¹„à¸Ÿà¸¥à¹Œà¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™ â€” à¹„à¸¡à¹ˆà¸”à¸±à¸™à¹à¸–à¸šà¸£à¸§à¸¡ à¸­à¸±à¸›à¹€à¸”à¸•à¹à¸„à¹ˆà¸‚à¹‰à¸­à¸„à¸§à¸²à¸¡
-                            string head = ev.TryGetProperty("head", out var he) && he.ValueKind == JsonValueKind.String ? he.GetString() : "à¸à¸³à¸¥à¸±à¸‡à¸”à¸²à¸§à¸™à¹Œà¹‚à¸«à¸¥à¸” update";
+                            // pct ของดาวน์โหลดเป็น % ของไฟล์เท่านั้น — ไม่ดันแถบรวม อัปเดตแค่ข้อความ
+                            string head = ev.TryGetProperty("head", out var he) && he.ValueKind == JsonValueKind.String ? he.GetString() : "กำลังดาวน์โหลด update";
                             double dmb = ev.TryGetProperty("doneMB", out var de) && de.ValueKind == JsonValueKind.Number ? de.GetDouble() : 0;
                             double tmb = ev.TryGetProperty("totalMB", out var te2) && te2.ValueKind == JsonValueKind.Number ? te2.GetDouble() : 0;
                             double spd = ev.TryGetProperty("speed", out var se2) && se2.ValueKind == JsonValueKind.Number ? se2.GetDouble() : 0;
-                            JobStep(0, head + " " + dmb.ToString("0.0") + "/" + tmb.ToString("0.0") + " MB Â· " + spd.ToString("0.0") + " MB/s");
+                            JobStep(0, head + " " + dmb.ToString("0.0") + "/" + tmb.ToString("0.0") + " MB · " + spd.ToString("0.0") + " MB/s");
                         }
                         else if (t == "install")
                         {
-                            JobStep(0, "à¸à¸³à¸¥à¸±à¸‡à¸•à¸´à¸”à¸•à¸±à¹‰à¸‡ Windows Update (DISM) â€” à¹ƒà¸Šà¹‰à¹€à¸§à¸¥à¸²à¸™à¸²à¸™ à¸«à¹‰à¸²à¸¡à¸›à¸´à¸”à¹à¸­à¸ž");
+                            JobStep(0, "กำลังติดตั้ง Windows Update (DISM) — ใช้เวลานาน ห้ามปิดแอพ");
                         }
                         else if (t == "dldone")
                         {
-                            JobStep(0, "à¸”à¸²à¸§à¸™à¹Œà¹‚à¸«à¸¥à¸”/à¸•à¸´à¸”à¸•à¸±à¹‰à¸‡ update à¹€à¸ªà¸£à¹‡à¸ˆ â€” à¸—à¸³à¸‚à¸±à¹‰à¸™à¸–à¸±à¸”à¹„à¸›à¸•à¹ˆà¸­");
+                            JobStep(0, "ดาวน์โหลด/ติดตั้ง update เสร็จ — ทำขั้นถัดไปต่อ");
                         }
                         else if (t == "done")
                         {
@@ -97,19 +97,19 @@ namespace KingR9Tools.Core
                 }, ("ARES_VIVETOOL", vive), ("ARES_WALLPAPER", wall), ("ARES_DO_UPDATE", doUpdate ? "1" : "0"));
 
                 string msg = gotDone
-                    ? "Ares à¹€à¸ªà¸£à¹‡à¸ˆà¸ªà¸¡à¸šà¸¹à¸£à¸“à¹Œ â€” à¸ªà¸³à¹€à¸£à¹‡à¸ˆ " + okC + " Â· à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§ " + failC + " Â· à¸‚à¹‰à¸²à¸¡ " + skipC + " Â· à¸„à¸§à¸£à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡"
-                    : "Ares à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¸£à¸²à¸¢à¸‡à¸²à¸™à¸œà¸¥à¸ªà¸£à¸¸à¸› (à¸ªà¸„à¸£à¸´à¸›à¸•à¹Œà¸«à¸¢à¸¸à¸”à¸à¸¥à¸²à¸‡à¸—à¸²à¸‡/timeout) â€” à¹€à¸Šà¹‡à¸„à¸«à¸™à¹‰à¸² Logs";
+                    ? "Ares เสร็จสมบูรณ์ — สำเร็จ " + okC + " · ล้มเหลว " + failC + " · ข้าม " + skipC + " · ควรรีสตาร์ทเครื่อง"
+                    : "Ares ไม่ได้รายงานผลสรุป (สคริปต์หยุดกลางทาง/timeout) — เช็คหน้า Logs";
                 if (!gotDone) _log.Err("Ares: script ended without done event (crash/timeout)");
-                if (failC > 0) _log.Err("Ares: à¸šà¸²à¸‡à¸‚à¸±à¹‰à¸™à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§ " + failC + " à¸‚à¸±à¹‰à¸™");
+                if (failC > 0) _log.Err("Ares: บางขั้นล้มเหลว " + failC + " ขั้น");
                 _log.Ok(msg);
                 Notify(gotDone ? (failC > 0 ? "yellow" : "green") : "red", "âš¡ Ares One-Click",
-                    gotDone ? "à¸ªà¸³à¹€à¸£à¹‡à¸ˆ **" + okC + "** Â· à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§ **" + failC + "** Â· à¸‚à¹‰à¸²à¸¡ **" + skipC + "**" : "à¸ªà¸„à¸£à¸´à¸›à¸•à¹Œà¸«à¸¢à¸¸à¸”à¸à¸¥à¸²à¸‡à¸—à¸²à¸‡ / timeout â€” à¹€à¸Šà¹‡à¸„à¸«à¸™à¹‰à¸² Logs");
+                    gotDone ? "สำเร็จ **" + okC + "** · ล้มเหลว **" + failC + "** · ข้าม **" + skipC + "**" : "สคริปต์หยุดกลางทาง / timeout — เช็คหน้า Logs");
                 JobEnd(gotDone, msg);
                 return J(new { ok = gotDone, msg, okCount = okC, fail = failC, skipped = skipC });
             }
             catch
             {
-                JobEnd(false, "Ares à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§");
+                JobEnd(false, "Ares ล้มเหลว");
                 throw;
             }
             finally { try { creep.Wait(300); } catch { } }
@@ -130,15 +130,15 @@ namespace KingR9Tools.Core
                         Sys.Cmd($"powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES {(on ? "100" : "5")}");
                         Sys.Cmd($"powercfg /setdcvalueindex SCHEME_CURRENT SUB_PROCESSOR CPMINCORES {(on ? "100" : "5")}");
                         Sys.Cmd("powercfg /setactive SCHEME_CURRENT");
-                        _log.Ok($"CPU Core Parking: {(on ? "à¸›à¸´à¸” (à¸—à¸¸à¸à¸„à¸­à¸£à¹Œà¸žà¸£à¹‰à¸­à¸¡à¸—à¸³à¸‡à¸²à¸™)" : "à¸„à¸·à¸™à¸„à¹ˆà¸² Auto")}");
-                        return J(new { ok = true, msg = on ? "à¸›à¸´à¸” Core Parking à¹à¸¥à¹‰à¸§" : "à¸„à¸·à¸™à¸„à¹ˆà¸² Core Parking" });
+                        _log.Ok($"CPU Core Parking: {(on ? "ปิด (ทุกคอร์พร้อมทำงาน)" : "คืนค่า Auto")}");
+                        return J(new { ok = true, msg = on ? "ปิด Core Parking แล้ว" : "คืนค่า Core Parking" });
 
                     case "pw_turbo":
                         Sys.Cmd($"powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PERFBOOSTMODE {(on ? "2" : "1")}");
                         Sys.Cmd($"powercfg /setdcvalueindex SCHEME_CURRENT SUB_PROCESSOR PERFBOOSTMODE {(on ? "2" : "1")}");
                         Sys.Cmd("powercfg /setactive SCHEME_CURRENT");
-                        _log.Ok($"Turbo Boost: {(on ? "Aggressive" : "à¸›à¸à¸•à¸´")}");
-                        return J(new { ok = true, msg = on ? "à¸¥à¹‡à¸­à¸ Turbo Boost (Aggressive)" : "à¸„à¸·à¸™à¸„à¹ˆà¸² Turbo Boost" });
+                        _log.Ok($"Turbo Boost: {(on ? "Aggressive" : "ปกติ")}");
+                        return J(new { ok = true, msg = on ? "ล็อก Turbo Boost (Aggressive)" : "คืนค่า Turbo Boost" });
 
                     case "mem_auto":
                         return J(new { ok = false, msg = "Standby memory trimming is no longer available." });
@@ -146,12 +146,12 @@ namespace KingR9Tools.Core
                     default:
                         {
                             var t = _all.FirstOrDefault(x => x.Id == id);
-                            if (t == null) return J(new { ok = false, msg = "à¹„à¸¡à¹ˆà¸£à¸¹à¹‰à¸ˆà¸±à¸ tweak: " + id });
+                            if (t == null) return J(new { ok = false, msg = "ไม่รู้จัก tweak: " + id });
                             t.IsSelected = on;
                             if (on) t.ApplyAction?.Invoke(_log);
                             else t.UndoAction?.Invoke(_log);
                             if (id == "r9_power") { _cfg.powerPlan = on ? "r9" : "default"; SaveCfg(); }
-                            return J(new { ok = true, msg = $"{t.Name}: {(on ? "à¹ƒà¸Šà¹‰à¸‡à¸²à¸™" : "à¸„à¸·à¸™à¸„à¹ˆà¸²")}à¹à¸¥à¹‰à¸§" });
+                            return J(new { ok = true, msg = $"{t.Name}: {(on ? "ใช้งาน" : "คืนค่า")}แล้ว" });
                         }
                 }
             }
@@ -166,7 +166,7 @@ namespace KingR9Tools.Core
 
         private sealed class PlanInfo { public string Guid = ""; public string Name = ""; public bool Active; }
 
-        /// <summary>à¸”à¸¶à¸‡à¸£à¸²à¸¢à¸à¸²à¸£ power plan à¸—à¸±à¹‰à¸‡à¸«à¸¡à¸”à¸ˆà¸²à¸ WMI (à¸Šà¸·à¹ˆà¸­à¸ à¸²à¸©à¸²à¹„à¸—à¸¢/à¸­à¸±à¸‡à¸à¸¤à¸©à¹„à¸¡à¹ˆà¸¡à¸µà¸›à¸±à¸à¸«à¸² encoding)</summary>
+        /// <summary>ดึงรายการ power plan ทั้งหมดจาก WMI (ชื่อภาษาไทย/อังกฤษไม่มีปัญหา encoding)</summary>
         private static List<PlanInfo> PowerPlanList()
         {
             var list = new List<PlanInfo>();
@@ -187,7 +187,7 @@ namespace KingR9Tools.Core
             return list;
         }
 
-        /// <summary>à¸¥à¸šà¹à¸œà¸™à¸—à¸µà¹ˆà¸Šà¸·à¹ˆà¸­à¸‹à¹‰à¸³à¸à¸±à¸™ â€” à¹€à¸«à¸¥à¸·à¸­à¸­à¸±à¸™à¹€à¸”à¸µà¸¢à¸§à¸•à¹ˆà¸­à¸Šà¸·à¹ˆà¸­ (à¸à¸¥à¸¸à¹ˆà¸¡à¹„à¸«à¸™à¸¡à¸µà¹à¸œà¸™ active à¸ˆà¸°à¹€à¸à¹‡à¸šà¸•à¸±à¸§ active à¹„à¸§à¹‰) â†’ à¸„à¸·à¸™à¸ˆà¸³à¸™à¸§à¸™à¸—à¸µà¹ˆà¸¥à¸šà¹„à¸”à¹‰</summary>
+        /// <summary>ลบแผนที่ชื่อซ้ำกัน — เหลืออันเดียวต่อชื่อ (กลุ่มไหนมีแผน active จะเก็บตัว active ไว้) → คืนจำนวนที่ลบได้</summary>
         private int PowerPlanDedupeInternal(Logger log)
         {
             var plans = PowerPlanList();
@@ -199,15 +199,15 @@ namespace KingR9Tools.Core
                 {
                     if (p.Guid.Equals(keep.Guid, StringComparison.OrdinalIgnoreCase)) continue;
                     string outp = Sys.Run("powercfg.exe", "/delete \"" + p.Guid + "\"");
-                    if (outp.StartsWith("ERR")) { log?.Warn("à¸¥à¸š power plan à¹„à¸¡à¹ˆà¸ªà¸³à¹€à¸£à¹‡à¸ˆ: " + p.Name + " â†’ " + outp); continue; }
+                    if (outp.StartsWith("ERR")) { log?.Warn("ลบ power plan ไม่สำเร็จ: " + p.Name + " → " + outp); continue; }
                     removed++;
-                    log?.Ok("à¸¥à¸š power plan à¸‹à¹‰à¸³: " + p.Name + " (" + p.Guid.Substring(0, 8) + ") â€” à¹€à¸à¹‡à¸š \"" + keep.Name + "\" à¹„à¸§à¹‰");
+                    log?.Ok("ลบ power plan ซ้ำ: " + p.Name + " (" + p.Guid.Substring(0, 8) + ") — เก็บ \"" + keep.Name + "\" ไว้");
                 }
             }
             return removed;
         }
 
-        /// <summary>à¸£à¸²à¸¢à¸à¸²à¸£ power plan à¸—à¸±à¹‰à¸‡à¸«à¸¡à¸” + à¸ˆà¸³à¸™à¸§à¸™à¸—à¸µà¹ˆà¸‹à¹‰à¸³ (à¹‚à¸Šà¸§à¹Œà¹ƒà¸™à¸«à¸™à¹‰à¸² Powerplan)</summary>
+        /// <summary>รายการ power plan ทั้งหมด + จำนวนที่ซ้ำ (โชว์ในหน้า Powerplan)</summary>
         public string PowerPlans()
         {
             Hello();
@@ -221,42 +221,42 @@ namespace KingR9Tools.Core
                     total = plans.Count,
                     plans = plans.Select(p => new { name = p.Name, guid = p.Guid.Length > 8 ? p.Guid.Substring(0, 8) : p.Guid, active = p.Active }),
                     dupCount = dupGroups.Sum(g => g.Count() - 1),
-                    dupNames = dupGroups.Select(g => g.Key + " Ã—" + g.Count())
+                    dupNames = dupGroups.Select(g => g.Key + " ×" + g.Count())
                 });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸¥à¸š power plan à¸—à¸µà¹ˆà¸‹à¹‰à¸³à¸à¸±à¸™ à¹€à¸«à¸¥à¸·à¸­à¸­à¸±à¸™à¹€à¸”à¸µà¸¢à¸§à¸•à¹ˆà¸­à¸Šà¸·à¹ˆà¸­</summary>
+        /// <summary>ลบ power plan ที่ซ้ำกัน เหลืออันเดียวต่อชื่อ</summary>
         public string PowerPlanDedupe()
         {
             Hello();
             try
             {
                 int removed = PowerPlanDedupeInternal(_log);
-                _log.Ok(removed > 0 ? $"à¸¥à¸š power plan à¸‹à¹‰à¸³ {removed} à¸•à¸±à¸§ â€” à¹€à¸«à¸¥à¸·à¸­à¸­à¸±à¸™à¹€à¸”à¸µà¸¢à¸§à¸•à¹ˆà¸­à¸Šà¸·à¹ˆà¸­à¹à¸¥à¹‰à¸§" : "à¹„à¸¡à¹ˆà¸¡à¸µ power plan à¸‹à¹‰à¸³");
+                _log.Ok(removed > 0 ? $"ลบ power plan ซ้ำ {removed} ตัว — เหลืออันเดียวต่อชื่อแล้ว" : "ไม่มี power plan ซ้ำ");
                 return J(new
                 {
                     ok = true,
                     removedCount = removed,
-                    msg = removed > 0 ? "à¸¥à¸š Power Plan à¸‹à¹‰à¸³ " + removed + " à¸•à¸±à¸§à¹à¸¥à¹‰à¸§ âœ“ (à¹€à¸«à¸¥à¸·à¸­à¸­à¸±à¸™à¹€à¸”à¸µà¸¢à¸§à¸•à¹ˆà¸­à¸Šà¸·à¹ˆà¸­)" : "à¹„à¸¡à¹ˆà¸žà¸š Power Plan à¸‹à¹‰à¸³"
+                    msg = removed > 0 ? "ลบ Power Plan ซ้ำ " + removed + " ตัวแล้ว ✓ (เหลืออันเดียวต่อชื่อ)" : "ไม่พบ Power Plan ซ้ำ"
                 });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸œà¸¹à¹‰à¹ƒà¸Šà¹‰à¸à¸” "à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸¥à¸¢" à¸ˆà¸²à¸à¸«à¸™à¹‰à¸²à¸•à¹ˆà¸²à¸‡à¸˜à¸µà¸¡à¸‚à¸­à¸‡à¹à¸­à¸› (à¹à¸—à¸™ MessageBox à¹€à¸”à¸´à¸¡) â€” à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹ƒà¸™ 5 à¸§à¸´</summary>
+        /// <summary>ผู้ใช้กด "รีสตาร์ทเลย" จากหน้าต่างธีมของแอป (แทน MessageBox เดิม) — รีสตาร์ทใน 5 วิ</summary>
         public string RestartNow()
         {
             Hello();
-            _log.Ok("à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¹ƒà¸™ 5 à¸§à¸´à¸™à¸²à¸—à¸µ (à¸¢à¸·à¸™à¸¢à¸±à¸™à¸ˆà¸²à¸à¸«à¸™à¹‰à¸²à¹€à¸§à¹‡à¸š)");
-            Notify("blue", "ðŸ”„ à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡", "à¸œà¸¹à¹‰à¹ƒà¸Šà¹‰à¸à¸”à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¸ˆà¸²à¸à¹à¸­à¸› â€” à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸ˆà¸°à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹ƒà¸™ 5 à¸§à¸´à¸™à¸²à¸—à¸µ");
+            _log.Ok("รีสตาร์ทเครื่องใน 5 วินาที (ยืนยันจากหน้าเว็บ)");
+            Notify("blue", "🔄 รีสตาร์ทเครื่อง", "ผู้ใช้กดรีสตาร์ทจากแอป — เครื่องจะรีสตาร์ทใน 5 วินาที");
             Sys.Cmd("shutdown /r /t 5 /c \"KingR9 Tools - restarting\"");
-            return J(new { ok = true, msg = "à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹ƒà¸™ 5 à¸§à¸´à¸™à¸²à¸—à¸µ..." });
+            return J(new { ok = true, msg = "รีสตาร์ทใน 5 วินาที..." });
         }
 
-        // ---------- R9 GROUP PAGES (à¸„à¹ˆà¸²à¸•à¸£à¸‡à¸•à¸²à¸¡à¸ªà¸„à¸£à¸´à¸›à¸•à¹Œ 07/08/09) ----------
-        /// <summary>à¸«à¸™à¹‰à¸² Powerplan â€” 4 checkbox</summary>
+        // ---------- R9 GROUP PAGES (ค่าตรงตามสคริปต์ 07/08/09) ----------
+        /// <summary>หน้า Powerplan — 4 checkbox</summary>
         public string PowerApply(bool plan, bool hib, bool boost, bool delay)
         {
             Hello();
@@ -268,11 +268,11 @@ namespace KingR9Tools.Core
                     TweakRegistry.RunFile(_log, "13_R9_Powerplan.ps1");
                     _cfg.powerPlan = "r9";
                     n++;
-                    // à¸•à¸£à¸§à¸ˆ + à¸¥à¸š power plan à¸—à¸µà¹ˆà¸‹à¹‰à¸³à¸à¸±à¸™à¸—à¸±à¸™à¸—à¸µ (à¹€à¸«à¸¥à¸·à¸­à¸­à¸±à¸™à¹€à¸”à¸µà¸¢à¸§à¸•à¹ˆà¸­à¸Šà¸·à¹ˆà¸­ â€” à¸à¸±à¸™à¹à¸œà¸™ R9 à¸‹à¹‰à¸­à¸™à¸ˆà¸²à¸à¸à¸²à¸£à¸à¸”à¸«à¸¥à¸²à¸¢à¸£à¸­à¸š)
+                    // ตรวจ + ลบ power plan ที่ซ้ำกันทันที (เหลืออันเดียวต่อชื่อ — กันแผน R9 ซ้อนจากการกดหลายรอบ)
                     try
                     {
                         int rm = PowerPlanDedupeInternal(_log);
-                        if (rm > 0) _log.Ok("à¸¥à¸š power plan à¸—à¸µà¹ˆà¸‹à¹‰à¸³à¸à¸±à¸™ " + rm + " à¸•à¸±à¸§ (à¹€à¸«à¸¥à¸·à¸­à¸­à¸±à¸™à¹€à¸”à¸µà¸¢à¸§à¸•à¹ˆà¸­à¸Šà¸·à¹ˆà¸­)");
+                        if (rm > 0) _log.Ok("ลบ power plan ที่ซ้ำกัน " + rm + " ตัว (เหลืออันเดียวต่อชื่อ)");
                     }
                     catch { }
                 }
@@ -283,7 +283,7 @@ namespace KingR9Tools.Core
                     Sys.SetDword(@"HKLM\SYSTEM\CurrentControlSet\Control\Power", "HibernateEnabledDefault", 0);
                     Sys.SetDword(@"HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Power", "HiberbootEnabled", 0);
                     Sys.SetDword(@"HKLM\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling", "PowerThrottlingOff", 1);
-                    _log.Ok("à¸›à¸´à¸” Hibernate / Fast Boot / Power Throttling à¹à¸¥à¹‰à¸§");
+                    _log.Ok("ปิด Hibernate / Fast Boot / Power Throttling แล้ว");
                     n++;
                 }
                 if (boost)
@@ -293,7 +293,7 @@ namespace KingR9Tools.Core
                     Sys.Cmd("powercfg /setacvalueindex SCHEME_CURRENT SUB_PROCESSOR PERFEPP 0");
                     Sys.Cmd("powercfg /setdcvalueindex SCHEME_CURRENT SUB_PROCESSOR PERFEPP 0");
                     Sys.Cmd("powercfg /setactive SCHEME_CURRENT");
-                    _log.Ok("CPU Boost Policy: Aggressive + EPP = 0 à¹à¸¥à¹‰à¸§");
+                    _log.Ok("CPU Boost Policy: Aggressive + EPP = 0 แล้ว");
                     n++;
                 }
                 if (delay)
@@ -305,16 +305,16 @@ namespace KingR9Tools.Core
                     Sys.Cmd("powercfg /setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0");
                     Sys.Cmd("powercfg /setdcvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0");
                     Sys.Cmd("powercfg /setactive SCHEME_CURRENT");
-                    _log.Ok("Minimize Delay: PCIe ASPM off Â· NVMe idle 0 Â· USB suspend off à¹à¸¥à¹‰à¸§");
+                    _log.Ok("Minimize Delay: PCIe ASPM off · NVMe idle 0 · USB suspend off แล้ว");
                     n++;
                 }
                 SaveCfg();
-                return J(new { ok = true, msg = $"à¹ƒà¸Šà¹‰ Power Plan Tweaks {n} à¸à¸¥à¸¸à¹ˆà¸¡à¹à¸¥à¹‰à¸§" });
+                return J(new { ok = true, msg = $"ใช้ Power Plan Tweaks {n} กลุ่มแล้ว" });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸«à¸™à¹‰à¸² FiveM Settings â€” 4 checkbox (à¸„à¹ˆà¸²à¸ˆà¸²à¸à¸ªà¸„à¸£à¸´à¸›à¸•à¹Œ 09)</summary>
+        /// <summary>หน้า FiveM Settings — 4 checkbox (ค่าจากสคริปต์ 09)</summary>
         public string FivemApply(bool cache, bool prio, bool cef, bool pkg)
         {
             Hello();
@@ -329,20 +329,20 @@ namespace KingR9Tools.Core
                     {
                         try { var full = Path.Combine(app, d); if (Directory.Exists(full)) Directory.Delete(full, true); } catch { }
                     }
-                    _log.Ok("à¸¥à¹‰à¸²à¸‡ FiveM cache à¸—à¸±à¹‰à¸‡ 4 à¹‚à¸Ÿà¸¥à¹€à¸”à¸­à¸£à¹Œà¹à¸¥à¹‰à¸§");
+                    _log.Ok("ล้าง FiveM cache ทั้ง 4 โฟลเดอร์แล้ว");
                     n++;
                 }
                 if (prio)
                 {
                     foreach (var exe in new[] { "FiveM.exe", "FiveM_GTAProcess.exe", "GTA5.exe" })
                         Sys.SetDword(@"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\" + exe + @"\PerfOptions", "CpuPriorityClass", 3);
-                    _log.Ok("CpuPriorityClass = 3 (High) à¹ƒà¸«à¹‰ FiveM.exe / FiveM_GTAProcess.exe / GTA5.exe à¹à¸¥à¹‰à¸§");
+                    _log.Ok("CpuPriorityClass = 3 (High) ให้ FiveM.exe / FiveM_GTAProcess.exe / GTA5.exe แล้ว");
                     n++;
                 }
                 if (cef)
                 {
                     Sys.SetDword(@"HKCU\Software\CitizenFX\FiveM", "CEFHardwareAcceleration", 0);
-                    _log.Ok("CEFHardwareAcceleration = 0 (à¸›à¸´à¸” HW accel à¸‚à¸­à¸‡ CEF UI) à¹à¸¥à¹‰à¸§");
+                    _log.Ok("CEFHardwareAcceleration = 0 (ปิด HW accel ของ CEF UI) แล้ว");
                     n++;
                 }
                 if (pkg)
@@ -350,15 +350,15 @@ namespace KingR9Tools.Core
                     Sys.SetDword(@"HKLM\SOFTWARE\Microsoft\MSMQ\Parameters", "TCPNoDelay", 1);
                     Sys.SetDword(@"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile", "NetworkThrottlingIndex", unchecked((int)4294967295));
                     Sys.SetDword(@"HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile", "SystemResponsiveness", 0);
-                    _log.Ok("package transmission: MSMQ NoDelay + NetworkThrottling off + Responsiveness 0 à¹à¸¥à¹‰à¸§");
+                    _log.Ok("package transmission: MSMQ NoDelay + NetworkThrottling off + Responsiveness 0 แล้ว");
                     n++;
                 }
-                return J(new { ok = true, msg = $"à¹ƒà¸Šà¹‰ FiveM Tweaks {n} à¸£à¸²à¸¢à¸à¸²à¸£à¹à¸¥à¹‰à¸§" });
+                return J(new { ok = true, msg = $"ใช้ FiveM Tweaks {n} รายการแล้ว" });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸«à¸™à¹‰à¸² FiveM Settings â€” dropdown STR (Global Timer Resolution Requests)</summary>
+        /// <summary>หน้า FiveM Settings — dropdown STR (Global Timer Resolution Requests)</summary>
         public string StrApply(bool low)
         {
             Hello();
@@ -369,18 +369,18 @@ namespace KingR9Tools.Core
                 {
                     Sys.SetDword(k, "GlobalTimerResolutionRequests", 1);
                     Sys.SetDword(k, "TimerResolution", 5000);
-                    _log.Ok("Global Timer Resolution Requests: 0.5ms (TimerResolution=5000) à¹à¸¥à¹‰à¸§");
+                    _log.Ok("Global Timer Resolution Requests: 0.5ms (TimerResolution=5000) แล้ว");
                     return J(new { ok = true, msg = "Timer Resolution: 0.5ms" });
                 }
                 Sys.DelValue(k, "GlobalTimerResolutionRequests");
                 Sys.DelValue(k, "TimerResolution");
-                _log.Ok("Global Timer Resolution Requests à¸à¸¥à¸±à¸š Default à¹à¸¥à¹‰à¸§");
+                _log.Ok("Global Timer Resolution Requests กลับ Default แล้ว");
                 return J(new { ok = true, msg = "Timer Resolution: Default" });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸«à¸™à¹‰à¸² FiveM Settings â€” Windows Services &amp; OS Tweaks 5 checkbox</summary>
+        /// <summary>หน้า FiveM Settings — Windows Services &amp; OS Tweaks 5 checkbox</summary>
         public string SvcApply(bool netstack, bool services, bool usb, bool latency, bool bcd)
         {
             Hello();
@@ -395,7 +395,7 @@ namespace KingR9Tools.Core
                     Sys.Cmd("powercfg /setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0");
                     Sys.Cmd("powercfg /setdcvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0");
                     Sys.Cmd("powercfg /setactive SCHEME_CURRENT");
-                    _log.Ok("à¸›à¸´à¸” USB Selective Suspend Power Saver à¹à¸¥à¹‰à¸§");
+                    _log.Ok("ปิด USB Selective Suspend Power Saver แล้ว");
                     n++;
                 }
                 if (latency) { Find("lat_nagle")?.ApplyAction(_log); n++; }
@@ -404,10 +404,10 @@ namespace KingR9Tools.Core
                     Sys.Cmd("bcdedit /deletevalue useplatformclock");
                     Sys.Cmd("bcdedit /deletevalue useplatformtick");
                     Sys.Cmd("bcdedit /set disabledynamictick no");
-                    _log.Ok("BCD: à¹€à¸„à¸¥à¸µà¸¢à¸£à¹Œ useplatformclock/tick + dynamic tick ON à¹à¸¥à¹‰à¸§ (à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¸¡à¸µà¸œà¸¥)");
+                    _log.Ok("BCD: เคลียร์ useplatformclock/tick + dynamic tick ON แล้ว (รีสตาร์ทมีผล)");
                     n++;
                 }
-                return J(new { ok = true, msg = $"à¹ƒà¸Šà¹‰ Services & OS Tweaks {n} à¸£à¸²à¸¢à¸à¸²à¸£à¹à¸¥à¹‰à¸§" });
+                return J(new { ok = true, msg = $"ใช้ Services & OS Tweaks {n} รายการแล้ว" });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
@@ -464,7 +464,7 @@ namespace KingR9Tools.Core
                 { ram = (Convert.ToDouble(o["TotalPhysicalMemory"]) / 1073741824.0).ToString("0.#") + " GB"; break; }
             }
             catch { }
-            _log.Info("Motherboard: " + prod + " Â· " + manu);
+            _log.Info("Motherboard: " + prod + " · " + manu);
             return J(new { ok = true, product = prod, manufacturer = manu, cpu = cpu, gpu = gpu, ram = ram });
         }
 
@@ -483,38 +483,38 @@ namespace KingR9Tools.Core
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }
         }
 
-        /// <summary>à¸Šà¸·à¹ˆà¸­à¸‚à¸±à¹‰à¸™à¸•à¸­à¸™à¹à¸šà¸šà¸­à¹ˆà¸²à¸™à¸‡à¹ˆà¸²à¸¢à¸ªà¸³à¸«à¸£à¸±à¸š tweak à¹à¸•à¹ˆà¸¥à¸°à¸•à¸±à¸§ (à¹‚à¸Šà¸§à¹Œà¹ƒà¸™à¸«à¸™à¹‰à¸²à¹‚à¸«à¸¥à¸”)</summary>
+        /// <summary>ชื่อขั้นตอนแบบอ่านง่ายสำหรับ tweak แต่ละตัว (โชว์ในหน้าโหลด)</summary>
         private static string TweakLabel(string id)
         {
             switch (id)
             {
-                case "r9_nic":   return "à¸›à¸£à¸±à¸š NIC Adapter";
-                case "r9_netsh": return "à¸›à¸£à¸±à¸š Netsh (cubic Â· MTU)";
-                case "r9_qos":   return "à¸ªà¸£à¹‰à¸²à¸‡ QoS DSCP 46";
-                case "r9_gta5":  return "à¹€à¸‚à¸µà¸¢à¸™à¹„à¸Ÿà¸¥à¹Œ config à¹€à¸à¸¡ (GTA5/FiveM)";
-                case "pw_park":  return "à¸›à¸£à¸±à¸š CPU Core Parking";
-                case "pw_turbo": return "à¸›à¸£à¸±à¸š Turbo Boost";
-                default:         return "à¸à¸³à¸¥à¸±à¸‡à¸›à¸£à¸±à¸š tweak";
+                case "r9_nic":   return "ปรับ NIC Adapter";
+                case "r9_netsh": return "ปรับ Netsh (cubic · MTU)";
+                case "r9_qos":   return "สร้าง QoS DSCP 46";
+                case "r9_gta5":  return "เขียนไฟล์ config เกม (GTA5/FiveM)";
+                case "pw_park":  return "ปรับ CPU Core Parking";
+                case "pw_turbo": return "ปรับ Turbo Boost";
+                default:         return "กำลังปรับ tweak";
             }
         }
 
-        /// <summary>à¸Šà¸·à¹ˆà¸­à¸‚à¸±à¹‰à¸™à¸•à¸­à¸™à¹à¸šà¸šà¸­à¹ˆà¸²à¸™à¸‡à¹ˆà¸²à¸¢à¸ªà¸³à¸«à¸£à¸±à¸šà¸«à¸™à¹‰à¸²à¹‚à¸«à¸¥à¸” (à¹„à¸¡à¹ˆà¹‚à¸Šà¸§à¹Œà¸Šà¸·à¹ˆà¸­à¹„à¸Ÿà¸¥à¹Œ .bat)</summary>
+        /// <summary>ชื่อขั้นตอนแบบอ่านง่ายสำหรับหน้าโหลด (ไม่โชว์ชื่อไฟล์ .bat)</summary>
         private static string StepLabel(string file)
         {
             switch (Path.GetFileName(file).ToLowerInvariant())
             {
-                case "01_registry_tweaks.bat":  return "à¸›à¸£à¸±à¸š Registry (TCP/IP Â· AFD Â· NetBT)";
-                case "02_netsh_tweaks.bat":     return "à¸›à¸£à¸±à¸š Netsh (cubic Â· MTU)";
-                case "03_bcdedit_tweaks.bat":   return "à¸›à¸£à¸±à¸š BCD (dynamic tick)";
-                case "04_nic_tweaks.bat":       return "à¸›à¸£à¸±à¸š NIC Adapter";
-                case "05_bindings_dns.bat":     return "à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² Bindings + DNS";
-                case "06_reset_adapter.bat":    return "à¸£à¸µà¹€à¸‹à¹‡à¸• Adapter (à¹€à¸™à¹‡à¸•à¸«à¸¥à¸¸à¸”à¹à¸›à¹Šà¸š ~15 à¸§à¸´)";
-                case "99_restore_defaults.bat": return "à¸„à¸·à¸™à¸„à¹ˆà¸²à¹€à¸£à¸´à¹ˆà¸¡à¸•à¹‰à¸™à¸‚à¸­à¸‡à¸Šà¸¸à¸” R9";
-                default:                        return "à¸à¸³à¸¥à¸±à¸‡à¸—à¸³à¸‡à¸²à¸™";
+                case "01_registry_tweaks.bat":  return "ปรับ Registry (TCP/IP · AFD · NetBT)";
+                case "02_netsh_tweaks.bat":     return "ปรับ Netsh (cubic · MTU)";
+                case "03_bcdedit_tweaks.bat":   return "ปรับ BCD (dynamic tick)";
+                case "04_nic_tweaks.bat":       return "ปรับ NIC Adapter";
+                case "05_bindings_dns.bat":     return "ตั้งค่า Bindings + DNS";
+                case "06_reset_adapter.bat":    return "รีเซ็ต Adapter (เน็ตหลุดแป๊บ ~15 วิ)";
+                case "99_restore_defaults.bat": return "คืนค่าเริ่มต้นของชุด R9";
+                default:                        return "กำลังทำงาน";
             }
         }
 
-        /// <summary>R9 internet â€” à¸Šà¸¸à¸” .bat à¸ˆà¸²à¸ InternetR9 (registry/netsh/bcd/nic/bindings/restore)</summary>
+        /// <summary>R9 internet — ชุด .bat จาก InternetR9 (registry/netsh/bcd/nic/bindings/restore)</summary>
         public string R9Net(string which)
         {
             Hello();
@@ -537,17 +537,17 @@ namespace KingR9Tools.Core
                     },
                     _ => Array.Empty<string>()
                 };
-                if (files.Length == 0) return J(new { ok = false, msg = "à¹„à¸¡à¹ˆà¸£à¸¹à¹‰à¸ˆà¸±à¸à¸Šà¸¸à¸”: " + which });
+                if (files.Length == 0) return J(new { ok = false, msg = "ไม่รู้จักชุด: " + which });
 
-                _log.Head("R9 internet â€” " + which);
+                _log.Head("R9 internet — " + which);
                 for (int i = 0; i < files.Length; i++)
                 {
-                    string lbl = $"à¸‚à¸±à¹‰à¸™à¸—à¸µà¹ˆ {i + 1}/{files.Length} Â· " + StepLabel(files[i]);
+                    string lbl = $"ขั้นที่ {i + 1}/{files.Length} · " + StepLabel(files[i]);
                     JobBeginStep(i, files.Length, lbl);
                     TweakRegistry.RunBat(_log, dir + files[i]);
                     JobStep((i + 1) * 100 / files.Length, lbl);
                 }
-                _log.Ok("R9 internet (" + which + ") à¹€à¸ªà¸£à¹‡à¸ˆà¸ªà¸¡à¸šà¸¹à¸£à¸“à¹Œ");
+                _log.Ok("R9 internet (" + which + ") เสร็จสมบูรณ์");
                 return J(new { ok = true, msg = "R9 internet: " + which + " âœ“" });
             }
             catch (Exception ex) { return J(new { ok = false, msg = ex.Message }); }

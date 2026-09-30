@@ -36,7 +36,7 @@ namespace KingR9Tools.Core
         {
             var lic = LicenseService.RecoverForThisMachine();
             return lic == null
-                ? J(new { key = "â€”", hwid = LicenseService.Hwid(), days = 0, status = "Inactive" })
+                ? J(new { key = "—", hwid = LicenseService.Hwid(), days = 0, status = "Inactive" })
                 : J(new { key = lic.key, hwid = lic.hwid, days = LicenseService.DaysLeft(lic), status = "Active" });
         }
 

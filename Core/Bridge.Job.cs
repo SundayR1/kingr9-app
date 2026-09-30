@@ -16,12 +16,12 @@ namespace KingR9Tools.Core
     public partial class Bridge
     {
 
-        // ---------- JOB PROGRESS (à¸›à¸¸à¹ˆà¸¡ Apply à¸—à¸±à¹ˆà¸§à¹„à¸› â€” à¸à¸±à¸™à¸à¸”à¸‹à¹‰à¸­à¸™ + à¸£à¸²à¸¢à¸‡à¸²à¸™ %) ----------
+        // ---------- JOB PROGRESS (ปุ่ม Apply ทั่วไป — กันกดซ้อน + รายงาน %) ----------
         private bool JobBegin(string label)
         {
             lock (_jobLock)
             {
-                if (_jobRunning) return false;   // à¸¡à¸µà¸‡à¸²à¸™à¸­à¸·à¹ˆà¸™à¸£à¸±à¸™à¸­à¸¢à¸¹à¹ˆ
+                if (_jobRunning) return false;   // มีงานอื่นรันอยู่
                 _jobRunning = true; _jobDone = false; _jobOk = false;
                 _jobPct = 0; _jobBase = 0; _jobSpan = 100;
                 _jobStepStart = DateTime.UtcNow;
@@ -38,7 +38,7 @@ namespace KingR9Tools.Core
             }
         }
 
-        /// <summary>à¹€à¸£à¸´à¹ˆà¸¡à¸‚à¸±à¹‰à¸™à¸—à¸µà¹ˆ index/total â€” à¹à¸–à¸šà¸ˆà¸°à¹„à¸«à¸¥à¸­à¸¢à¸¹à¹ˆà¹ƒà¸™à¸Šà¹ˆà¸§à¸‡à¸‚à¸­à¸‡à¸‚à¸±à¹‰à¸™à¸™à¸µà¹‰à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™ (à¸‚à¸±à¹‰à¸™à¸–à¸±à¸”à¹„à¸›à¹„à¸«à¸¥à¸Šà¹ˆà¸§à¸‡à¸–à¸±à¸”à¹„à¸› â€” à¹„à¸¡à¹ˆà¸¡à¸µà¹€à¸žà¸”à¸²à¸™à¸£à¸§à¸¡à¹ƒà¸«à¹‰à¸„à¹‰à¸²à¸‡)</summary>
+        /// <summary>เริ่มขั้นที่ index/total — แถบจะไหลอยู่ในช่วงของขั้นนี้เท่านั้น (ขั้นถัดไปไหลช่วงถัดไป — ไม่มีเพดานรวมให้ค้าง)</summary>
         private void JobBeginStep(int index, int total, string label)
         {
             lock (_jobLock)
@@ -50,7 +50,7 @@ namespace KingR9Tools.Core
             }
         }
 
-        /// <summary>à¸¥à¸¹à¸›à¹„à¸«à¸¥ % â€” à¹„à¸•à¹ˆà¸–à¸¶à¸‡ ~88% à¸‚à¸­à¸‡à¸Šà¹ˆà¸§à¸‡à¸‚à¸±à¹‰à¸™à¹ƒà¸™ ~10 à¸§à¸´ à¹à¸¥à¹‰à¸§à¸„à¸¥à¸²à¸™à¸Šà¹‰à¸² à¹† à¸•à¹ˆà¸­à¹€à¸™à¸·à¹ˆà¸­à¸‡ (à¹„à¸¡à¹ˆà¹€à¸à¸´à¸™à¸Šà¹ˆà¸§à¸‡à¸‚à¸­à¸‡à¸‚à¸±à¹‰à¸™à¸•à¸±à¸§à¹€à¸­à¸‡ à¹„à¸¡à¹ˆà¸™à¸´à¹ˆà¸‡à¸ªà¸™à¸´à¸—)</summary>
+        /// <summary>ลูปไหล % — ไต่ถึง ~88% ของช่วงขั้นใน ~10 วิ แล้วคลานช้า ๆ ต่อเนื่อง (ไม่เกินช่วงของขั้นตัวเอง ไม่นิ่งสนิท)</summary>
         private void CreepLoop()
         {
             while (true)
@@ -78,28 +78,28 @@ namespace KingR9Tools.Core
             lock (_jobLock)
             {
                 _jobRunning = false; _jobDone = true; _jobOk = ok;
-                _jobDoneMsg = msg ?? "";   // à¸„à¸‡ _jobPct à¹„à¸§à¹‰ â€” à¸«à¸™à¹‰à¸²à¹‚à¸«à¸¥à¸”à¸à¸±à¹ˆà¸‡ JS à¹€à¸›à¹‡à¸™à¸„à¸™à¹€à¸”à¹‰à¸‡ 100% à¹€à¸­à¸‡
+                _jobDoneMsg = msg ?? "";   // คง _jobPct ไว้ — หน้าโหลดฝั่ง JS เป็นคนเด้ง 100% เอง
             }
         }
 
-        /// <summary>à¸ªà¸–à¸²à¸™à¸°à¸‡à¸²à¸™à¸›à¸±à¸ˆà¸ˆà¸¸à¸šà¸±à¸™ â€” JS poll à¸—à¸¸à¸ 0.4 à¸§à¸´ à¸•à¸­à¸™à¹‚à¸Šà¸§à¹Œà¸«à¸™à¹‰à¸²à¹‚à¸«à¸¥à¸”</summary>
+        /// <summary>สถานะงานปัจจุบัน — JS poll ทุก 0.4 วิ ตอนโชว์หน้าโหลด</summary>
         public string JobProgress()
         {
             lock (_jobLock)
             {
-                // à¸Šà¹ˆà¸§à¸‡à¹€à¸›à¸¥à¸µà¹ˆà¸¢à¸™à¸‡à¸²à¸™ (à¸‡à¸²à¸™à¹€à¸à¹ˆà¸²à¸ˆà¸š à¸‡à¸²à¸™à¹ƒà¸«à¸¡à¹ˆà¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹€à¸£à¸´à¹ˆà¸¡) à¸ªà¹ˆà¸‡ pct = null â†’ JS à¸„à¸‡à¹à¸–à¸šà¹„à¸§à¹‰ à¹„à¸¡à¹ˆà¸à¸£à¸°à¹‚à¸”à¸”à¸à¸¥à¸±à¸š
+                // ช่วงเปลี่ยนงาน (งานเก่าจบ งานใหม่ยังไม่เริ่ม) ส่ง pct = null → JS คงแถบไว้ ไม่กระโดดกลับ
                 int? pct = (_jobRunning || _jobDone) ? _jobPct : (int?)null;
                 var r = new { running = _jobRunning, done = _jobDone, pct = pct, label = _jobLabel, ok = _jobOk, msg = _jobDoneMsg };
-                if (_jobDone) _jobDone = false;   // à¸­à¹ˆà¸²à¸™à¸„à¸£à¸±à¹‰à¸‡à¹€à¸”à¸µà¸¢à¸§à¸ˆà¸š
+                if (_jobDone) _jobDone = false;   // อ่านครั้งเดียวจบ
                 return J(r);
             }
         }
 
-        /// <summary>à¸«à¹ˆà¸­à¸‡à¸²à¸™ apply à¸—à¸±à¹ˆà¸§à¹„à¸› â€” à¹€à¸£à¸´à¹ˆà¸¡ job (à¸à¸±à¸™à¸à¸”à¸‹à¹‰à¸­à¸™) + % à¹„à¸«à¸¥à¸•à¸²à¸¡à¹€à¸§à¸¥à¸²à¸ˆà¸£à¸´à¸‡ à¸ˆà¸™à¸‡à¸²à¸™à¸ˆà¸šà¹€à¸”à¹‰à¸‡ 100
-        /// (à¸‡à¸²à¸™à¸—à¸µà¹ˆà¸¡à¸µ % à¸ˆà¸£à¸´à¸‡à¸•à¹ˆà¸­à¸‚à¸±à¹‰à¸™ à¹€à¸Šà¹ˆà¸™ R9Net à¹€à¸›à¹‡à¸™à¸œà¸¹à¹‰à¹€à¸£à¸µà¸¢à¸ JobStep à¹€à¸­à¸‡ â€” JobStep à¹ƒà¸Šà¹‰à¸„à¹ˆà¸² Max à¸ˆà¸¶à¸‡à¹„à¸¥à¹ˆà¸—à¸±à¸š % à¸›à¸£à¸°à¸¡à¸²à¸“à¹„à¸”à¹‰)</summary>
+        /// <summary>ห่องาน apply ทั่วไป — เริ่ม job (กันกดซ้อน) + % ไหลตามเวลาจริง จนงานจบเด้ง 100
+        /// (งานที่มี % จริงต่อขั้น เช่น R9Net เป็นผู้เรียก JobStep เอง — JobStep ใช้ค่า Max จึงไล่ทับ % ประมาณได้)</summary>
         private string RunApplyJob(string label, Func<string> work)
         {
-            if (!JobBegin(label)) return J(new { ok = false, msg = "à¸¡à¸µà¸‡à¸²à¸™à¸à¸³à¸¥à¸±à¸‡à¸—à¸³à¸‡à¸²à¸™à¸­à¸¢à¸¹à¹ˆ â€” à¸£à¸­à¸ˆà¸šà¸à¹ˆà¸­à¸™à¹à¸¥à¹‰à¸§à¸à¸”à¹ƒà¸«à¸¡à¹ˆ" });
+            if (!JobBegin(label)) return J(new { ok = false, msg = "มีงานกำลังทำงานอยู่ — รอจบก่อนแล้วกดใหม่" });
             var creep = Task.Run(CreepLoop);
             try
             {
@@ -117,13 +117,13 @@ namespace KingR9Tools.Core
             }
             catch
             {
-                JobEnd(false, "à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§");
+                JobEnd(false, "ล้มเหลว");
                 throw;
             }
             finally { try { creep.Wait(300); } catch { } }
         }
 
-        // ---------- CHAIN JOB (à¸‡à¸²à¸™à¸¥à¸¹à¸à¹‚à¸‹à¹ˆà¸«à¸¥à¸²à¸¢à¸‚à¸±à¹‰à¸™à¸£à¸§à¸¡à¹€à¸›à¹‡à¸™ job à¹€à¸”à¸µà¸¢à¸§ â€” à¹à¸–à¸š % à¹„à¸«à¸¥à¸•à¹ˆà¸­à¹€à¸™à¸·à¹ˆà¸­à¸‡à¸•à¸¥à¸­à¸”) ----------
+        // ---------- CHAIN JOB (งานลูกโซ่หลายขั้นรวมเป็น job เดียว — แถบ % ไหลต่อเนื่องตลอด) ----------
         private static string PStr(JsonElement p, string n) =>
             p.ValueKind == JsonValueKind.Object && p.TryGetProperty(n, out var x) && x.ValueKind == JsonValueKind.String ? (x.GetString() ?? "") : "";
 
@@ -132,7 +132,7 @@ namespace KingR9Tools.Core
             t == "strApply" || t == "svcApply" || t == "setTweak" || t == "cleanJunk" ||
             t == "powerPlanDedupe";
 
-        /// <summary>à¸Šà¸·à¹ˆà¸­à¸‚à¸±à¹‰à¸™à¸•à¸­à¸™à¸‚à¸­à¸‡à¹à¸•à¹ˆà¸¥à¸° apply type (à¹‚à¸Šà¸§à¹Œà¹ƒà¸™à¸«à¸™à¹‰à¸²à¹‚à¸«à¸¥à¸”)</summary>
+        /// <summary>ชื่อขั้นตอนของแต่ละ apply type (โชว์ในหน้าโหลด)</summary>
         private static string ApplyLabel(string type, JsonElement p)
         {
             switch (type)
@@ -140,26 +140,26 @@ namespace KingR9Tools.Core
                 case "setTweak":
                     return TweakLabel(PStr(p, "id"));
                 case "r9net":
-                    return PStr(p, "which") == "reset" ? "à¸£à¸µà¹€à¸‹à¹‡à¸• Adapter (à¹€à¸™à¹‡à¸•à¸«à¸¥à¸¸à¸”à¹à¸›à¹Šà¸š ~15 à¸§à¸´)" : "R9 internet";
+                    return PStr(p, "which") == "reset" ? "รีเซ็ต Adapter (เน็ตหลุดแป๊บ ~15 วิ)" : "R9 internet";
                 case "sysTool":    return "System Tool";
                 case "powerApply": return "Power & BCD";
                 case "fivemApply": return "FiveM Tweaks";
                 case "strApply":   return "Timer Resolution";
                 case "svcApply":   return "Services & OS Tweaks";
                 case "cleanJunk":  return "Junk Cleaner";
-                case "powerPlanDedupe": return "à¸¥à¸š Power Plan à¸‹à¹‰à¸³";
-                default:           return "à¸à¸³à¸¥à¸±à¸‡à¸—à¸³à¸‡à¸²à¸™";
+                case "powerPlanDedupe": return "ลบ Power Plan ซ้ำ";
+                default:           return "กำลังทำงาน";
             }
         }
 
-        /// <summary>à¸£à¸±à¸™à¸‡à¸²à¸™à¸¥à¸¹à¸à¹‚à¸‹à¹ˆà¸«à¸¥à¸²à¸¢à¸‚à¸±à¹‰à¸™à¹ƒà¸™ job à¹€à¸”à¸µà¸¢à¸§ â€” % à¸£à¸§à¸¡à¸—à¸±à¹‰à¸‡à¸Šà¸¸à¸”à¹„à¸«à¸¥à¸•à¹ˆà¸­à¹€à¸™à¸·à¹ˆà¸­à¸‡ à¸‚à¸±à¹‰à¸™à¹„à¸«à¸™ fail à¸«à¸¢à¸¸à¸”à¸—à¸±à¸™à¸—à¸µ</summary>
+        /// <summary>รันงานลูกโซ่หลายขั้นใน job เดียว — % รวมทั้งชุดไหลต่อเนื่อง ขั้นไหน fail หยุดทันที</summary>
         private string RunChainJob(JsonElement stepsEl)
         {
-            // JS à¸ªà¹ˆà¸‡ payload à¸¡à¸²à¸—à¸±à¹‰à¸‡à¸à¹‰à¸­à¸™à¹€à¸›à¹‡à¸™ { steps: [...] } â€” à¸£à¸­à¸‡à¸£à¸±à¸šà¸—à¸±à¹‰à¸‡à¹à¸šà¸š wrapper à¹à¸¥à¸° array à¸•à¸£à¸‡ à¹†
+            // JS ส่ง payload มาทั้งก้อนเป็น { steps: [...] } — รองรับทั้งแบบ wrapper และ array ตรง ๆ
             if (stepsEl.ValueKind == JsonValueKind.Object && stepsEl.TryGetProperty("steps", out var wrap) && wrap.ValueKind == JsonValueKind.Array)
                 stepsEl = wrap;
             var steps = new List<(string label, string type, JsonElement payload)>();
-            if (stepsEl.ValueKind != JsonValueKind.Array) return J(new { ok = false, msg = "à¸£à¸¹à¸›à¹à¸šà¸š chain à¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡" });
+            if (stepsEl.ValueKind != JsonValueKind.Array) return J(new { ok = false, msg = "รูปแบบ chain ไม่ถูกต้อง" });
             try
             {
                 foreach (var s in stepsEl.EnumerateArray())
@@ -169,11 +169,11 @@ namespace KingR9Tools.Core
                     steps.Add((s.TryGetProperty("label", out var ll) && ll.ValueKind == JsonValueKind.String ? ll.GetString() ?? "" : "", t, pl));
                 }
             }
-            catch { return J(new { ok = false, msg = "à¸£à¸¹à¸›à¹à¸šà¸š chain à¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡" }); }
-            if (steps.Count == 0) return J(new { ok = false, msg = "à¹„à¸¡à¹ˆà¸¡à¸µà¸‚à¸±à¹‰à¸™à¸•à¸­à¸™à¹ƒà¸«à¹‰à¸—à¸³" });
+            catch { return J(new { ok = false, msg = "รูปแบบ chain ไม่ถูกต้อง" }); }
+            if (steps.Count == 0) return J(new { ok = false, msg = "ไม่มีขั้นตอนให้ทำ" });
 
             if (!JobBegin(ApplyLabel(steps[0].type, steps[0].payload)))
-                return J(new { ok = false, msg = "à¸¡à¸µà¸‡à¸²à¸™à¸à¸³à¸¥à¸±à¸‡à¸—à¸³à¸‡à¸²à¸™à¸­à¸¢à¸¹à¹ˆ â€” à¸£à¸­à¸ˆà¸šà¸à¹ˆà¸­à¸™à¹à¸¥à¹‰à¸§à¸à¸”à¹ƒà¸«à¸¡à¹ˆ" });
+                return J(new { ok = false, msg = "มีงานกำลังทำงานอยู่ — รอจบก่อนแล้วกดใหม่" });
 
             var creep = Task.Run(CreepLoop);
             try
@@ -181,7 +181,7 @@ namespace KingR9Tools.Core
                 string lastMsg = "";
                 for (int i = 0; i < steps.Count; i++)
                 {
-                    string lbl = $"à¸‚à¸±à¹‰à¸™à¸—à¸µà¹ˆ {i + 1}/{steps.Count} Â· " + (steps[i].label.Length > 0 ? steps[i].label : ApplyLabel(steps[i].type, steps[i].payload));
+                    string lbl = $"ขั้นที่ {i + 1}/{steps.Count} · " + (steps[i].label.Length > 0 ? steps[i].label : ApplyLabel(steps[i].type, steps[i].payload));
                     JobBeginStep(i, steps.Count, lbl);
                     string r = RunRpc(steps[i].type, steps[i].payload);
 
@@ -203,13 +203,13 @@ namespace KingR9Tools.Core
             }
             catch
             {
-                JobEnd(false, "à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§");
+                JobEnd(false, "ล้มเหลว");
                 throw;
             }
             finally { try { creep.Wait(300); } catch { } }
         }
 
-        // ---------- DISCORD WEBHOOK (à¹à¸ˆà¹‰à¸‡à¹€à¸•à¸·à¸­à¸™ log à¹€à¸«à¸•à¸¸à¸à¸²à¸£à¸“à¹Œà¸ªà¸³à¸„à¸±à¸ â€” admin) ----------
+        // ---------- DISCORD WEBHOOK (แจ้งเตือน log เหตุการณ์สำคัญ — admin) ----------
 
         public string OptimizeStart()
         {
@@ -226,17 +226,17 @@ namespace KingR9Tools.Core
             return J(new { ok = true });
         }
 
-        /// <summary>à¸–à¸­à¸™ tweak à¸—à¸±à¹‰à¸‡à¸«à¸¡à¸”à¸à¸¥à¸±à¸šà¸„à¹ˆà¸²à¹€à¸£à¸´à¹ˆà¸¡à¸•à¹‰à¸™ â€” à¹ƒà¸Šà¹‰ 12_System_Tools.ps1 -Action defaults</summary>
+        /// <summary>ถอน tweak ทั้งหมดกลับค่าเริ่มต้น — ใช้ 12_System_Tools.ps1 -Action defaults</summary>
         private void RunDefaults()
         {
             lock (_runLock) { _busy = true; _running = true; _done = false; _ok = 0; _fail = 0; _pct = 30; }
             try
             {
-                _log.Head("â•â•â• RESTORE DEFAULTS â€” à¸ªà¸³à¸£à¸­à¸‡à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸à¹ˆà¸­à¸™à¸–à¸­à¸™ tweak â•â•â•");
+                _log.Head("═══ RESTORE DEFAULTS — สำรองข้อมูลก่อนถอน tweak ═══");
                 try { BackupService.Create(_log); }
                 catch (Exception bex) { _log.Err("backup: " + bex.Message); }
 
-                _log.Head("â•â•â• RESTORE DEFAULTS â€” à¸–à¸­à¸™ tweak à¸—à¸±à¹‰à¸‡à¸«à¸¡à¸” (12_System_Tools -Action defaults) â•â•â•");
+                _log.Head("═══ RESTORE DEFAULTS — ถอน tweak ทั้งหมด (12_System_Tools -Action defaults) ═══");
                 TweakRegistry.SystemTool(_log, "defaults");
 
                 lock (_runLock)
@@ -247,7 +247,7 @@ namespace KingR9Tools.Core
                 _cfg.lastScore = 40;
                 _cfg.lastApplied = 0;
                 SaveCfg();
-                _log.Head("â•â•â• à¸–à¸­à¸™à¸„à¹ˆà¸²à¹€à¸£à¸´à¹ˆà¸¡à¸•à¹‰à¸™à¹€à¸ªà¸£à¹‡à¸ˆ â€” à¹à¸™à¸°à¸™à¸³à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡ â•â•â•");
+                _log.Head("═══ ถอนค่าเริ่มต้นเสร็จ — แนะนำรีสตาร์ทเครื่อง ═══");
             }
             catch (Exception ex)
             {
@@ -275,7 +275,7 @@ namespace KingR9Tools.Core
                     total = _total,
                     score = _score
                 };
-                if (_done) _done = false;   // à¸­à¹ˆà¸²à¸™à¸„à¸£à¸±à¹‰à¸‡à¹€à¸”à¸µà¸¢à¸§à¸ˆà¸š
+                if (_done) _done = false;   // อ่านครั้งเดียวจบ
                 return J(r);
             }
         }
@@ -289,12 +289,12 @@ namespace KingR9Tools.Core
                 bool restart = false;
                 if (apply)
                 {
-                    _log.Head("à¸à¸³à¸¥à¸±à¸‡à¸ªà¸³à¸£à¸­à¸‡à¸‚à¹‰à¸­à¸¡à¸¹à¸¥à¸à¹ˆà¸­à¸™ Optimize...");
+                    _log.Head("กำลังสำรองข้อมูลก่อน Optimize...");
                     try { BackupService.Create(_log); }
                     catch (Exception ex) { _log.Err("backup: " + ex.Message); }
                 }
 
-                _log.Head($"â•â•â• {(apply ? "OPTIMIZE" : "RESTORE")} : {sel.Count} à¸£à¸²à¸¢à¸à¸²à¸£ â•â•â•");
+                _log.Head($"═══ {(apply ? "OPTIMIZE" : "RESTORE")} : {sel.Count} รายการ ═══");
 
                 for (int i = 0; i < sel.Count; i++)
                 {
@@ -307,7 +307,7 @@ namespace KingR9Tools.Core
                         _ok++;
                         if (t.NeedsRestart) restart = true;
                     }
-                    catch (Exception ex) { _log.Err("à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§: " + ex.Message); _fail++; }
+                    catch (Exception ex) { _log.Err("ล้มเหลว: " + ex.Message); _fail++; }
 
                     lock (_runLock) { _pct = (int)((i + 1) * 100.0 / sel.Count); }
                 }
@@ -332,9 +332,9 @@ namespace KingR9Tools.Core
                     _done = true;
                 }
 
-                _log.Head($"â•â•â• à¹€à¸ªà¸£à¹‡à¸ˆà¸ªà¸´à¹‰à¸™ â€” à¸ªà¸³à¹€à¸£à¹‡à¸ˆ {_ok} Â· à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§ {_fail} â•â•â•");
-                Notify(_fail > 0 ? "red" : "green", apply ? "âš¡ Optimize à¹€à¸ªà¸£à¹‡à¸ˆà¸ªà¸´à¹‰à¸™" : "â†©ï¸ Restore à¹€à¸ªà¸£à¹‡à¸ˆà¸ªà¸´à¹‰à¸™",
-                    "à¸ªà¸³à¹€à¸£à¹‡à¸ˆ **" + _ok + "** Â· à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§ **" + _fail + "**" + (restart ? "\nà¸•à¹‰à¸­à¸‡à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸„à¸£à¸·à¹ˆà¸­à¸‡à¸ˆà¸¶à¸‡à¸¡à¸µà¸œà¸¥à¹€à¸•à¹‡à¸¡à¸—à¸µà¹ˆ" : ""));
+                _log.Head($"═══ เสร็จสิ้น — สำเร็จ {_ok} · ล้มเหลว {_fail} ═══");
+                Notify(_fail > 0 ? "red" : "green", apply ? "⚡ Optimize เสร็จสิ้น" : "↩️ Restore เสร็จสิ้น",
+                    "สำเร็จ **" + _ok + "** · ล้มเหลว **" + _fail + "**" + (restart ? "\nต้องรีสตาร์ทเครื่องจึงมีผลเต็มที่" : ""));
 
                 if (restart)
                 {
@@ -346,7 +346,7 @@ namespace KingR9Tools.Core
                             var wv = _win.Web != null ? _win.Web.CoreWebView2 : null;
                             if (wv != null)
                             {
-                                // à¸–à¸²à¸¡à¸œà¹ˆà¸²à¸™à¸«à¸™à¹‰à¸²à¸•à¹ˆà¸²à¸‡à¸˜à¸µà¸¡à¸‚à¸­à¸‡à¹à¸­à¸› (KR.confirm à¹ƒà¸™à¸«à¸™à¹‰à¸²à¹€à¸§à¹‡à¸š) à¹à¸—à¸™ MessageBox à¸‚à¸­à¸‡ Windows
+                                // ถามผ่านหน้าต่างธีมของแอป (KR.confirm ในหน้าเว็บ) แทน MessageBox ของ Windows
                                 _ = wv.ExecuteScriptAsync(
                                     "window.__krDispatch({event:'askRestart',ok:" + okCount + ",fail:" + failCount +
                                     ",apply:'" + (apply ? "opt" : "res") + "'});");
@@ -354,7 +354,7 @@ namespace KingR9Tools.Core
                             }
                         }
                         catch { }
-                        _log.Info("à¸¡à¸µ tweak à¸—à¸µà¹ˆà¸•à¹‰à¸­à¸‡à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸— â€” à¸«à¸™à¹‰à¸²à¹€à¸§à¹‡à¸šà¹„à¸¡à¹ˆà¸žà¸£à¹‰à¸­à¸¡à¹à¸ªà¸”à¸‡à¸›à¸¸à¹ˆà¸¡à¸¢à¸·à¸™à¸¢à¸±à¸™ à¹ƒà¸«à¹‰à¸œà¸¹à¹‰à¹ƒà¸Šà¹‰à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸­à¸‡");
+                        _log.Info("มี tweak ที่ต้องรีสตาร์ท — หน้าเว็บไม่พร้อมแสดงปุ่มยืนยัน ให้ผู้ใช้รีสตาร์ทเอง");
                     }));
                 }
             }

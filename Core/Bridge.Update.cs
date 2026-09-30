@@ -21,35 +21,35 @@ namespace KingR9Tools.Core
         public string DiscordGet()
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
             return J(new { ok = true, url = _cfg.discordWebhook ?? "" });
         }
 
         public string DiscordSave(string url)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
             string raw = (url ?? "").Trim();
             string cleaned = Discord.Clean(raw);
-            // à¸–à¹‰à¸²à¸à¸£à¸­à¸ URL à¸¡à¸² à¹à¸•à¹ˆà¹„à¸¡à¹ˆà¹ƒà¸Šà¹ˆ Discord Webhook â†’ à¸„à¸·à¸™ error
+            // ถ้ากรอก URL มา แต่ไม่ใช่ Discord Webhook → คืน error
             if (raw.Length > 0 && cleaned.Length == 0)
-                return J(new { ok = false, msg = "URL à¹„à¸¡à¹ˆà¸–à¸¹à¸à¸•à¹‰à¸­à¸‡ â€” à¸•à¹‰à¸­à¸‡à¹€à¸›à¹‡à¸™ Webhook à¸‚à¸­à¸‡ Discord (https://discord.com/api/webhooks/...)" });
+                return J(new { ok = false, msg = "URL ไม่ถูกต้อง — ต้องเป็น Webhook ของ Discord (https://discord.com/api/webhooks/...)" });
             _cfg.discordWebhook = cleaned;
             SaveCfg();
-            _log.Ok(cleaned.Length == 0 ? "à¸›à¸´à¸”à¸à¸²à¸£à¹à¸ˆà¹‰à¸‡à¹€à¸•à¸·à¸­à¸™ Discord à¹à¸¥à¹‰à¸§" : "à¸šà¸±à¸™à¸—à¸¶à¸ Discord Webhook à¹à¸¥à¹‰à¸§");
-            return J(new { ok = true, msg = cleaned.Length == 0 ? "à¸›à¸´à¸”à¸à¸²à¸£à¹à¸ˆà¹‰à¸‡à¹€à¸•à¸·à¸­à¸™ Discord à¹à¸¥à¹‰à¸§" : "à¸šà¸±à¸™à¸—à¸¶à¸ Webhook à¹à¸¥à¹‰à¸§ âœ“" });
+            _log.Ok(cleaned.Length == 0 ? "ปิดการแจ้งเตือน Discord แล้ว" : "บันทึก Discord Webhook แล้ว");
+            return J(new { ok = true, msg = cleaned.Length == 0 ? "ปิดการแจ้งเตือน Discord แล้ว" : "บันทึก Webhook แล้ว ✓" });
         }
 
         public string DiscordTest()
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
-            var (ok, msg) = Discord.SendNow(_cfg.discordWebhook, "KingR9Tools à¸žà¸£à¹‰à¸­à¸¡à¹à¸ˆà¹‰à¸‡à¹€à¸•à¸·à¸­à¸™", "à¸—à¸”à¸ªà¸­à¸š Webhook à¸ˆà¸²à¸à¸«à¸™à¹‰à¸² Key Generator");
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
+            var (ok, msg) = Discord.SendNow(_cfg.discordWebhook, "KingR9Tools พร้อมแจ้งเตือน", "ทดสอบ Webhook จากหน้า Key Generator");
             _log.Ok("Discord test: " + msg);
             return J(new { ok, msg });
         }
 
-        // ---------- AUTO UPDATE (à¸•à¸£à¸§à¸ˆà¹€à¸§à¸­à¸£à¹Œà¸Šà¸±à¸™à¸ˆà¸²à¸ server â†’ à¹‚à¸«à¸¥à¸” â†’ à¸ªà¸¥à¸±à¸šà¹„à¸Ÿà¸¥à¹Œ â†’ à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸­à¸‡) ----------
+        // ---------- AUTO UPDATE (ตรวจเวอร์ชันจาก server → โหลด → สลับไฟล์ → รีสตาร์ทเอง) ----------
         public static string AppVersion = "1.0.2";
 
         private static bool VersionNewer(string remote, string local)
@@ -107,13 +107,13 @@ namespace KingR9Tools.Core
             Hello();
             try
             {
-                if (!ServerReady) return J(new { ok = false, msg = "à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¹€à¸Šà¸·à¹ˆà¸­à¸¡ server" });
+                if (!ServerReady) return J(new { ok = false, msg = "ยังไม่ได้เชื่อม server" });
                 var (ver, url, _, sha256) = UpdateManifest();
                 if (!VersionNewer(ver, AppVersion) || !IsHttpsUrl(url) || !IsSha256(sha256))
-                    return J(new { ok = false, msg = "à¸„à¸¸à¸“à¹ƒà¸Šà¹‰à¹€à¸§à¸­à¸£à¹Œà¸Šà¸±à¸™à¸¥à¹ˆà¸²à¸ªà¸¸à¸”à¸­à¸¢à¸¹à¹ˆà¹à¸¥à¹‰à¸§ âœ“" });
+                    return J(new { ok = false, msg = "คุณใช้เวอร์ชันล่าสุดอยู่แล้ว ✓" });
 
-                if (!JobBegin("à¸­à¸±à¸›à¹€à¸”à¸•à¹à¸­à¸› â†’ v" + ver))
-                    return J(new { ok = false, msg = "à¸¡à¸µà¸‡à¸²à¸™à¸à¸³à¸¥à¸±à¸‡à¸—à¸³à¸‡à¸²à¸™à¸­à¸¢à¸¹à¹ˆ â€” à¸£à¸­à¸ˆà¸šà¸à¹ˆà¸­à¸™à¹à¸¥à¹‰à¸§à¸à¸”à¹ƒà¸«à¸¡à¹ˆ" });
+                if (!JobBegin("อัปเดตแอป → v" + ver))
+                    return J(new { ok = false, msg = "มีงานกำลังทำงานอยู่ — รอจบก่อนแล้วกดใหม่" });
                 var creep = Task.Run(CreepLoop);
                 try
                 {
@@ -125,7 +125,7 @@ namespace KingR9Tools.Core
                     string newPath = Path.Combine(dir, "KingR9Tools_update.exe");
                     string oldPath = exePath;
                     // __UPD3__
-                    // à¸”à¸²à¸§à¸™à¹Œà¹‚à¸«à¸¥à¸”à¸žà¸£à¹‰à¸­à¸¡ % à¸ˆà¸£à¸´à¸‡à¸ˆà¸²à¸ ContentLength
+                    // ดาวน์โหลดพร้อม % จริงจาก ContentLength
                     using (var http = new HttpClient { Timeout = TimeSpan.FromMinutes(15) })
                     using (var resp = http.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).Result)
                     {
@@ -136,11 +136,11 @@ namespace KingR9Tools.Core
                         }
                         if (!resp.IsSuccessStatusCode)
                         {
-                            JobEnd(false, "à¹‚à¸«à¸¥à¸”à¹„à¸Ÿà¸¥à¹Œà¹„à¸¡à¹ˆà¸ªà¸³à¹€à¸£à¹‡à¸ˆ (HTTP " + (int)resp.StatusCode + ")");
-                            return J(new { ok = false, msg = "à¹‚à¸«à¸¥à¸”à¹„à¸Ÿà¸¥à¹Œà¹„à¸¡à¹ˆà¸ªà¸³à¹€à¸£à¹‡à¸ˆ (HTTP " + (int)resp.StatusCode + ")" });
+                            JobEnd(false, "โหลดไฟล์ไม่สำเร็จ (HTTP " + (int)resp.StatusCode + ")");
+                            return J(new { ok = false, msg = "โหลดไฟล์ไม่สำเร็จ (HTTP " + (int)resp.StatusCode + ")" });
                         }
                         long total = resp.Content.Headers.ContentLength ?? -1;
-                        JobStep(0, "à¸à¸³à¸¥à¸±à¸‡à¹‚à¸«à¸¥à¸” v" + ver + " ...");
+                        JobStep(0, "กำลังโหลด v" + ver + " ...");
                         using var src = resp.Content.ReadAsStreamAsync().Result;
                         using var dst = new FileStream(newPath, FileMode.Create, FileAccess.Write);
                         var buf = new byte[81920];
@@ -154,16 +154,16 @@ namespace KingR9Tools.Core
                             if (total > 0 && sw.ElapsedMilliseconds - lastUi > 300)
                             {
                                 lastUi = sw.ElapsedMilliseconds;
-                                JobStep((int)(done * 100 / total), "à¹‚à¸«à¸¥à¸” v" + ver + " Â· " + (done / 1048576.0).ToString("0.0") + "/" + (total / 1048576.0).ToString("0.0") + " MB");
+                                JobStep((int)(done * 100 / total), "โหลด v" + ver + " · " + (done / 1048576.0).ToString("0.0") + "/" + (total / 1048576.0).ToString("0.0") + " MB");
                             }
                         }
-                        if (total > 0) JobStep(100, "à¹‚à¸«à¸¥à¸”à¹€à¸ªà¸£à¹‡à¸ˆ â€” à¸à¸³à¸¥à¸±à¸‡à¸ªà¸¥à¸±à¸šà¹„à¸Ÿà¸¥à¹Œ...");
+                        if (total > 0) JobStep(100, "โหลดเสร็จ — กำลังสลับไฟล์...");
                     }
                     if (new FileInfo(newPath).Length < 1024 * 1024)
                     {
                         try { File.Delete(newPath); } catch { }
-                        JobEnd(false, "à¹„à¸Ÿà¸¥à¹Œà¸—à¸µà¹ˆà¹‚à¸«à¸¥à¸”à¸¡à¸²à¹„à¸¡à¹ˆà¸ªà¸¡à¸šà¸¹à¸£à¸“à¹Œ");
-                        return J(new { ok = false, msg = "à¹„à¸Ÿà¸¥à¹Œà¸—à¸µà¹ˆà¹‚à¸«à¸¥à¸”à¸¡à¸²à¹„à¸¡à¹ˆà¸ªà¸¡à¸šà¸¹à¸£à¸“à¹Œ â€” à¸¥à¸­à¸‡à¹ƒà¸«à¸¡à¹ˆà¸­à¸µà¸à¸„à¸£à¸±à¹‰à¸‡" });
+                        JobEnd(false, "ไฟล์ที่โหลดมาไม่สมบูรณ์");
+                        return J(new { ok = false, msg = "ไฟล์ที่โหลดมาไม่สมบูรณ์ — ลองใหม่อีกครั้ง" });
                     }
                     // อัปเดตแบบ clean (ไม่ trigger AV): rename exe เก่า → move ตัวใหม่เข้าแทน → เปิดตัวใหม่
                     string actualSha256;
@@ -191,9 +191,9 @@ namespace KingR9Tools.Core
                     { UseShellExecute = true };
                     System.Diagnostics.Process.Start(psi);
 
-                    _log.Ok("à¸­à¸±à¸›à¹€à¸”à¸•à¹à¸­à¸› v" + AppVersion + " â†’ v" + ver + " â€” à¹‚à¸«à¸¥à¸”à¹€à¸ªà¸£à¹‡à¸ˆ à¸à¸³à¸¥à¸±à¸‡à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹à¸­à¸›");
-                    Notify("green", "â¬†ï¸ à¹à¸­à¸›à¸­à¸±à¸›à¹€à¸”à¸•", "v" + AppVersion + " â†’ **v" + ver + "** â€” à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹à¸­à¸›à¹€à¸£à¸µà¸¢à¸šà¸£à¹‰à¸­à¸¢");
-                    JobEnd(true, "à¸­à¸±à¸›à¹€à¸”à¸•à¸ªà¸³à¹€à¸£à¹‡à¸ˆ â€” à¹à¸­à¸›à¸ˆà¸°à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸­à¸‡à¹ƒà¸™à¹„à¸¡à¹ˆà¸Šà¹‰à¸²");
+                    _log.Ok("อัปเดตแอป v" + AppVersion + " → v" + ver + " — โหลดเสร็จ กำลังรีสตาร์ทแอป");
+                    Notify("green", "⬆️ แอปอัปเดต", "v" + AppVersion + " → **v" + ver + "** — รีสตาร์ทแอปเรียบร้อย");
+                    JobEnd(true, "อัปเดตสำเร็จ — แอปจะรีสตาร์ทเองในไม่ช้า");
 
 #pragma warning disable CS4014
                     Task.Run(async () =>
@@ -202,11 +202,11 @@ namespace KingR9Tools.Core
                         try { _win.Dispatcher.BeginInvoke(new Action(() => System.Windows.Application.Current.Shutdown())); } catch { }
                     });
 #pragma warning restore CS4014
-                    return J(new { ok = true, msg = "à¸­à¸±à¸›à¹€à¸”à¸•à¸ªà¸³à¹€à¸£à¹‡à¸ˆ â€” à¹à¸­à¸›à¸ˆà¸°à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—à¹€à¸­à¸‡ (v" + ver + ")" });
+                    return J(new { ok = true, msg = "อัปเดตสำเร็จ — แอปจะรีสตาร์ทเอง (v" + ver + ")" });
                 }
                 catch
                 {
-                    JobEnd(false, "à¸­à¸±à¸›à¹€à¸”à¸•à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§");
+                    JobEnd(false, "อัปเดตล้มเหลว");
                     throw;
                 }
                 finally { try { creep.Wait(300); } catch { } }
@@ -214,31 +214,31 @@ namespace KingR9Tools.Core
             catch (Exception ex)
             {
                 _log.Err("update: " + ex.Message);
-                return J(new { ok = false, msg = "à¸œà¸´à¸”à¸žà¸¥à¸²à¸”: " + ex.Message });
+                return J(new { ok = false, msg = "ผิดพลาด: " + ex.Message });
             }
         }
 
         public string UpdatePublish(string version, string url, string sha256, string notes)
         {
             Hello();
-            if (!IsAdmin()) return J(new { ok = false, msg = "à¸«à¸™à¹‰à¸²à¸™à¸µà¹‰à¸ªà¸³à¸«à¸£à¸±à¸šà¹à¸­à¸”à¸¡à¸´à¸™à¹€à¸—à¹ˆà¸²à¸™à¸±à¹‰à¸™" });
-            if (!ServerReady) return J(new { ok = false, msg = "à¸¢à¸±à¸‡à¹„à¸¡à¹ˆà¹„à¸”à¹‰à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server â€” à¸à¸”à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸²à¹ƒà¸™à¸«à¸™à¹‰à¸²à¹€à¸ˆà¸™ key à¸à¹ˆà¸­à¸™" });
+            if (!IsAdmin()) return J(new { ok = false, msg = "หน้านี้สำหรับแอดมินเท่านั้น" });
+            if (!ServerReady) return J(new { ok = false, msg = "ยังไม่ได้ตั้งค่า server — กดตั้งค่าในหน้าเจน key ก่อน" });
             version = (version ?? "").Trim();
             url = (url ?? "").Trim();
             sha256 = (sha256 ?? "").Trim();
             notes = (notes ?? "").Trim();
             if (version.Length == 0 || !IsHttpsUrl(url) || !IsSha256(sha256))
-                return J(new { ok = false, msg = "à¸à¸£à¸­à¸ version (à¹€à¸Šà¹ˆà¸™ 1.0.2) à¹à¸¥à¸° URL à¹„à¸Ÿà¸¥à¹Œ exe à¹ƒà¸«à¹‰à¸–à¸¹à¸à¸•à¹‰à¸­à¸‡" });
+                return J(new { ok = false, msg = "กรอก version (เช่น 1.0.2) และ URL ไฟล์ exe ให้ถูกต้อง" });
             bool up = HttpPut(FirebaseUrl.TrimEnd('/') + "/appUpdate.json" + AuthQuery(),
                 JsonSerializer.Serialize(new { version, url, sha256 = sha256.ToUpperInvariant(), notes }));
-            _log.Ok(up ? "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆà¸­à¸±à¸›à¹€à¸”à¸• v" + version + " à¹à¸¥à¹‰à¸§" : "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆà¸­à¸±à¸›à¹€à¸”à¸•à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§");
+            _log.Ok(up ? "เผยแพร่อัปเดต v" + version + " แล้ว" : "เผยแพร่อัปเดตล้มเหลว");
             return J(new { ok = up, msg = up
-                ? "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆ v" + version + " à¹à¸¥à¹‰à¸§ âœ“ â€” à¸¥à¸¹à¸à¸„à¹‰à¸²à¸ˆà¸°à¹€à¸«à¹‡à¸™ banner à¸­à¸±à¸›à¹€à¸”à¸•à¸•à¸­à¸™à¹€à¸›à¸´à¸”à¹à¸­à¸›"
-                : "à¹€à¸œà¸¢à¹à¸žà¸£à¹ˆà¹„à¸¡à¹ˆà¸ªà¸³à¹€à¸£à¹‡à¸ˆ â€” à¸•à¸£à¸§à¸ˆà¸­à¸´à¸™à¹€à¸—à¸­à¸£à¹Œà¹€à¸™à¹‡à¸•/à¸à¸²à¸£à¸•à¸±à¹‰à¸‡à¸„à¹ˆà¸² server" });
+                ? "เผยแพร่ v" + version + " แล้ว ✓ — ลูกค้าจะเห็น banner อัปเดตตอนเปิดแอป"
+                : "เผยแพร่ไม่สำเร็จ — ตรวจอินเทอร์เน็ต/การตั้งค่า server" });
         }
 
-        // ---------- ARES ONE-CLICK (à¸£à¸§à¸¡à¸ˆà¸²à¸à¹‚à¸›à¸£à¹€à¸ˆà¸à¸•à¹Œ Ares Store / JX Setting â€” optimizer.ps1 ~50 à¸‚à¸±à¹‰à¸™à¹à¸šà¸š MAX) ----------
-        // à¸£à¸±à¸™à¹€à¸›à¹‡à¸™ job à¹€à¸”à¸µà¸¢à¸§ à¹à¸–à¸š % à¸ˆà¸£à¸´à¸‡à¸¡à¸²à¸ˆà¸²à¸ event à¸‚à¸­à¸‡à¸ªà¸„à¸£à¸´à¸›à¸•à¹Œà¹€à¸­à¸‡ (JX|{t:'step',pct,idx,total,msg})
-        // à¸£à¸°à¸«à¸§à¹ˆà¸²à¸‡à¹‚à¸«à¸¥à¸” Windows Update à¸ˆà¸°à¹‚à¸Šà¸§à¹Œ MB/s à¸ªà¸” à¹† à¸ˆà¸šà¹à¸¥à¹‰à¸§à¸ªà¸£à¸¸à¸› à¸ªà¸³à¹€à¸£à¹‡à¸ˆ/à¸¥à¹‰à¸¡à¹€à¸«à¸¥à¸§/à¸‚à¹‰à¸²à¸¡ + à¹à¸™à¸°à¸™à¸³à¸£à¸µà¸ªà¸•à¸²à¸£à¹Œà¸—
+        // ---------- ARES ONE-CLICK (รวมจากโปรเจกต์ Ares Store / JX Setting — optimizer.ps1 ~50 ขั้นแบบ MAX) ----------
+        // รันเป็น job เดียว แถบ % จริงมาจาก event ของสคริปต์เอง (JX|{t:'step',pct,idx,total,msg})
+        // ระหว่างโหลด Windows Update จะโชว์ MB/s สด ๆ จบแล้วสรุป สำเร็จ/ล้มเหลว/ข้าม + แนะนำรีสตาร์ท
     }
 }

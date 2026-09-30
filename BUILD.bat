@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-title KingR9 Tools - Portable Build
+title KingR9 Tools - Version Build
 cd /d "%~dp0"
 
 set "DOTNET=%LOCALAPPDATA%\Programs\dotnet\dotnet.exe"
@@ -12,17 +12,17 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo Publishing portable folder...
+echo Publishing versioned folder...
 "%DOTNET%" publish KingR9Tools.csproj -c Release -r win-x64 --self-contained true ^
   /p:PublishSingleFile=false ^
   /p:IncludeNativeLibrariesForSelfExtract=false ^
   /p:DebugType=None /p:DebugSymbols=false ^
-  -o "%~dp0Release\KingR9"
+  -o "%~dp0Release\KingR9_v1.0.2"
 if errorlevel 1 exit /b 1
 
-powershell -NoProfile -ExecutionPolicy Bypass -Command "Compress-Archive -Path '%~dp0Release\KingR9\*' -DestinationPath '%~dp0Release\KingR9_v1.0.2.zip' -CompressionLevel Optimal -Force"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "Compress-Archive -Path '%~dp0Release\KingR9_v1.0.2\*' -DestinationPath '%~dp0Release\KingR9_v1.0.2.zip' -CompressionLevel Optimal -Force"
 if errorlevel 1 exit /b 1
 
-echo Build complete: %~dp0Release\KingR9
-echo Portable archive: %~dp0Release\KingR9_v1.0.2.zip
+echo Build complete: %~dp0Release\KingR9_v1.0.2
+echo Version archive: %~dp0Release\KingR9_v1.0.2.zip
 
